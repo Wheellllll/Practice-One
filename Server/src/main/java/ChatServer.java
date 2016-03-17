@@ -28,4 +28,5 @@ public class ChatServer {
             System.out.println("Could not start server. " + e.getMessage());
         }
     }
+
 }

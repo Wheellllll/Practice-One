@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 /**
@@ -10,6 +11,8 @@ public class SocketHandler extends Thread {
     private BufferedReader in;
     private PrintWriter out;
 
+    private static ArrayList<Socket> onlineUsers = new ArrayList<Socket>();
+
     public SocketHandler(Socket socket) throws IOException {
         mSocket = socket;
 
@@ -18,6 +21,7 @@ public class SocketHandler extends Thread {
         this.start();
     }
 
+    @Override
     public void run() {
         try {
             while (true) {
@@ -34,5 +38,26 @@ public class SocketHandler extends Thread {
     private void handleMessage(String message) {
         System.out.println(message);
         StringTokenizer st = new StringTokenizer(message);
+
+        String action = st.nextToken();
+        if (action.equals("reg")) {
+
+        } else if (action.equals("login")) {
+
+        } else if (action.equals("sendAll")) {
+
+        }
+    }
+
+    private void reg() {
+
+    }
+
+    private void login() {
+
+    }
+
+    private void sendAll() {
+
     }
 }
