@@ -1,2 +1,4 @@
 .idea/
 out/
+Client/target/
+Server/target/
