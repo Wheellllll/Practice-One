@@ -9,73 +9,87 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
-import java.util.concurrent.Future;
 
 public class NIOClient {
-    public static void main(String[] args) throws Exception {
+    public void runClient() throws Exception {
+        SocketAddress serverAddr = new InetSocketAddress("localhost", 9001);
         AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-        SocketAddress serverAddr = new InetSocketAddress("localhost", 8999);
-        Future<Void> result = channel.connect(serverAddr);
-        result.get();
-        System.out.println("Connected");
-        Attachment attach = new Attachment();
-        attach.channel = channel;
-        attach.buffer = ByteBuffer.allocate(2048);
-        attach.isRead = false;
-        attach.mainThread = Thread.currentThread();
+        channel.connect(serverAddr, channel, new ConnectionHandler());
 
-        Charset cs = Charset.forName("UTF-8");
-        String msg = "Hello";
-        byte[] data = msg.getBytes(cs);
-        attach.buffer.put(data);
-        attach.buffer.flip();
-
-        ReadWriteHandler readWriteHandler = new ReadWriteHandler();
-        channel.write(attach.buffer, attach, readWriteHandler);
-        attach.mainThread.join();
+        Thread.currentThread().join();
     }
-}
-class Attachment {
-    AsynchronousSocketChannel channel;
-    ByteBuffer buffer;
-    Thread mainThread;
-    boolean isRead;
-}
-class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
 
-    public void completed(Integer result, Attachment attach) {
-        if (attach.isRead) {
-            attach.buffer.flip();
-            Charset cs = Charset.forName("UTF-8");
-            int limits = attach.buffer.limit();
-            byte bytes[] = new byte[limits];
-            attach.buffer.get(bytes, 0, limits);
-            String msg = new String(bytes, cs);
-            System.out.format("Server Responded: "+ msg);
+    private void startRead( final AsynchronousSocketChannel sockChannel) {
+        final ByteBuffer buf = ByteBuffer.allocate(2048);
+
+        sockChannel.read( buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>(){
+
+            public void completed(Integer result, AsynchronousSocketChannel channel) {
+                buf.flip();
+
+                int limits = buf.limit();
+                byte bytes[] = new byte[limits];
+                buf.get(bytes);
+                Charset cs = Charset.forName("UTF-8");
+                String msg = new String(bytes, cs);
+
+                System.out.println("Read message:" + msg);
+                buf.rewind();
+
+                try {
+                    String msgToWrite = getTextFromUser();
+                    startWrite(channel, msgToWrite);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                startRead(channel);
+            }
+
+            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
+                System.out.println( "Fail to read message from server");
+            }
+
+        });
+
+    }
+
+    private void startWrite( final AsynchronousSocketChannel sockChannel, final String message) {
+        ByteBuffer buf = ByteBuffer.allocate(2048);
+        buf.put(message.getBytes());
+        buf.flip();
+        sockChannel.write(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
+            public void completed(Integer result, AsynchronousSocketChannel channel ) {
+                //Nothing to do
+            }
+
+            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
+                System.out.println( "Fail to write the message to server");
+            }
+        });
+    }
+
+    class ConnectionHandler implements
+            CompletionHandler<Void, AsynchronousSocketChannel> {
+
+
+        public void completed(Void result, AsynchronousSocketChannel channel) {
+            System.out.println("Connected");
+
+            startRead(channel);
+
             try {
-                msg = this.getTextFromUser();
+                String msgToWrite = getTextFromUser();
+                startWrite(channel, msgToWrite);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (msg.equalsIgnoreCase("bye")) {
-                attach.mainThread.interrupt();
-                return;
-            }
-            attach.buffer.clear();
-            byte[] data = msg.getBytes(cs);
-            attach.buffer.put(data);
-            attach.buffer.flip();
-            attach.isRead = false; // It is a write
-            attach.channel.write(attach.buffer, attach, this);
-        }else {
-            attach.isRead = true;
-            attach.buffer.clear();
-            attach.channel.read(attach.buffer, attach, this);
-        }
-    }
 
-    public void failed(Throwable e, Attachment attach) {
-        e.printStackTrace();
+        }
+
+        public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
+            System.out.println("Fail to connect to server");
+        }
     }
 
     private String getTextFromUser() throws Exception{
@@ -85,4 +99,5 @@ class ReadWriteHandler implements CompletionHandler<Integer, Attachment> {
         String msg = consoleReader.readLine();
         return msg;
     }
+
 }

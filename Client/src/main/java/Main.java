@@ -3,9 +3,13 @@
  */
 public class Main {
 
-    public static ChatClient chatClient = new ChatClient();
+    public static NIOClient client = new NIOClient();
 
     public static void main(String[] args) {
-        chatClient.runClient();
+        try {
+            client.runClient();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
