@@ -9,12 +9,9 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 
 public class NIOServer {
-    /*
-     * TODO: 管理socket连接池
-     */
-
     public void runServer() throws Exception {
         String host = "localhost";
         int port = 9001;
@@ -91,8 +88,10 @@ public class NIOServer {
             CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
 
         public void completed(AsynchronousSocketChannel clientSock, AsynchronousServerSocketChannel serverSock) {
+            //处理下一条连接
             serverSock.accept(serverSock, this);
 
+            //接受消息
             startRead(clientSock);
         }
 
