@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.ConnectException;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.util.Scanner;
 
 /**
@@ -19,6 +18,7 @@ public class ChatClient {
         Scanner s = new Scanner(System.in);
 
         connectServer();
+        new ReceivedMessageHandler(in);
 
         while (true) {
             String line = s.nextLine();
@@ -34,7 +34,8 @@ public class ChatClient {
         } catch (ConnectException e) {
             e.printStackTrace();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
+
 }
