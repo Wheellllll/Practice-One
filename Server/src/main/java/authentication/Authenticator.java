@@ -19,9 +19,17 @@ public class Authenticator {
         socketPools = new ArrayList<SocketWithUser>();
     }
 
-    public boolean addSocket() {
+    public boolean addSocket(AsynchronousSocketChannel socketChannel) {
         /*
          * TODO: 添加一个Socket
+         */
+
+        return true;
+    }
+
+    public boolean deleteSocket(AsynchronousSocketChannel socketChannel) {
+        /*
+         * TODO: 删除一个Socket
          */
 
         return true;
@@ -56,6 +64,10 @@ public class Authenticator {
          * TODO: 发送了一条信息，更新状态
          */
 
+    }
+
+    public String canSend() {
+        return "success";
     }
 
 

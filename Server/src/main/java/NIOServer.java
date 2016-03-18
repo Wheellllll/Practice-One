@@ -1,6 +1,8 @@
 /**
  * Created by sweet on 3/17/16.
  */
+import authentication.Authenticator;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -12,6 +14,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 public class NIOServer {
+    private Authenticator mAuthenticator;
+
+    public NIOServer() {
+        mAuthenticator = new Authenticator();
+    }
+
     public void runServer() throws Exception {
         String host = "localhost";
         int port = 9001;
@@ -34,6 +42,7 @@ public class NIOServer {
                 if (result == -1) {
                     try {
                         System.out.format("Stopped listening to the client %s%n", channel.getRemoteAddress());
+                        mAuthenticator.deleteSocket(channel);
                         channel.close();
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -60,7 +69,7 @@ public class NIOServer {
                 startWrite( channel, msg );
 
                 /*
-                 * 继续处理下一条信息
+                 * 处理下一条信息
                  */
                 startRead( channel );
             }
@@ -93,10 +102,12 @@ public class NIOServer {
             CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
 
         public void completed(AsynchronousSocketChannel clientSock, AsynchronousServerSocketChannel serverSock) {
+            mAuthenticator.addSocket(clientSock);
+
             //处理下一条连接
             serverSock.accept(serverSock, this);
 
-            //接受消息
+            //为socket绑定接收
             startRead(clientSock);
         }
 
