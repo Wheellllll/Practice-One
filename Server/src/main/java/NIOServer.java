@@ -41,25 +41,27 @@ public class NIOServer {
                     return;
                 }
 
-                buf.flip();
-
-                int limits = buf.limit();
-                byte bytes[] = new byte[limits];
-                buf.get(bytes);
-                Charset cs = Charset.forName("UTF-8");
-                String msg = new String(bytes, cs);
-
-                try {
-                    System.out.format("Client at  %s  says: %s%n", channel.getRemoteAddress(), msg);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
+                /*
+                 * 读消息
+                 */
+                String msg = StringUtils.bufToString(buf);
                 System.out.println(msg);
-                buf.rewind();
 
-                startWrite( channel, buf );
+//                try {
+//                    System.out.format("Client at  %s  says: %s%n", channel.getRemoteAddress(), msg);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//
 
+                /*
+                 * 写消息
+                 */
+                startWrite( channel, msg );
+
+                /*
+                 * 继续处理下一条信息
+                 */
                 startRead( channel );
             }
 
@@ -70,7 +72,10 @@ public class NIOServer {
         });
     }
 
-    private void startWrite( AsynchronousSocketChannel sockChannel, final ByteBuffer buf) {
+    private void startWrite( AsynchronousSocketChannel sockChannel, final String message) {
+        ByteBuffer buf = ByteBuffer.allocate(2048);
+        buf.put(message.getBytes());
+        buf.flip();
         sockChannel.write(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
 
             public void completed(Integer result, AsynchronousSocketChannel channel) {

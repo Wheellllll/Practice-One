@@ -25,16 +25,8 @@ public class NIOClient {
         sockChannel.read( buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>(){
 
             public void completed(Integer result, AsynchronousSocketChannel channel) {
-                buf.flip();
-
-                int limits = buf.limit();
-                byte bytes[] = new byte[limits];
-                buf.get(bytes);
-                Charset cs = Charset.forName("UTF-8");
-                String msg = new String(bytes, cs);
-
+                String msg = StringUtils.bufToString(buf);
                 System.out.println("Read message:" + msg);
-                buf.rewind();
 
                 try {
                     String msgToWrite = getTextFromUser();
@@ -43,6 +35,9 @@ public class NIOClient {
                     e.printStackTrace();
                 }
 
+                /*
+                 * 继续处理下一条信息
+                 */
                 startRead(channel);
             }
 
