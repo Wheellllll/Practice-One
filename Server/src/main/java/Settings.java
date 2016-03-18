@@ -11,6 +11,6 @@ public class Settings {
      *
      */
     public static enum Status {
-        LOGIN, LOGOUT, NEED_RELOGIN
+        LOGIN, LOGOUT, RELOGIN, IGNORE
     };
 }
