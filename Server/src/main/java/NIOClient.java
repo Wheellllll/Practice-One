@@ -11,10 +11,32 @@ import java.util.StringTokenizer;
 public class NIOClient {
     private static ArrayList<NIOClient> clients = new ArrayList<NIOClient>();
 
-    private AsynchronousSocketChannel mSocketChannel;
+    /*
+     * mSocketChannel 绑定的socket
+     * mUsername 用户名
+     * mPassword 密码
+     * mStatus 当前状态->Settings.Status
+     * mMsgPerSecond最近1秒发送的消息数
+     * mMsgSinceLogin自从登陆起发送的消息数
+     * mLastSendTime上次发送的时间戳
+     *
+     */
+    private AsynchronousSocketChannel mSocketChannel = null;
+    private String mUsername = null;
+    private String mPassword = null;
+    private Settings.Status mStatus = Settings.Status.LOGOUT;
+    private int mMsgPerSecond = 0;
+    private int mMsgSinceLogin = 0;
+    private int mLastSendTime = 0;
+
+    private StringTokenizer mSt;
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
+        /*
+         * 触发OnConnect事件
+         */
+        OnConnect();
 
         //开始接受消息
         readMessage();
@@ -31,8 +53,10 @@ public class NIOClient {
             public void completed(Integer result, AsynchronousSocketChannel socketChannel) {
                 if (result == -1) {
                     try {
-                        System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
-                        mSocketChannel.close();
+                        /*
+                         * 触发OnDisconnect事件
+                         */
+                        OnDisconnect();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -40,8 +64,8 @@ public class NIOClient {
                 }
 
                 String message = StringUtils.bufToString(buf);
-                System.out.println(message);
                 dispatchMessage(message);
+                System.out.println(message);
 
                 /*
                  * 处理下一条信息
@@ -57,14 +81,37 @@ public class NIOClient {
     }
 
     private void dispatchMessage(String message) {
-        StringTokenizer st = new StringTokenizer(message, "|");
-
-
+        /*
+         * TODO: 使用RxJava注册事件和分发事件
+         */
+        mSt = new StringTokenizer(message, "|");
+        String event = mSt.nextToken();
+        if (event.equals("reg")) {
+            /*
+             * 触发OnRegister事件
+             */
+            OnRegister();
+        } else if (event.equals("login")) {
+            /*
+             * 触发OnLogin事件
+             */
+            OnLogin();
+        } else if(event.equals("send")) {
+            /*
+             * 触发OnSend事件
+             */
+            OnSend();
+        } else {
+            /*
+             * 触发OnError事件
+             */
+            OnError();
+        }
     }
 
     private void sendMessage(final String message) {
         /*
-         * 发消息到客户端
+         * 发消息
          */
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
@@ -82,5 +129,60 @@ public class NIOClient {
         });
     }
 
+    /*
+     * 事件定义
+     */
+
+    public void OnConnect() {
+        clients.add(this);
+    }
+
+    public void OnDisconnect() throws IOException {
+        System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
+        clients.remove(this);
+        mSocketChannel.close();
+    }
+
+    public void OnRegister() {
+        /*
+         * TODO:注册
+         * 1.判断是否已经注册
+         * 2.判断密码是否大于6位
+         * 3.加密存储
+         * 4.成功则自动登陆
+         * 5.失败则返回错误信息
+         */
+
+    }
+
+    public void OnLogin() {
+        /*
+         * TODO:登陆
+         * 1.判断用户名和密码
+         * 2.判断是否已经登陆
+         * 3.成功修改状态
+         * 4.失败返回错误信息
+         */
+
+    }
+
+    public void OnSend() {
+        /*
+         * TODO:发送
+         * 1.判断用户状态
+         * 2.发送消息
+         * 3.更新用户状态
+         */
+
+        String message = mSt.nextToken();
+        for (NIOClient client : clients) {
+            if (client != this) client.sendMessage(message);
+        }
+        sendMessage("success");
+    }
+
+    public void OnError() {
+        sendMessage("消息非法！");
+    }
 
 }
