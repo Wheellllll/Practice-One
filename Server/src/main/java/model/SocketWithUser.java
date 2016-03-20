@@ -1,5 +1,7 @@
 package model;
 
+import authentication.Authenticator;
+
 import java.nio.channels.AsynchronousSocketChannel;
 
 /**
@@ -20,7 +22,7 @@ public class SocketWithUser {
     public AsynchronousSocketChannel socketChannel;
     public String username;
     public String password;
-    public int status;
+    public Authenticator.Status status;
     public int msgPerSecond;
     public int msgSinceLogin;
     public int lastSendTime;

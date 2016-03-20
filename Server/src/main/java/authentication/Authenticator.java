@@ -3,6 +3,8 @@ package authentication;
 import model.SocketWithUser;
 
 import java.nio.channels.AsynchronousSocketChannel;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 
 /**
@@ -20,19 +22,23 @@ public class Authenticator {
     }
 
     public boolean addSocket(AsynchronousSocketChannel socketChannel) {
-        /*
-         * TODO: 添加一个Socket
-         */
+        SocketWithUser su = new SocketWithUser();
+        su.socketChannel = socketChannel;
+        su.status = Status.IGNORE;
+        socketPools.add(su);
 
         return true;
     }
 
     public boolean deleteSocket(AsynchronousSocketChannel socketChannel) {
-        /*
-         * TODO: 删除一个Socket
-         */
 
-        return true;
+        for (SocketWithUser su : socketPools) {
+            if (su.socketChannel == socketChannel) {
+                return socketPools.remove(su);
+            }
+        }
+
+        return false;
     }
 
     public boolean addUser() {
@@ -47,28 +53,71 @@ public class Authenticator {
         /*
          * TODO: 在数据库中注册用户,password要使用md5加密
          */
+        String encryptedPass = md5Hash(password);
 
         return true;
     }
 
     public boolean login(AsynchronousSocketChannel channel, String username, String password) {
-        /*
-         * TODO: 为一个socket登陆
-         */
-
-        return true;
+        for (SocketWithUser su : socketPools) {
+            if (su.socketChannel == channel) {
+                su.username = username;
+                su.password = password;
+                su.status = Status.LOGIN;
+                return true;
+            }
+        }
+        return false;
     }
 
     public void updateMsg(String username, int timeStamp) {
-        /*
-         * TODO: 发送了一条信息，更新状态
-         */
-
+        for (SocketWithUser su : socketPools) {
+            if (su.username.equals(username)) {
+                su.lastSendTime = timeStamp;
+                return;
+            }
+        }
     }
 
     public String canSend() {
         return "success";
     }
 
+
+    /*
+    * TODO: 暂时把需要的方法复制到此
+    */
+    /*
+     * socket状态
+     * LOGOUT--已登出
+     * LOGIN--已登陆
+     * RELOGIN--已发送100条消息，需重新登陆
+     * IGNORE--超过5条/秒的限制，忽略
+     *
+     */
+    public static enum Status {
+        LOGIN, LOGOUT, RELOGIN, IGNORE
+    }
+
+    public static String md5Hash(String plainText) {
+        String str = null;
+        try {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            md5.reset();
+            byte[] bytes = md5.digest(plainText.getBytes());
+            StringBuilder stringBuilder = new StringBuilder();
+            for (byte b : bytes) {
+                int bt = b & 0xff;
+                if (bt < 16) {
+                    stringBuilder.append(0);
+                }
+                stringBuilder.append(Integer.toHexString(bt));
+            }
+            str = stringBuilder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return str;
+    }
 
 }

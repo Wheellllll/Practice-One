@@ -12,5 +12,5 @@ public class Settings {
      */
     public static enum Status {
         LOGIN, LOGOUT, RELOGIN, IGNORE
-    };
+    }
 }
