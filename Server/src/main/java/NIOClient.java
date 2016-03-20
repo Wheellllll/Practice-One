@@ -27,7 +27,8 @@ public class NIOClient {
     private Settings.Status mStatus = Settings.Status.LOGOUT;
     private int mMsgPerSecond = 0;
     private int mMsgSinceLogin = 0;
-    private int mLastSendTime = 0;
+    private long mLastSendTime = 0;
+    private boolean recoverFromIgnored = false;
 
     private StringTokenizer mSt;
 
@@ -145,7 +146,6 @@ public class NIOClient {
 
     public void OnRegister() {
         /*
-         * TODO:注册
          * 1.判断是否已经注册
          * 2.判断密码是否大于6位
          * 3.加密存储
@@ -153,17 +153,54 @@ public class NIOClient {
          * 5.失败则返回错误信息
          */
 
+        String username = mSt.nextToken();
+        String password = mSt.nextToken();
+        if (DatabaseUtils.isExisted(username)) {
+            sendMessage("Id already exists.");
+        } else if (password.length() < 6) {
+            sendMessage("The password is too short (at least six).");
+        } else {
+            String encryptedPass = StringUtils.md5Hash(password);
+            boolean b = DatabaseUtils.createAccount(username, encryptedPass);
+            if (b) {
+                mUsername = username;
+                mPassword = encryptedPass;
+                mStatus = Settings.Status.LOGIN;
+                sendMessage("Registration successful.");
+            } else {
+                sendMessage("Registration failed due to an unexpected error.");
+            }
+        }
     }
 
     public void OnLogin() {
         /*
-         * TODO:登陆
          * 1.判断用户名和密码
          * 2.判断是否已经登陆
          * 3.成功修改状态
          * 4.失败返回错误信息
          */
 
+        String username = mSt.nextToken();
+        String encryptedPass = StringUtils.md5Hash(mSt.nextToken());
+        if (DatabaseUtils.isValid(username, encryptedPass)) {
+            for (NIOClient client : clients) {
+                if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
+                    sendMessage("Already login on another terminal.");
+                    return;
+                }
+            }
+            if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
+                sendMessage("Already login.");
+            } else if (mStatus == Settings.Status.LOGOUT) {
+                sendMessage("OK");
+                mStatus = Settings.Status.LOGIN;
+                mUsername = username;
+                mPassword = encryptedPass;
+            }
+        } else {
+            sendMessage("Invalid account.");
+        }
     }
 
     public void OnSend() {
@@ -174,11 +211,47 @@ public class NIOClient {
          * 3.更新用户状态
          */
 
-        String message = mSt.nextToken();
-        for (NIOClient client : clients) {
-            if (client != this) client.sendMessage(message);
+        if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.IGNORE) {
+            /*
+            * TODO:count ignored message
+            */
+            return;
+        } else {
+            /*
+            * TODO:Traffic limit & Count not ignored message
+            */
+//            if (mLastSendTime == 0 || recoverFromIgnored) {
+//                mLastSendTime = System.currentTimeMillis();
+//            }
+            mMsgPerSecond += 1;
+//            if (mMsgPerSecond >= Settings.maxNumberPerSecond) {
+//                if ((System.currentTimeMillis() - mLastSendTime) <= 1000)
+//                    mStatus = Settings.Status.IGNORE;
+//                while ((System.currentTimeMillis() - mLastSendTime) <= 1000) {
+//                    //ignore
+//                }
+//                mStatus = Settings.Status.LOGIN;
+//                recoverFromIgnored = true;
+//            }
+            String message = mSt.nextToken();
+            for (NIOClient client : clients) {
+                if (client != this &&
+                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN))
+                    client.sendMessage(message);
+            }
+            mMsgSinceLogin += 1;
+            if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
+                mStatus = Settings.Status.LOGOUT;
+                mUsername = null;
+                mPassword = null;
+                mMsgPerSecond = 0;
+                mMsgSinceLogin = 0;
+                mLastSendTime = 0;
+                sendMessage("Redo login");
+            }
         }
-        sendMessage("success");
+
+//        sendMessage("success");
     }
 
     public void OnError() {

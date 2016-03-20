@@ -34,12 +34,12 @@ public class Client {
 
             startRead(channel);
 
-                try {
+                /*try {
                     String msgToWrite = getTextFromUser();
                     startWrite(channel, msgToWrite);
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
 
             try {
                 String msgToWrite = getTextFromUser();

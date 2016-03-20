@@ -19,16 +19,16 @@ public class DatabaseUtils {
         return connection;
     }
 
-    public static boolean isValid(String username, String password) {
-        String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
+    public static boolean isExisted(String username) {
+        String sql = "SELECT * FROM account WHERE username = ?";
         PreparedStatement pstmt = null;
         Connection conn = getConnection();
         try {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
-            pstmt.setString(2, password);
             ResultSet resultSet = pstmt.executeQuery();
             if (resultSet.next()) {
+                resultSet.close();
                 return true;
             }
         } catch (SQLException e) {
@@ -52,15 +52,19 @@ public class DatabaseUtils {
         return false;
     }
 
-    public static void insertAccount(String username, String password) {
-        String sql = "INSERT INTO account VALUES (?, ?)";
+    public static boolean isValid(String username, String password) {
+        String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
         PreparedStatement pstmt = null;
         Connection conn = getConnection();
         try {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-            pstmt.execute();
+            ResultSet resultSet = pstmt.executeQuery();
+            if (resultSet.next()) {
+                resultSet.close();
+                return true;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -79,6 +83,38 @@ public class DatabaseUtils {
                 }
             }
         }
+        return false;
+    }
+
+    public static boolean createAccount(String username, String password) {
+        String sql = "INSERT INTO account VALUES (?, ?)";
+        PreparedStatement pstmt = null;
+        Connection conn = getConnection();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, username);
+            pstmt.setString(2, password);
+            pstmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
     }
 
     /*public static void createTable() {

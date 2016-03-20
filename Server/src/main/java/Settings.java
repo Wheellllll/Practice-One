@@ -17,4 +17,8 @@ public class Settings {
     public static enum Status {
         LOGIN, LOGOUT, RELOGIN, IGNORE
     }
+
+    public static int maxNumberPerSecond = 5;
+    public static int maxNumberPerSession = 100;
+
 }
