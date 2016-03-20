@@ -29,11 +29,17 @@ public class Client {
     class ConnectionHandler implements
             CompletionHandler<Void, AsynchronousSocketChannel> {
 
-
         public void completed(Void result, AsynchronousSocketChannel channel) {
             System.out.println("Connected");
 
             startRead(channel);
+
+                try {
+                    String msgToWrite = getTextFromUser();
+                    startWrite(channel, msgToWrite);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             try {
                 String msgToWrite = getTextFromUser();
@@ -58,13 +64,6 @@ public class Client {
                 String msg = StringUtils.bufToString(buf);
                 System.out.println("Read message:" + msg);
 
-                try {
-                    String msgToWrite = getTextFromUser();
-                    startWrite(channel, msgToWrite);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
                 /*
                  * 继续处理下一条信息
                  */
@@ -86,6 +85,13 @@ public class Client {
         sockChannel.write(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
                 //Nothing to do
+
+                try {
+                    String msgToWrite = getTextFromUser();
+                    startWrite(channel, msgToWrite);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {

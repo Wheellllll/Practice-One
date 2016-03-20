@@ -101,6 +101,11 @@ public class NIOClient {
              * 触发OnSend事件
              */
             OnSend();
+        } else {
+            /*
+             * 触发OnError事件
+             */
+            OnError();
         }
     }
 
@@ -129,11 +134,12 @@ public class NIOClient {
      */
 
     public void OnConnect() {
-
+        clients.add(this);
     }
 
     public void OnDisconnect() throws IOException {
         System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
+        clients.remove(this);
         mSocketChannel.close();
     }
 
@@ -168,6 +174,15 @@ public class NIOClient {
          * 3.更新用户状态
          */
 
+        String message = mSt.nextToken();
+        for (NIOClient client : clients) {
+            if (client != this) client.sendMessage(message);
+        }
+        sendMessage("success");
+    }
+
+    public void OnError() {
+        sendMessage("消息非法！");
     }
 
 }
