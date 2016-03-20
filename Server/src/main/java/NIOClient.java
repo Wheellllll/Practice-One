@@ -122,10 +122,23 @@ public class NIOClient {
     }
 
     public void register() {
+        /*
+         * TODO:注册
+         * 判断是否已经注册
+         * 判断密码是否大于6位
+         * 加密存储
+         */
 
     }
 
     public void login() {
+        /*
+         * TODO:登陆
+         * 判断用户名和密码
+         * 判断是否已经登陆
+         * 成功修改状态
+         * 失败返回错误信息
+         */
 
     }
 
