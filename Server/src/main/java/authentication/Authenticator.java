@@ -24,6 +24,7 @@ public class Authenticator {
          * TODO: 添加一个Socket
          */
 
+
         return true;
     }
 
@@ -51,7 +52,7 @@ public class Authenticator {
         return true;
     }
 
-    public boolean login(AsynchronousSocketChannel channel, String username, String password) {
+    public boolean login(AsynchronousSocketChannel socketChannel, String username, String password) {
         /*
          * TODO: 为一个socket登陆
          */
@@ -59,15 +60,8 @@ public class Authenticator {
         return true;
     }
 
-    public void updateMsg(String username, int timeStamp) {
-        /*
-         * TODO: 发送了一条信息，更新状态
-         */
+    public void handleSend(AsynchronousSocketChannel socketChannel) {
 
-    }
-
-    public String canSend() {
-        return "success";
     }
 
 
