@@ -10,6 +10,10 @@ public class Settings {
      * IGNORE--超过5条/秒的限制，忽略
      *
      */
+
+    public static final String HOST = "localhost";
+    public static final int PORT = 9001;
+
     public static enum Status {
         LOGIN, LOGOUT, RELOGIN, IGNORE
     }

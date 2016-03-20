@@ -26,4 +26,11 @@ public class SocketWithUser {
     public int msgPerSecond;
     public int msgSinceLogin;
     public int lastSendTime;
+
+    public void send(String message) {
+        /*
+         * 发送消息
+         */
+
+    }
 }

@@ -27,6 +27,7 @@ public class Authenticator {
         su.status = Status.IGNORE;
         socketPools.add(su);
 
+
         return true;
     }
 
@@ -58,9 +59,19 @@ public class Authenticator {
         return true;
     }
 
-    public boolean login(AsynchronousSocketChannel channel, String username, String password) {
+
+    /*public void updateMsg(String username, int timeStamp) {
         for (SocketWithUser su : socketPools) {
-            if (su.socketChannel == channel) {
+            if (su.username.equals(username)) {
+                su.lastSendTime = timeStamp;
+                return;
+            }
+        }
+    }*/
+
+    public boolean login(AsynchronousSocketChannel socketChannel, String username, String password) {
+        for (SocketWithUser su : socketPools) {
+            if (su.socketChannel == socketChannel) {
                 su.username = username;
                 su.password = password;
                 su.status = Status.LOGIN;
@@ -70,17 +81,8 @@ public class Authenticator {
         return false;
     }
 
-    public void updateMsg(String username, int timeStamp) {
-        for (SocketWithUser su : socketPools) {
-            if (su.username.equals(username)) {
-                su.lastSendTime = timeStamp;
-                return;
-            }
-        }
-    }
+    public void handleSend(AsynchronousSocketChannel socketChannel) {
 
-    public String canSend() {
-        return "success";
     }
 
 
