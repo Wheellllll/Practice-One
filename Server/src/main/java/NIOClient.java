@@ -11,7 +11,25 @@ import java.util.StringTokenizer;
 public class NIOClient {
     private static ArrayList<NIOClient> clients = new ArrayList<NIOClient>();
 
+    /*
+     * mSocketChannel 绑定的socket
+     * mUsername 用户名
+     * mPassword 密码
+     * mStatus 当前状态->Settings.Status
+     * mMsgPerSecond最近1秒发送的消息数
+     * mMsgSinceLogin自从登陆起发送的消息数
+     * mLastSendTime上次发送的时间戳
+     *
+     */
     private AsynchronousSocketChannel mSocketChannel;
+    private String mUsername;
+    private String mPassword;
+    private int mStatus;
+    private int mMsgPerSecond;
+    private int mMsgSinceLogin;
+    private int mLastSendTime;
+
+    private StringTokenizer mSt;
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
@@ -33,6 +51,9 @@ public class NIOClient {
                     try {
                         System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
                         mSocketChannel.close();
+                        /*
+                         * 触发OnDisconnect事件
+                         */
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -40,8 +61,8 @@ public class NIOClient {
                 }
 
                 String message = StringUtils.bufToString(buf);
-                System.out.println(message);
                 dispatchMessage(message);
+                System.out.println(message);
 
                 /*
                  * 处理下一条信息
@@ -57,14 +78,32 @@ public class NIOClient {
     }
 
     private void dispatchMessage(String message) {
-        StringTokenizer st = new StringTokenizer(message, "|");
-
-
+        /*
+         * TODO: 使用RxJava注册事件和分发事件
+         */
+        mSt = new StringTokenizer(message, "|");
+        String event = mSt.nextToken();
+        if (event.equals("reg")) {
+            /*
+             * 触发OnRegister事件
+             */
+            register();
+        } else if (event.equals("login")) {
+            /*
+             * 触发OnLogin事件
+             */
+            login();
+        } else if(event.equals("send")) {
+            /*
+             * 触发OnSend事件
+             */
+            send();
+        }
     }
 
     private void sendMessage(final String message) {
         /*
-         * 发消息到客户端
+         * 发消息
          */
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
@@ -82,5 +121,16 @@ public class NIOClient {
         });
     }
 
+    public void register() {
+
+    }
+
+    public void login() {
+
+    }
+
+    public void send() {
+
+    }
 
 }
