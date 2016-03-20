@@ -21,18 +21,22 @@ public class NIOClient {
      * mLastSendTime上次发送的时间戳
      *
      */
-    private AsynchronousSocketChannel mSocketChannel;
-    private String mUsername;
-    private String mPassword;
-    private int mStatus;
-    private int mMsgPerSecond;
-    private int mMsgSinceLogin;
-    private int mLastSendTime;
+    private AsynchronousSocketChannel mSocketChannel = null;
+    private String mUsername = null;
+    private String mPassword = null;
+    private Settings.Status mStatus = Settings.Status.LOGOUT;
+    private int mMsgPerSecond = 0;
+    private int mMsgSinceLogin = 0;
+    private int mLastSendTime = 0;
 
     private StringTokenizer mSt;
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
+        /*
+         * 触发OnConnect事件
+         */
+        OnConnect();
 
         //开始接受消息
         readMessage();
@@ -49,11 +53,10 @@ public class NIOClient {
             public void completed(Integer result, AsynchronousSocketChannel socketChannel) {
                 if (result == -1) {
                     try {
-                        System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
-                        mSocketChannel.close();
                         /*
                          * 触发OnDisconnect事件
                          */
+                        OnDisconnect();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -87,17 +90,17 @@ public class NIOClient {
             /*
              * 触发OnRegister事件
              */
-            register();
+            OnRegister();
         } else if (event.equals("login")) {
             /*
              * 触发OnLogin事件
              */
-            login();
+            OnLogin();
         } else if(event.equals("send")) {
             /*
              * 触发OnSend事件
              */
-            send();
+            OnSend();
         }
     }
 
@@ -121,28 +124,49 @@ public class NIOClient {
         });
     }
 
-    public void register() {
+    /*
+     * 事件定义
+     */
+
+    public void OnConnect() {
+
+    }
+
+    public void OnDisconnect() throws IOException {
+        System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
+        mSocketChannel.close();
+    }
+
+    public void OnRegister() {
         /*
          * TODO:注册
-         * 判断是否已经注册
-         * 判断密码是否大于6位
-         * 加密存储
+         * 1.判断是否已经注册
+         * 2.判断密码是否大于6位
+         * 3.加密存储
+         * 4.成功则自动登陆
+         * 5.失败则返回错误信息
          */
 
     }
 
-    public void login() {
+    public void OnLogin() {
         /*
          * TODO:登陆
-         * 判断用户名和密码
-         * 判断是否已经登陆
-         * 成功修改状态
-         * 失败返回错误信息
+         * 1.判断用户名和密码
+         * 2.判断是否已经登陆
+         * 3.成功修改状态
+         * 4.失败返回错误信息
          */
 
     }
 
-    public void send() {
+    public void OnSend() {
+        /*
+         * TODO:发送
+         * 1.判断用户状态
+         * 2.发送消息
+         * 3.更新用户状态
+         */
 
     }
 
