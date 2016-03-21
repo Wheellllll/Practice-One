@@ -34,7 +34,6 @@ public class NIOClient {
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
-        EventManager.getDefault().init();
         /*
          * 触发OnConnect事件
          */
