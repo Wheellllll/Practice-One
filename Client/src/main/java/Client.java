@@ -1,4 +1,3 @@
-import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -112,7 +111,7 @@ public class Client {
 
     public static void main(String[] args) {
 //        new Client();
-        new LoginForm();
+        new LoginAndRegisterForm();
 
         try {
             Thread.currentThread().join();
