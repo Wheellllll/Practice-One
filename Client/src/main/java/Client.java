@@ -1,3 +1,5 @@
+import ui.ChatRoomForm;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -110,8 +112,10 @@ public class Client {
     }
 
     public static void main(String[] args) {
-//        new Client();
-        new LoginAndRegisterForm();
+        new Client();
+
+//        new LoginAndRegisterForm();
+//        new ChatRoomForm();
 
         try {
             Thread.currentThread().join();
