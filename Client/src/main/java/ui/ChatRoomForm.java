@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 /**
  * Created by sweet on 3/21/16.
@@ -39,12 +40,25 @@ public class ChatRoomForm {
         frame.add(container);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //添加事件
-        sendBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
+    }
 
-            }
-        });
+    public void close() {
+        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    }
 
+    public String getSendMessage() {
+        return chatArea.getText();
+    }
+
+    public void addMessage(String from, String message) {
+        messageArea.append(from + ":" + message + "\n");
+    }
+
+    public void clearChatArea() {
+        chatArea.setText("");
+    }
+
+    public void setOnSendListener(ActionListener listener) {
+        sendBtn.addActionListener(listener);
     }
 }

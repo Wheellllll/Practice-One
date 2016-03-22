@@ -1,5 +1,8 @@
 import ui.ChatRoomForm;
+import ui.LoginAndRegisterForm;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -8,48 +11,73 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.StringTokenizer;
 
 /**
  * Created by sweet on 3/16/16.
  */
 public class Client {
 
+    private LoginAndRegisterForm mLoginAndRegisterForm = null;
+    private ChatRoomForm mChatRoomForm = null;
+    private AsynchronousSocketChannel mSocketChannel = null;
+
+    private StringTokenizer mSt;
+
     public Client() {
         try {
+            initWelcomeUI();
             SocketAddress serverAddress = new InetSocketAddress("localhost", 9001);
-            AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-            channel.connect(serverAddress, channel, new ConnectionHandler());
+            AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
+            socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
             Thread.currentThread().join();
         } catch (IOException e) {
             System.out.format("Fail to connect to server: %s", e.getMessage());
         } catch (InterruptedException e) {
             System.out.format("Stop to connect to server");
         }
+    }
 
+    private void initWelcomeUI() {
+        //开启登陆界面
+        mLoginAndRegisterForm = new LoginAndRegisterForm();
+        mLoginAndRegisterForm.setOnLoginListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                String username = mLoginAndRegisterForm.getUsername();
+                String password = mLoginAndRegisterForm.getPassword();
+                sendMessage(String.format("login|%s|%s", username, password));
+            }
+        });
+        mLoginAndRegisterForm.setOnRegisterListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                String username = mLoginAndRegisterForm.getUsername();
+                String password = mLoginAndRegisterForm.getPassword();
+                sendMessage(String.format("reg|%s|%s", username, password));
+            }
+        });
+    }
+
+    private void initChatRoomUI() {
+        //开启聊天室界面
+        mChatRoomForm = new ChatRoomForm();
+        mChatRoomForm.setOnSendListener(new ActionListener() {
+            public void actionPerformed(ActionEvent actionEvent) {
+                String msgToSend = mChatRoomForm.getSendMessage();
+                sendMessage(String.format("send|%s", msgToSend));
+                mChatRoomForm.clearChatArea();
+            }
+        });
     }
 
     class ConnectionHandler implements
             CompletionHandler<Void, AsynchronousSocketChannel> {
 
-        public void completed(Void result, AsynchronousSocketChannel channel) {
+        public void completed(Void result, AsynchronousSocketChannel socketChannel) {
+            mSocketChannel = socketChannel;
             System.out.println("Connected");
 
-            startRead(channel);
-
-                /*try {
-                    String msgToWrite = getTextFromUser();
-                    startWrite(channel, msgToWrite);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
-
-            try {
-                String msgToWrite = getTextFromUser();
-                startWrite(channel, msgToWrite);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+            //开始读消息
+            readMessage();
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
@@ -57,19 +85,18 @@ public class Client {
         }
     }
 
-        private void startRead( final AsynchronousSocketChannel sockChannel) {
+    private void readMessage() {
         final ByteBuffer buf = ByteBuffer.allocate(2048);
-
-        sockChannel.read( buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>(){
+        mSocketChannel.read(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>(){
 
             public void completed(Integer result, AsynchronousSocketChannel channel) {
-                String msg = StringUtils.bufToString(buf);
-                System.out.println("Read message:" + msg);
+                String message = StringUtils.bufToString(buf);
+                System.out.println("Read message:" + message);
 
-                /*
-                 * 继续处理下一条信息
-                 */
-                startRead(channel);
+                dispatchMessage(message);
+
+                //继续处理下一条消息
+                readMessage();
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -77,23 +104,15 @@ public class Client {
             }
 
         });
-
     }
 
-    private void startWrite( final AsynchronousSocketChannel sockChannel, final String message) {
+    private void sendMessage(final String message) {
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
         buf.flip();
-        sockChannel.write(buf, sockChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
+        mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
                 //Nothing to do
-
-                try {
-                    String msgToWrite = getTextFromUser();
-                    startWrite(channel, msgToWrite);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -113,14 +132,52 @@ public class Client {
 
     public static void main(String[] args) {
         new Client();
+    }
 
-//        new LoginAndRegisterForm();
-//        new ChatRoomForm();
-
-        try {
-            Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    private void dispatchMessage(String message) {
+        mSt = new StringTokenizer(message, "|");
+        String event = mSt.nextToken();
+        if (event.equals("login")) {
+            OnLogin();
+        } else if (event.equals("reg")) {
+            OnRegister();
+        } else if (event.equals("send")) {
+            OnSend();
+        } else {
+            OnError();
         }
+    }
+
+    /*
+     * 事件定义
+     */
+    private void OnLogin() {
+        String result = mSt.nextToken();
+        if (result.equals("success")) {
+            mLoginAndRegisterForm.close();
+            initChatRoomUI();
+        } else {
+            //登陆失败，更新错误信息
+        }
+    }
+
+    private void OnRegister() {
+        String result = mSt.nextToken();
+        if (result.equals("success")) {
+            mLoginAndRegisterForm.close();
+            initChatRoomUI();
+        } else {
+            //注册失败，更新错误信息
+        }
+    }
+
+    private void OnSend() {
+        String from = mSt.nextToken();
+        String message = mSt.nextToken();
+        mChatRoomForm.addMessage(from, message);
+    }
+
+    private void OnError() {
+
     }
 }

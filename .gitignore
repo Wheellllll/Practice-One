@@ -1,6 +1,7 @@
 out/
 Client/target/
 Server/target/
+*.db
 
 # User-specific stuff:
 .idea/workspace.xml

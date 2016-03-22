@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 /**
  * Created by sweet on 3/21/16.
@@ -52,17 +53,25 @@ public class LoginAndRegisterForm {
         buttonPanel.add(registerBtn);
         c.add(buttonPanel,"South");
 
-        //添加事件
-        loginBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
+    }
 
-            }
-        });
+    public void close() {
+        frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
+    }
 
-        registerBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent actionEvent) {
+    public String getUsername() {
+        return username.getText();
+    }
 
-            }
-        });
+    public String getPassword() {
+        return new String(password.getPassword());
+    }
+
+    public void setOnLoginListener(ActionListener listener) {
+        loginBtn.addActionListener(listener);
+    }
+
+    public void setOnRegisterListener(ActionListener listener) {
+        registerBtn.addActionListener(listener);
     }
 }

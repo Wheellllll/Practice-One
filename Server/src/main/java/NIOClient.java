@@ -134,17 +134,17 @@ public class NIOClient {
      * 事件定义
      */
 
-    public void OnConnect() {
+    private void OnConnect() {
         clients.add(this);
     }
 
-    public void OnDisconnect() throws IOException {
+    private void OnDisconnect() throws IOException {
         System.out.format("Stopped listening to the client %s%n", mSocketChannel.getRemoteAddress());
         clients.remove(this);
         mSocketChannel.close();
     }
 
-    public void OnRegister() {
+    private void OnRegister() {
         /*
          * 1.判断是否已经注册
          * 2.判断密码是否大于6位
@@ -166,14 +166,14 @@ public class NIOClient {
                 mUsername = username;
                 mPassword = encryptedPass;
                 mStatus = Settings.Status.LOGIN;
-                sendMessage("Registration successful.");
+                sendMessage("reg|success");
             } else {
                 sendMessage("Registration failed due to an unexpected error.");
             }
         }
     }
 
-    public void OnLogin() {
+    private void OnLogin() {
         /*
          * 1.判断用户名和密码
          * 2.判断是否已经登陆
@@ -193,7 +193,7 @@ public class NIOClient {
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
                 sendMessage("Already login.");
             } else if (mStatus == Settings.Status.LOGOUT) {
-                sendMessage("OK");
+                sendMessage("login|success");
                 mStatus = Settings.Status.LOGIN;
                 mUsername = username;
                 mPassword = encryptedPass;
@@ -203,7 +203,7 @@ public class NIOClient {
         }
     }
 
-    public void OnSend() {
+    private void OnSend() {
         /*
          * TODO:发送
          * 1.判断用户状态
@@ -237,7 +237,7 @@ public class NIOClient {
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN))
-                    client.sendMessage(message);
+                    client.sendMessage(String.format("send|%s|%s", this.mUsername, message));
             }
             mMsgSinceLogin += 1;
             if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
@@ -254,7 +254,7 @@ public class NIOClient {
 //        sendMessage("success");
     }
 
-    public void OnError() {
+    private void OnError() {
         sendMessage("消息非法！");
     }
 
