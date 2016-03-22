@@ -234,11 +234,11 @@ public class Client {
         if (meg.get("event").equals("login")) {
             OnLogin(meg);
         } else if (meg.get("event").equals("reg")) {
-            OnRegister();
+            OnRegister(meg);
         } else if (meg.get("event").equals("send")) {
             OnSend();
         } else if (meg.get("even").equals("forward")) {
-            OnForward();
+            OnForward(meg);
         } else {
             OnError();
         }
@@ -248,8 +248,8 @@ public class Client {
      * 事件定义
      */
     private void OnLogin(HashMap<String,String> meg) {
-        String result =
-        if (result.equals("success")) {
+
+        if (meg.get("result").equals("success")) {
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
@@ -257,9 +257,9 @@ public class Client {
         }
     }
 
-    private void OnRegister() {
-        String result = mSt.nextToken();
-        if (result.equals("success")) {
+    private void OnRegister(HashMap<String,String> meg) {
+
+        if (meg.get("result").equals("success")) {
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
@@ -273,9 +273,9 @@ public class Client {
     }
 
     //从其他客户端来的消息
-    private void OnForward() {
-        String from = mSt.nextToken();
-        String message = mSt.nextToken();
+    private void OnForward(HashMap<String,String> meg) {
+        String from = meg.get("from");
+        String message = meg.get("message");
 
         mChatRoomForm.addMessage(from, message);
     }
