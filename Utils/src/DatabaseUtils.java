@@ -10,11 +10,23 @@ public class DatabaseUtils {
 
     private static Connection getConnection() {
         Connection connection = null;
+        Statement statement = null;
         try {
             Class.forName(JDBC_DRIVER);
             connection = DriverManager.getConnection(DB_URL);
+            statement = connection.createStatement();
+            String create_sql = "CREATE TABLE IF NOT EXISTS account (username VARCHAR , password VARCHAR )";
+            statement.executeUpdate(create_sql);
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return connection;
     }

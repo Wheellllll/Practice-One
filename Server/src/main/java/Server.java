@@ -17,12 +17,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class Server {
 
-//    private int validLogin = 0;
-//    private int invalidLogin = 0;
-//    private int receiveMsgNum = 0;
-//    private int ignoreMsgNum = 0;
-//    private int forwardMsgNum = 0;
-
     private ScheduledExecutorService sc = null;
 
     public Server() {
