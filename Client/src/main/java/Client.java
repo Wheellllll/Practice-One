@@ -233,7 +233,10 @@ public class Client {
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
-            //登陆失败，更新错误信息
+            /*
+             * TODO:登陆失败，更新UI
+             * 等改完JSON再写
+             */
         }
     }
 
@@ -243,11 +246,14 @@ public class Client {
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
-            //注册失败，更新错误信息
+            /*
+             * TODO:注册失败，更新UI
+             * 等改完JSON再写
+             */
         }
     }
 
-    //消息发送成功
+    //消息发送结果
     private void OnSend() {
 
     }

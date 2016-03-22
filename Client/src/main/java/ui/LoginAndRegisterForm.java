@@ -16,6 +16,7 @@ public class LoginAndRegisterForm {
     private JPasswordField password = new JPasswordField();
     private JButton loginBtn = new JButton("登陆");
     private JButton registerBtn = new JButton("注册");
+    private JLabel errorLabel = new JLabel("错误");
     public LoginAndRegisterForm(){
         frame.setSize(300,200);
         c.setLayout(new BorderLayout());
@@ -31,6 +32,10 @@ public class LoginAndRegisterForm {
         titlePanel.add(new JLabel("Naive客户端"));
         c.add(titlePanel,"North");
 
+        JPanel formPanel = new JPanel();
+        formPanel.setLayout(new BorderLayout());
+        c.add(formPanel, "Center");
+
         //中部表单
         JPanel fieldPanel = new JPanel();
         fieldPanel.setLayout(null);
@@ -44,9 +49,15 @@ public class LoginAndRegisterForm {
         password.setBounds(110,60,120,20);
         fieldPanel.add(username);
         fieldPanel.add(password);
-        c.add(fieldPanel,"Center");
+        formPanel.add(fieldPanel, "Center");
 
         //中下部错误信息
+        JPanel errorPanel = new JPanel();
+        errorPanel.setLayout(new FlowLayout());
+        errorLabel.setForeground(Color.RED);
+        errorLabel.setVisible(false);
+        errorPanel.add(errorLabel);
+        formPanel.add(errorPanel, "South");
 
         //底部按钮
         JPanel buttonPanel = new JPanel();
@@ -67,6 +78,11 @@ public class LoginAndRegisterForm {
 
     public String getPassword() {
         return new String(password.getPassword());
+    }
+
+    public void setError(String error) {
+        errorLabel.setVisible(true);
+        errorLabel.setText(error);
     }
 
     public void setOnLoginListener(ActionListener listener) {
