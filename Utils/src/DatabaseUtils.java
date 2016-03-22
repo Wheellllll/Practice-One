@@ -129,7 +129,7 @@ public class DatabaseUtils {
         return true;
     }
 
-    /*public static void createTable() {
+    public static void createTable() {
         Connection connection = getConnection();
         try {
             Statement statement = connection.createStatement();
@@ -139,6 +139,6 @@ public class DatabaseUtils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }*/
+    }
 
 }
