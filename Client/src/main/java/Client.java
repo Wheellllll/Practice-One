@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSON;
 import ui.ChatRoomForm;
 import ui.LoginAndRegisterForm;
 
@@ -11,10 +12,13 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by sweet on 3/16/16.
@@ -25,7 +29,6 @@ public class Client {
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
 
-    private StringTokenizer mSt = null;
 
     private ScheduledExecutorService sc = null;
     private int loginSuccessNum = 0;
@@ -58,14 +61,26 @@ public class Client {
             public void actionPerformed(ActionEvent actionEvent) {
                 String username = mLoginAndRegisterForm.getUsername();
                 String password = mLoginAndRegisterForm.getPassword();
-                sendMessage(String.format("login|%s|%s", username, password));
+
+                HashMap<String,String> meg = new HashMap<String,String>();
+                meg.put("event","login");
+                meg.put("username",username);
+                meg.put("password",password);
+                String jsonStringMeg = JSON.toJSONString(meg);
+                sendMessage(jsonStringMeg);
             }
         });
         mLoginAndRegisterForm.setOnRegisterListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String username = mLoginAndRegisterForm.getUsername();
                 String password = mLoginAndRegisterForm.getPassword();
-                sendMessage(String.format("reg|%s|%s", username, password));
+                HashMap<String,String> meg = new HashMap<String, String>();
+                meg.put("event","reg");
+                meg.put("username",username);
+                meg.put("password",password);
+                String jsonStringMeg = JSON.toJSONString(meg);
+
+                sendMessage(jsonStringMeg);
             }
         });
     }
@@ -76,7 +91,11 @@ public class Client {
         mChatRoomForm.setOnSendListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String msgToSend = mChatRoomForm.getSendMessage();
-                sendMessage(String.format("send|%s", msgToSend));
+                HashMap<String,String> meg = new HashMap<String, String>();
+                meg.put("event","send");
+                meg.put("message",msgToSend);
+                String jsonStringMeg = JSON.toJSONString(meg);
+                sendMessage(jsonStringMeg);
                 mChatRoomForm.clearChatArea();
             }
         });
@@ -158,6 +177,7 @@ public class Client {
     }
 
     private void sendMessage(final String message) {
+        //String jsonString = JSON.toJSONString(message);
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
         buf.flip();
@@ -186,12 +206,12 @@ public class Client {
 //>>>>>>> a0a07e3191c1ba1fad2ac15d799a52d76ef47233
             }
 
-            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                mSt = new StringTokenizer(message, "|");
-                if (mSt.nextToken().equals("login"))
-                    loginFailNum ++;
-                System.out.println( "Fail to write the message to server");
-            }
+          //  public void failed(Throwable exc, AsynchronousSocketChannel channel) {
+          //      mSt = new StringTokenizer(message, "|");
+          //      if (mSt.nextToken().equals("login"))
+          //          loginFailNum ++;
+          //      System.out.println( "Fail to write the message to server");
+          //  }
         });
     }
 
@@ -209,15 +229,15 @@ public class Client {
     }
 
     private void dispatchMessage(String message) {
-        mSt = new StringTokenizer(message, "|");
-        String event = mSt.nextToken();
-        if (event.equals("login")) {
-            OnLogin();
-        } else if (event.equals("reg")) {
+        HashMap<String,String> meg = JSON.parseObject(message, HashMap.class);
+
+        if (meg.get("event").equals("login")) {
+            OnLogin(meg);
+        } else if (meg.get("event").equals("reg")) {
             OnRegister();
-        } else if (event.equals("send")) {
+        } else if (meg.get("event").equals("send")) {
             OnSend();
-        } else if (event.equals("forward")) {
+        } else if (meg.get("even").equals("forward")) {
             OnForward();
         } else {
             OnError();
@@ -227,8 +247,8 @@ public class Client {
     /*
      * 事件定义
      */
-    private void OnLogin() {
-        String result = mSt.nextToken();
+    private void OnLogin(HashMap<String,String> meg) {
+        String result =
         if (result.equals("success")) {
             mLoginAndRegisterForm.close();
             initChatRoomUI();

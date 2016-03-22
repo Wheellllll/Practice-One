@@ -45,6 +45,7 @@ public class Server {
 
     public static void main(String[] args) {
         new Server();
+     //   DatabaseUtils.createTable();
     }
 
     class ConnectionHandler implements

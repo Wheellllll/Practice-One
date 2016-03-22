@@ -1,8 +1,13 @@
+import com.alibaba.fastjson.JSON;
+
+import javax.swing.plaf.basic.BasicScrollPaneUI;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -59,7 +64,7 @@ public class NIOClient {
         return clients;
     }
 
-    private StringTokenizer mSt;
+
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
@@ -114,23 +119,24 @@ public class NIOClient {
         /*
          * TODO: 使用RxJava注册事件和分发事件
          */
-        mSt = new StringTokenizer(message, "|");
-        String event = mSt.nextToken();
-        if (event.equals("reg")) {
+
+        HashMap<String,String> meg = JSON.parseObject(message, HashMap.class);
+
+        if (meg.get("event").equals("reg")) {
             /*
              * 触发OnRegister事件
              */
-            OnRegister();
-        } else if (event.equals("login")) {
+            OnRegister(meg);
+        } else if (meg.get("event").equals("login")) {
             /*
              * 触发OnLogin事件
              */
-            OnLogin();
-        } else if(event.equals("send")) {
+            OnLogin(meg);
+        } else if(meg.get("event").equals("send")) {
             /*
              * 触发OnSend事件
              */
-            OnSend();
+            OnSend(meg);
         } else {
             /*
              * 触发OnError事件
@@ -143,8 +149,9 @@ public class NIOClient {
         /*
          * 发消息
          */
+        String jsonString = JSON.toJSONString(message);
         ByteBuffer buf = ByteBuffer.allocate(2048);
-        buf.put(message.getBytes());
+        buf.put(jsonString.getBytes());
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
 
@@ -173,7 +180,7 @@ public class NIOClient {
         mSocketChannel.close();
     }
 
-    private void OnRegister() {
+    private void OnRegister(Map<String,String> meg) {
         /*
          * 1.判断是否已经注册
          * 2.判断密码是否大于6位
@@ -182,8 +189,8 @@ public class NIOClient {
          * 5.失败则返回错误信息
          */
 
-        String username = mSt.nextToken();
-        String password = mSt.nextToken();
+        String username = meg.get("username");
+        String password = meg.get("password");
         if (DatabaseUtils.isExisted(username)) {
             sendMessage("fail|Id already exists.");
         } else if (password.length() < 6) {
@@ -202,7 +209,7 @@ public class NIOClient {
         }
     }
 
-    private void OnLogin() {
+    private void OnLogin(Map<String,String> meg) {
         /*
          * 1.判断用户名和密码
          * 2.判断是否已经登陆
@@ -210,33 +217,52 @@ public class NIOClient {
          * 4.失败返回错误信息
          */
 
-        String username = mSt.nextToken();
-        String encryptedPass = StringUtils.md5Hash(mSt.nextToken());
+        String username = meg.get("username");
+        String encryptedPass = StringUtils.md5Hash(meg.get("password"));
         if (DatabaseUtils.isValid(username, encryptedPass)) {
             for (NIOClient client : clients) {
                 if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
                     localInvalidLogin ++;
-                    sendMessage("fail|Already login on another terminal.");
+                    HashMap<String,String> meg = new HashMap<String, String>();
+                    meg.put("event","login");
+                    meg.put("result","fail");
+                    meg.put("message","Already login on another terminal.");
+                    String jsonString = JSON.toJSONString(meg);
+                    sendMessage(jsonString);
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
                 localInvalidLogin ++;
-                sendMessage("fail|Already login.");
+                HashMap<String,String> meg = new HashMap<String, String>();
+                meg.put("event","login");
+                meg.put("result","fail");
+                meg.put("message","Already login");
+                String jsonString = JSON.toJSONString(meg);
+                sendMessage(meg);
             } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
-                sendMessage("login|success");
+                HashMap<String,String> meg = new HashMap<String, String>();
+                meg.put("event","login");
+                meg.put("result","success");
+                String jsonString = JSON.toJSONString(meg);
+                sendMessage(jsonString);
                 mStatus = Settings.Status.LOGIN;
                 mUsername = username;
                 mPassword = encryptedPass;
             }
         } else {
             localInvalidLogin ++;
-            sendMessage("fail|Invalid account.");
+            HashMap<String,String> meg = new HashMap<String, String>();
+            meg.put("event","login");
+            meg.put("result","fail");
+            meg.put("message","Invalid account.");
+            String jsonString = JSON.toJSONString(meg);
+            sendMessage(jsonString);
         }
     }
 
-    private void OnSend() {
+    private void OnSend(Map<String,String> meg) {
         /*
          * 1.判断用户状态
          * 2.发送消息
@@ -269,26 +295,49 @@ public class NIOClient {
                 //mMsgPerSecond = 0;
                 mMsgSinceLogin = 0;
                 //mLastSendTime = 0;
-                sendMessage("Redo login");
+                HashMap<String,String> mSt = new HashMap<String, String>();
+                mSt.put("event","Redo login");
+                String jsonStringMeg = JSON.toJSONString(mSt);
+                sendMessage(jsonStringMeg);
             } else {
-                sendMessage("send|success");
+                HashMap<String,String> mSt = new HashMap<String, String>();
+                mSt.put("event","send");
+                mSt.put("result","success");
+                String jsonStringMeg = JSON.toJSONString(mSt);
+                sendMessage(jsonStringMeg);
             }
-            String message = mSt.nextToken();
+
+            String message = meg.get("message");
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
-                    client.sendMessage(String.format("forward|%s|%s", this.mUsername, message));
+                    HashMap<String,String> mSt = new HashMap<String, String>();
+                    mSt.put("event","forward");
+                    mSt.put("from",this.mUsername);
+                    mSt.put("message", message);
+                    String jsonString = JSON.toJSONString(mSt);
+
+                    client.sendMessage(jsonString);
                     localForwardMsgNum ++;
                 } else {
                     //发给自己的
-                    sendMessage(String.format("forward|你|%s", message));
+                    HashMap<String,String> mSt = new HashMap<String, String>();
+                    mSt.put("event","forward");
+                    mSt.put("from","你");
+                    mSt.put("message",message);
+                    String jsonString = JSON.toJSONString(mSt);
+                    sendMessage(jsonString);
                 }
             }
         }
     }
 
     private void OnError() {
-        sendMessage("消息非法！");
+        HashMap<String,String> mSt = new HashMap<String, String>();
+        mSt.put("event","error");
+        mSt.put("reason","error");
+        String jsonString = JSON.toJSONString(mSt);
+        sendMessage(jsonString);
     }
 
 }
