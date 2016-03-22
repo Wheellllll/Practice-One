@@ -5,21 +5,22 @@
 - reg|{username}|{password}
 
 ##### 服务器
-- success
-- failed|{reason}
+- reg|success
+- reg|{reason}
 
 ####登陆
 ##### 客户端
 - login|{username}|{password}
 
 ##### 服务器
-- success
-- failed|{reason}
+- login|success
+- login|{reason}
 
 #### 发送消息
 ##### 客户端
 - send|{message}
 
 ##### 服务器
-- success
-- failed{reason}
+- send|success               (给自己)
+- forward|{from}|{message}   (从其他客户端来的)
+- send|{reason}              (发送失败，理由)
