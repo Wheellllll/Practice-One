@@ -256,6 +256,7 @@ public class Client {
     private void OnForward() {
         String from = mSt.nextToken();
         String message = mSt.nextToken();
+
         mChatRoomForm.addMessage(from, message);
     }
 
