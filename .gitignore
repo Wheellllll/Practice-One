@@ -2,6 +2,7 @@ out/
 Client/target/
 Server/target/
 *.db
+*.log
 
 # User-specific stuff:
 .idea/workspace.xml

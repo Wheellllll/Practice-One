@@ -28,7 +28,36 @@ public class NIOClient {
     private int mMsgPerSecond = 0;
     private int mMsgSinceLogin = 0;
     private long mLastSendTime = 0;
-    private boolean recoverFromIgnored = false;
+
+    private int localValidLogin = 0;
+    private int localInvalidLogin = 0;
+    private int localReceiveMsgNum = 0;
+    private int localIgnoreMsgNum = 0;
+    private int localForwardMsgNum = 0;
+
+    public int getLocalValidLogin() {
+        return localValidLogin;
+    }
+
+    public int getLocalInvalidLogin() {
+        return localInvalidLogin;
+    }
+
+    public int getLocalReceiveMsgNum() {
+        return localReceiveMsgNum;
+    }
+
+    public int getLocalIgnoreMsgNum() {
+        return localIgnoreMsgNum;
+    }
+
+    public int getLocalForwardMsgNum() {
+        return localForwardMsgNum;
+    }
+
+    public static ArrayList<NIOClient> getClients() {
+        return clients;
+    }
 
     private StringTokenizer mSt;
 
@@ -156,9 +185,9 @@ public class NIOClient {
         String username = mSt.nextToken();
         String password = mSt.nextToken();
         if (DatabaseUtils.isExisted(username)) {
-            sendMessage("Id already exists.");
+            sendMessage("failed|Id already exists.");
         } else if (password.length() < 6) {
-            sendMessage("The password is too short (at least six).");
+            sendMessage("failed|The password is too short (at least six).");
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
             boolean b = DatabaseUtils.createAccount(username, encryptedPass);
@@ -168,7 +197,7 @@ public class NIOClient {
                 mStatus = Settings.Status.LOGIN;
                 sendMessage("reg|success");
             } else {
-                sendMessage("Registration failed due to an unexpected error.");
+                sendMessage("failed|Registration failed due to an unexpected error.");
             }
         }
     }
@@ -186,72 +215,73 @@ public class NIOClient {
         if (DatabaseUtils.isValid(username, encryptedPass)) {
             for (NIOClient client : clients) {
                 if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
-                    sendMessage("Already login on another terminal.");
+                    localInvalidLogin ++;
+                    sendMessage("failed|Already login on another terminal.");
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
-                sendMessage("Already login.");
+                localInvalidLogin ++;
+                sendMessage("failed|Already login.");
             } else if (mStatus == Settings.Status.LOGOUT) {
+                localValidLogin ++;
                 sendMessage("login|success");
                 mStatus = Settings.Status.LOGIN;
                 mUsername = username;
                 mPassword = encryptedPass;
             }
         } else {
-            sendMessage("Invalid account.");
+            localInvalidLogin ++;
+            sendMessage("failed|Invalid account.");
         }
     }
 
     private void OnSend() {
         /*
-         * TODO:发送
          * 1.判断用户状态
          * 2.发送消息
          * 3.更新用户状态
          */
 
-        if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.IGNORE) {
-            /*
-            * TODO:count ignored message
-            */
-            return;
-        } else {
-            /*
-            * TODO:Traffic limit & Count not ignored message
-            */
-//            if (mLastSendTime == 0 || recoverFromIgnored) {
-//                mLastSendTime = System.currentTimeMillis();
-//            }
-            mMsgPerSecond += 1;
-//            if (mMsgPerSecond >= Settings.maxNumberPerSecond) {
-//                if ((System.currentTimeMillis() - mLastSendTime) <= 1000)
-//                    mStatus = Settings.Status.IGNORE;
-//                while ((System.currentTimeMillis() - mLastSendTime) <= 1000) {
-//                    //ignore
-//                }
-//                mStatus = Settings.Status.LOGIN;
-//                recoverFromIgnored = true;
-//            }
-            String message = mSt.nextToken();
-            for (NIOClient client : clients) {
-                if (client != this &&
-                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN))
-                    client.sendMessage(String.format("send|%s|%s", this.mUsername, message));
+        long currentSendTime = System.currentTimeMillis() / 1000;
+        if (mLastSendTime == currentSendTime) {
+            mMsgPerSecond ++;
+            if (mMsgPerSecond >= Settings.maxNumberPerSecond) {
+                mStatus = Settings.Status.IGNORE;
             }
-            mMsgSinceLogin += 1;
+        } else {
+            mMsgPerSecond = 0;
+            if (mStatus == Settings.Status.IGNORE)
+                mStatus = Settings.Status.LOGIN;
+        }
+        mLastSendTime = currentSendTime;
+
+        localReceiveMsgNum ++;
+
+        if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.IGNORE) {
+            localIgnoreMsgNum ++;
+        } else {
+            mMsgSinceLogin ++;
             if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
                 mStatus = Settings.Status.LOGOUT;
                 mUsername = null;
                 mPassword = null;
-                mMsgPerSecond = 0;
+                //mMsgPerSecond = 0;
                 mMsgSinceLogin = 0;
-                mLastSendTime = 0;
+                //mLastSendTime = 0;
                 sendMessage("Redo login");
+            } else {
+                sendMessage("success");
+            }
+            String message = mSt.nextToken();
+            for (NIOClient client : clients) {
+                if (client != this &&
+                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
+                    client.sendMessage("forward|" + message);
+                    localForwardMsgNum ++;
+                }
             }
         }
-
-//        sendMessage("success");
     }
 
     private void OnError() {

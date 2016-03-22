@@ -8,11 +8,22 @@ import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sweet on 3/16/16.
  */
 public class Server {
+
+//    private int validLogin = 0;
+//    private int invalidLogin = 0;
+//    private int receiveMsgNum = 0;
+//    private int ignoreMsgNum = 0;
+//    private int forwardMsgNum = 0;
+
+    private ScheduledExecutorService sc = null;
 
     public Server() {
         try {
@@ -22,6 +33,8 @@ public class Server {
                     .bind(socketAddress);
             System.out.format("Server is listening at %s%n", socketAddress);
             serverSocketChannel.accept(serverSocketChannel, new ConnectionHandler());
+            sc = Executors.newScheduledThreadPool(1);
+            sc.scheduleAtFixedRate(new ServerLogger(NIOClient.getClients()), 0, 5, TimeUnit.SECONDS);
             Thread.currentThread().join();
         } catch (IOException e) {
             System.out.format("Server failed to start: %s", e.getMessage());

@@ -12,6 +12,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.StringTokenizer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by sweet on 3/16/16.
@@ -22,14 +25,16 @@ public class Client {
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
 
-    private StringTokenizer mSt;
+    private StringTokenizer mSt = null;
 
     public Client() {
         try {
             initWelcomeUI();
             SocketAddress serverAddress = new InetSocketAddress("localhost", 9001);
-            AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
-            socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
+            AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
+            channel.connect(serverAddress, channel, new ConnectionHandler());
+            sc = Executors.newScheduledThreadPool(1);
+            sc.scheduleAtFixedRate(new ClientLogger(this), 0, 1, TimeUnit.MINUTES);
             Thread.currentThread().join();
         } catch (IOException e) {
             System.out.format("Fail to connect to server: %s", e.getMessage());
@@ -69,6 +74,31 @@ public class Client {
         });
     }
 
+    private ScheduledExecutorService sc = null;
+    private int loginSuccessNum = 0;
+    private int loginFailNum = 0;
+    private int sendMsgNum = 0;
+    private int receiveMsgNum = 0;
+    private String username = null;
+    private String password = null;
+
+    public int getLoginSuccessNum() {
+        return loginSuccessNum;
+    }
+
+    public int getLoginFailNum() {
+        return loginFailNum;
+    }
+
+    public int getSendMsgNum() {
+        return sendMsgNum;
+    }
+
+    public int getReceiveMsgNum() {
+        return receiveMsgNum;
+    }
+
+
     class ConnectionHandler implements
             CompletionHandler<Void, AsynchronousSocketChannel> {
 
@@ -78,6 +108,14 @@ public class Client {
 
             //开始读消息
             readMessage();
+
+//            try {
+//                String msgToWrite = getTextFromUser();
+//                startWrite(channel, msgToWrite);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
+
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
@@ -95,8 +133,29 @@ public class Client {
 
                 dispatchMessage(message);
 
+//<<<<<<< HEAD
                 //继续处理下一条消息
-                readMessage();
+//                readMessage();
+//=======
+//                mSt = new StringTokenizer(msg, "|");
+//                String event = mSt.nextToken();
+//                if (event.equals("success")) {
+//                    loginSuccessNum ++;
+//                } else if (event.equals("failed")) {
+//                    loginFailNum ++;
+//                } else if (event.equals("forward")) {
+//                    System.out.println("Forwarded message:" + mSt.nextToken());
+//                    receiveMsgNum ++;
+//                    startWrite(sockChannel, "ack|Receive forwarded message.");
+//                } else if (event.equals("Redo login")) {
+//                    startWrite(sockChannel, "login|" + username + "|" + password);
+//                }
+
+                /*
+                 * 继续处理下一条信息
+                 */
+//                startRead(channel);
+//>>>>>>> a0a07e3191c1ba1fad2ac15d799a52d76ef47233
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -112,10 +171,33 @@ public class Client {
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
+//<<<<<<< HEAD
                 //Nothing to do
+//=======
+//                if (! message.equals("")) {
+//                    mSt = new StringTokenizer(message, "|");
+//                    String event = mSt.nextToken();
+//                    if (event.equals("send")) {
+//                        sendMsgNum ++;
+//                    } else if (event.equals("login")) {
+//                        username = mSt.nextToken();
+//                        password = mSt.nextToken();
+//                    }
+//                }
+//
+//                try {
+//                    String msgToWrite = getTextFromUser();
+//                    startWrite(channel, msgToWrite);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//>>>>>>> a0a07e3191c1ba1fad2ac15d799a52d76ef47233
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
+                mSt = new StringTokenizer(message, "|");
+                if (mSt.nextToken().equals("login"))
+                    loginFailNum ++;
                 System.out.println( "Fail to write the message to server");
             }
         });
