@@ -277,7 +277,8 @@ public class NIOClient {
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
-                    client.sendMessage("forward|" + message);
+                    client.sendMessage(String.format("send|%s|%s", this.mUsername, message));
+//                    client.sendMessage("send|" + message);
                     localForwardMsgNum ++;
                 }
             }

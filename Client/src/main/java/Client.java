@@ -27,6 +27,14 @@ public class Client {
 
     private StringTokenizer mSt = null;
 
+    private ScheduledExecutorService sc = null;
+    private int loginSuccessNum = 0;
+    private int loginFailNum = 0;
+    private int sendMsgNum = 0;
+    private int receiveMsgNum = 0;
+    private String username = null;
+    private String password = null;
+
     public Client() {
         try {
             initWelcomeUI();
@@ -74,13 +82,6 @@ public class Client {
         });
     }
 
-    private ScheduledExecutorService sc = null;
-    private int loginSuccessNum = 0;
-    private int loginFailNum = 0;
-    private int sendMsgNum = 0;
-    private int receiveMsgNum = 0;
-    private String username = null;
-    private String password = null;
 
     public int getLoginSuccessNum() {
         return loginSuccessNum;
@@ -98,7 +99,6 @@ public class Client {
         return receiveMsgNum;
     }
 
-
     class ConnectionHandler implements
             CompletionHandler<Void, AsynchronousSocketChannel> {
 
@@ -108,14 +108,6 @@ public class Client {
 
             //开始读消息
             readMessage();
-
-//            try {
-//                String msgToWrite = getTextFromUser();
-//                startWrite(channel, msgToWrite);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
@@ -135,7 +127,7 @@ public class Client {
 
 //<<<<<<< HEAD
                 //继续处理下一条消息
-//                readMessage();
+                readMessage();
 //=======
 //                mSt = new StringTokenizer(msg, "|");
 //                String event = mSt.nextToken();
