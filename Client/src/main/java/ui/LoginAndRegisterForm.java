@@ -46,6 +46,8 @@ public class LoginAndRegisterForm {
         fieldPanel.add(password);
         c.add(fieldPanel,"Center");
 
+        //中下部错误信息
+
         //底部按钮
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
