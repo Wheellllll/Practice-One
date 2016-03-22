@@ -28,7 +28,7 @@ public class Server {
             System.out.format("Server is listening at %s%n", socketAddress);
             serverSocketChannel.accept(serverSocketChannel, new ConnectionHandler());
             sc = Executors.newScheduledThreadPool(1);
-            sc.scheduleAtFixedRate(new ServerLogger(NIOClient.getClients()), 0, 5, TimeUnit.SECONDS);
+            sc.scheduleAtFixedRate(new ServerLogger(NIOClient.getClients()), 0, 1, TimeUnit.MINUTES);
             Thread.currentThread().join();
         } catch (IOException e) {
             System.out.format("Server failed to start: %s", e.getMessage());

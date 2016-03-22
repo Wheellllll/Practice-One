@@ -157,6 +157,8 @@ public class NIOClient {
             }
 
         });
+        System.out.println("写完了！！！");
+
     }
 
     /*
@@ -185,9 +187,9 @@ public class NIOClient {
         String username = mSt.nextToken();
         String password = mSt.nextToken();
         if (DatabaseUtils.isExisted(username)) {
-            sendMessage("fail|Id already exists.");
+            sendMessage("reg|Id already exists.");
         } else if (password.length() < 6) {
-            sendMessage("fail|The password is too short (at least six).");
+            sendMessage("reg|The password is too short (at least six).");
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
             boolean b = DatabaseUtils.createAccount(username, encryptedPass);
@@ -197,7 +199,7 @@ public class NIOClient {
                 mStatus = Settings.Status.LOGIN;
                 sendMessage("reg|success");
             } else {
-                sendMessage("fail|Registration failed due to an unexpected error.");
+                sendMessage("reg|Registration failed due to an unexpected error.");
             }
         }
     }
@@ -214,15 +216,16 @@ public class NIOClient {
         String encryptedPass = StringUtils.md5Hash(mSt.nextToken());
         if (DatabaseUtils.isValid(username, encryptedPass)) {
             for (NIOClient client : clients) {
-                if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
+                if (client != this && client.mUsername != null &&
+                        client.mUsername.equals(username) && client.mStatus != Settings.Status.LOGOUT) {
                     localInvalidLogin ++;
-                    sendMessage("fail|Already login on another terminal.");
+                    sendMessage("login|Already login on another terminal.");
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
                 localInvalidLogin ++;
-                sendMessage("fail|Already login.");
+                sendMessage("login|Already login.");
             } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
                 sendMessage("login|success");
@@ -232,7 +235,7 @@ public class NIOClient {
             }
         } else {
             localInvalidLogin ++;
-            sendMessage("fail|Invalid account.");
+            sendMessage("login|Invalid account.");
         }
     }
 
@@ -264,12 +267,12 @@ public class NIOClient {
             mMsgSinceLogin ++;
             if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
                 mStatus = Settings.Status.LOGOUT;
-                mUsername = null;
-                mPassword = null;
+                //mUsername = null;
+                //mPassword = null;
                 //mMsgPerSecond = 0;
                 mMsgSinceLogin = 0;
                 //mLastSendTime = 0;
-                sendMessage("Redo login");
+                sendMessage("send|Redo login");
             } else {
                 sendMessage("send|success");
             }

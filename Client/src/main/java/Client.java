@@ -125,29 +125,9 @@ public class Client {
 
                 dispatchMessage(message);
 
-//<<<<<<< HEAD
                 //继续处理下一条消息
                 readMessage();
-//=======
-//                mSt = new StringTokenizer(msg, "|");
-//                String event = mSt.nextToken();
-//                if (event.equals("success")) {
-//                    loginSuccessNum ++;
-//                } else if (event.equals("failed")) {
-//                    loginFailNum ++;
-//                } else if (event.equals("forward")) {
-//                    System.out.println("Forwarded message:" + mSt.nextToken());
-//                    receiveMsgNum ++;
-//                    startWrite(sockChannel, "ack|Receive forwarded message.");
-//                } else if (event.equals("Redo login")) {
-//                    startWrite(sockChannel, "login|" + username + "|" + password);
-//                }
 
-                /*
-                 * 继续处理下一条信息
-                 */
-//                startRead(channel);
-//>>>>>>> a0a07e3191c1ba1fad2ac15d799a52d76ef47233
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -163,27 +143,16 @@ public class Client {
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
-//<<<<<<< HEAD
-                //Nothing to do
-//=======
-//                if (! message.equals("")) {
-//                    mSt = new StringTokenizer(message, "|");
-//                    String event = mSt.nextToken();
-//                    if (event.equals("send")) {
-//                        sendMsgNum ++;
-//                    } else if (event.equals("login")) {
-//                        username = mSt.nextToken();
-//                        password = mSt.nextToken();
-//                    }
-//                }
-//
-//                try {
-//                    String msgToWrite = getTextFromUser();
-//                    startWrite(channel, msgToWrite);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//>>>>>>> a0a07e3191c1ba1fad2ac15d799a52d76ef47233
+
+                mSt = new StringTokenizer(message, "|");
+                String event = mSt.nextToken();
+                if (event.equals("send")) {
+                    sendMsgNum ++;
+                } else if (event.equals("login") || event.equals("reg")) {
+                    username = mSt.nextToken();
+                    password = mSt.nextToken();
+                }
+
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -230,6 +199,7 @@ public class Client {
     private void OnLogin() {
         String result = mSt.nextToken();
         if (result.equals("success")) {
+            loginSuccessNum ++;
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
@@ -237,6 +207,7 @@ public class Client {
              * TODO:登陆失败，更新UI
              * 等改完JSON再写
              */
+            loginFailNum ++;
         }
     }
 
@@ -255,6 +226,11 @@ public class Client {
 
     //消息发送结果
     private void OnSend() {
+        //TODO:重新登录后需更新UI
+        /*String result = mSt.nextToken();
+        if (result.equals("Redo login")) {
+            sendMessage(String.format("login|%s|%s", username, password));
+        }*/
 
     }
 
@@ -263,7 +239,9 @@ public class Client {
         String from = mSt.nextToken();
         String message = mSt.nextToken();
 
+        receiveMsgNum ++;
         mChatRoomForm.addMessage(from, message);
+        //TODO: acknowledge server
     }
 
     private void OnError() {
