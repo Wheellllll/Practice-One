@@ -42,6 +42,10 @@ public class ChatRoomForm {
 
     }
 
+    public JFrame getFrame() {
+        return frame;
+    }
+
     public void close() {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }

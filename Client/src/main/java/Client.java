@@ -1,4 +1,5 @@
 import ui.ChatRoomForm;
+import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
 
 import java.awt.event.ActionEvent;
@@ -66,6 +67,12 @@ public class Client {
                 String username = mLoginAndRegisterForm.getUsername();
                 String password = mLoginAndRegisterForm.getPassword();
                 sendMessage(String.format("reg|%s|%s", username, password));
+            }
+        });
+        mLoginAndRegisterForm.setOnConfigListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                new ConfigDialog(mLoginAndRegisterForm.getFrame());
             }
         });
     }

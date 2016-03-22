@@ -16,6 +16,7 @@ public class LoginAndRegisterForm {
     private JPasswordField password = new JPasswordField();
     private JButton loginBtn = new JButton("登陆");
     private JButton registerBtn = new JButton("注册");
+    private JButton configBtn = new JButton("设置");
     private JLabel errorLabel = new JLabel("错误");
     public LoginAndRegisterForm(){
         frame.setSize(300,200);
@@ -64,8 +65,13 @@ public class LoginAndRegisterForm {
         buttonPanel.setLayout(new FlowLayout());
         buttonPanel.add(loginBtn);
         buttonPanel.add(registerBtn);
+        buttonPanel.add(configBtn);
         c.add(buttonPanel,"South");
 
+    }
+
+    public JFrame getFrame() {
+        return frame;
     }
 
     public void close() {
@@ -91,5 +97,9 @@ public class LoginAndRegisterForm {
 
     public void setOnRegisterListener(ActionListener listener) {
         registerBtn.addActionListener(listener);
+    }
+
+    public void setOnConfigListener(ActionListener listener) {
+        configBtn.addActionListener(listener);
     }
 }
