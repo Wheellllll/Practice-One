@@ -1,12 +1,11 @@
 import ui.ChatRoomForm;
+import ui.Config;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
@@ -39,14 +38,11 @@ public class Client {
     public Client() {
         try {
             initWelcomeUI();
-            SocketAddress serverAddress = new InetSocketAddress("localhost", 9001);
-            AsynchronousSocketChannel channel = AsynchronousSocketChannel.open();
-            channel.connect(serverAddress, channel, new ConnectionHandler());
+            tryConnect();
+
             sc = Executors.newScheduledThreadPool(1);
             sc.scheduleAtFixedRate(new ClientLogger(this), 0, 1, TimeUnit.MINUTES);
             Thread.currentThread().join();
-        } catch (IOException e) {
-            System.out.format("Fail to connect to server: %s", e.getMessage());
         } catch (InterruptedException e) {
             System.out.format("Stop to connect to server");
         }
@@ -73,6 +69,7 @@ public class Client {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 new ConfigDialog(mLoginAndRegisterForm.getFrame());
+                tryConnect();
             }
         });
     }
@@ -104,6 +101,18 @@ public class Client {
 
     public int getReceiveMsgNum() {
         return receiveMsgNum;
+    }
+
+    private void tryConnect() {
+        try {
+            String host = Config.getConfig().getProperty("host");
+            String port = Config.getConfig().getProperty("port");
+            SocketAddress serverAddress = new InetSocketAddress(host, Integer.parseInt(port));
+            AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
+            socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
+        } catch (IOException e) {
+            System.out.format("Fail to connect to server: %s", e.getMessage());
+        }
     }
 
     class ConnectionHandler implements
@@ -171,14 +180,6 @@ public class Client {
         });
     }
 
-
-    private String getTextFromUser() throws Exception{
-        System.out.print("Please enter a  message  (Bye  to quit):");
-        BufferedReader consoleReader = new BufferedReader(
-                new InputStreamReader(System.in));
-        String msg = consoleReader.readLine();
-        return msg;
-    }
 
     public static void main(String[] args) {
         new Client();
