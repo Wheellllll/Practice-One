@@ -217,6 +217,8 @@ public class Client {
             OnRegister();
         } else if (event.equals("send")) {
             OnSend();
+        } else if (event.equals("forward")) {
+            OnForward();
         } else {
             OnError();
         }
@@ -245,7 +247,13 @@ public class Client {
         }
     }
 
+    //消息发送成功
     private void OnSend() {
+
+    }
+
+    //从其他客户端来的消息
+    private void OnForward() {
         String from = mSt.nextToken();
         String message = mSt.nextToken();
         mChatRoomForm.addMessage(from, message);

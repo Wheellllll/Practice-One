@@ -185,9 +185,9 @@ public class NIOClient {
         String username = mSt.nextToken();
         String password = mSt.nextToken();
         if (DatabaseUtils.isExisted(username)) {
-            sendMessage("failed|Id already exists.");
+            sendMessage("fail|Id already exists.");
         } else if (password.length() < 6) {
-            sendMessage("failed|The password is too short (at least six).");
+            sendMessage("fail|The password is too short (at least six).");
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
             boolean b = DatabaseUtils.createAccount(username, encryptedPass);
@@ -197,7 +197,7 @@ public class NIOClient {
                 mStatus = Settings.Status.LOGIN;
                 sendMessage("reg|success");
             } else {
-                sendMessage("failed|Registration failed due to an unexpected error.");
+                sendMessage("fail|Registration failed due to an unexpected error.");
             }
         }
     }
@@ -216,13 +216,13 @@ public class NIOClient {
             for (NIOClient client : clients) {
                 if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
                     localInvalidLogin ++;
-                    sendMessage("failed|Already login on another terminal.");
+                    sendMessage("fail|Already login on another terminal.");
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
                 localInvalidLogin ++;
-                sendMessage("failed|Already login.");
+                sendMessage("fail|Already login.");
             } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
                 sendMessage("login|success");
@@ -232,7 +232,7 @@ public class NIOClient {
             }
         } else {
             localInvalidLogin ++;
-            sendMessage("failed|Invalid account.");
+            sendMessage("fail|Invalid account.");
         }
     }
 
@@ -271,15 +271,17 @@ public class NIOClient {
                 //mLastSendTime = 0;
                 sendMessage("Redo login");
             } else {
-                sendMessage("success");
+                sendMessage("send|success");
             }
             String message = mSt.nextToken();
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
-                    client.sendMessage(String.format("send|%s|%s", this.mUsername, message));
-//                    client.sendMessage("send|" + message);
+                    client.sendMessage(String.format("forward|%s|%s", this.mUsername, message));
                     localForwardMsgNum ++;
+                } else {
+                    //发给自己的
+                    sendMessage(String.format("forward|你|%s", message));
                 }
             }
         }
