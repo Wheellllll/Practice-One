@@ -3,6 +3,8 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.StringTokenizer;
 
 /**
@@ -21,6 +23,8 @@ public class NIOClient {
      * mLastSendTime上次发送的时间戳
      *
      */
+    private final Queue<String> msgQueue = new LinkedList<String>();
+    private boolean isWriting = false;
     private AsynchronousSocketChannel mSocketChannel = null;
     private String mUsername = null;
     private String mPassword = null;
@@ -139,6 +143,33 @@ public class NIOClient {
         }
     }
 
+    private void addMessageToQueue(final String message) {
+        boolean currentThreadWrite = false;
+        synchronized (msgQueue) {
+            msgQueue.add(message);
+            if (!isWriting) {
+                isWriting = true;
+                currentThreadWrite= true;
+            }
+        }
+        if (currentThreadWrite) {
+            writeMessageFromQueue();
+        }
+    }
+
+    private void writeMessageFromQueue() {
+        String message = null;
+        synchronized (msgQueue) {
+            message = msgQueue.poll();
+            if (message == null) {
+                isWriting = false;
+            }
+        }
+        if (isWriting) {
+            sendMessage(message);
+        }
+    }
+
     private void sendMessage(final String message) {
         /*
          * 发消息
@@ -149,7 +180,7 @@ public class NIOClient {
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
 
             public void completed(Integer result, AsynchronousSocketChannel channel) {
-                //Nothing to do
+                writeMessageFromQueue();
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -157,6 +188,7 @@ public class NIOClient {
             }
 
         });
+
     }
 
     /*
@@ -185,9 +217,9 @@ public class NIOClient {
         String username = mSt.nextToken();
         String password = mSt.nextToken();
         if (DatabaseUtils.isExisted(username)) {
-            sendMessage("fail|Id already exists.");
+            addMessageToQueue("reg|Id already exists.");
         } else if (password.length() < 6) {
-            sendMessage("fail|The password is too short (at least six).");
+            addMessageToQueue("reg|The password is too short (at least six).");
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
             boolean b = DatabaseUtils.createAccount(username, encryptedPass);
@@ -195,9 +227,9 @@ public class NIOClient {
                 mUsername = username;
                 mPassword = encryptedPass;
                 mStatus = Settings.Status.LOGIN;
-                sendMessage("reg|success");
+                addMessageToQueue("reg|success");
             } else {
-                sendMessage("fail|Registration failed due to an unexpected error.");
+                addMessageToQueue("reg|Registration failed due to an unexpected error.");
             }
         }
     }
@@ -214,25 +246,26 @@ public class NIOClient {
         String encryptedPass = StringUtils.md5Hash(mSt.nextToken());
         if (DatabaseUtils.isValid(username, encryptedPass)) {
             for (NIOClient client : clients) {
-                if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
+                if (client != this && client.mUsername != null &&
+                        client.mUsername.equals(username) && client.mStatus != Settings.Status.LOGOUT) {
                     localInvalidLogin ++;
-                    sendMessage("fail|Already login on another terminal.");
+                    addMessageToQueue("login|Already login on another terminal.");
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
                 localInvalidLogin ++;
-                sendMessage("fail|Already login.");
+                addMessageToQueue("login|Already login.");
             } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
-                sendMessage("login|success");
+                addMessageToQueue("login|success");
                 mStatus = Settings.Status.LOGIN;
                 mUsername = username;
                 mPassword = encryptedPass;
             }
         } else {
             localInvalidLogin ++;
-            sendMessage("fail|Invalid account.");
+            addMessageToQueue("login|Invalid account.");
         }
     }
 
@@ -264,31 +297,31 @@ public class NIOClient {
             mMsgSinceLogin ++;
             if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
                 mStatus = Settings.Status.LOGOUT;
-                mUsername = null;
-                mPassword = null;
+                //mUsername = null;
+                //mPassword = null;
                 //mMsgPerSecond = 0;
                 mMsgSinceLogin = 0;
                 //mLastSendTime = 0;
-                sendMessage("Redo login");
+                addMessageToQueue("send|Redo login");
             } else {
-                sendMessage("send|success");
+                addMessageToQueue("send|success");
             }
             String message = mSt.nextToken();
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
-                    client.sendMessage(String.format("forward|%s|%s", this.mUsername, message));
+                    client.addMessageToQueue(String.format("forward|%s|%s", this.mUsername, message));
                     localForwardMsgNum ++;
                 } else {
                     //发给自己的
-                    sendMessage(String.format("forward|你|%s", message));
+                    addMessageToQueue(String.format("forward|你|%s", message));
                 }
             }
         }
     }
 
     private void OnError() {
-        sendMessage("消息非法！");
+        addMessageToQueue("消息非法！");
     }
 
 }
