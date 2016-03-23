@@ -13,7 +13,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -180,7 +179,6 @@ public class Client {
     }
 
     private void sendMessage(final String message) {
-        //String jsonString = JSON.toJSONString(message);
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
         //4表示传输结束
@@ -225,7 +223,7 @@ public class Client {
             OnRegister(msg);
         } else if (msg.get("event").equals("send")) {
             OnSend(msg);
-        } else if (msg.get("even").equals("forward")) {
+        } else if (msg.get("event").equals("forward")) {
             OnForward(msg);
         } else {
             OnError(msg);

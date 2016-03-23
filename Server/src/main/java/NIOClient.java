@@ -356,7 +356,7 @@ public class NIOClient {
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
                     String msgToSend = new MessageBuilder()
                             .add("event","forward")
-                            .add("form",this.mUsername)
+                            .add("from",this.mUsername)
                             .add("message",message)
                             .build();
                     client.sendMessage(msgToSend);
