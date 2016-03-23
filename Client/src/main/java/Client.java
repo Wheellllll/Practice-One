@@ -1,3 +1,4 @@
+import com.alibaba.fastjson.JSON;
 import ui.ChatRoomForm;
 import ui.Config;
 import ui.ConfigDialog;
@@ -11,10 +12,13 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * Created by sweet on 3/16/16.
@@ -56,14 +60,28 @@ public class Client {
             public void actionPerformed(ActionEvent actionEvent) {
                 String username = mLoginAndRegisterForm.getUsername();
                 String password = mLoginAndRegisterForm.getPassword();
-                sendMessage(String.format("login|%s|%s", username, password));
+
+                String msgToSend = new MessageBuilder()
+                        .add("event", "login")
+                        .add("username", username)
+                        .add("password", password)
+                        .build();
+
+                sendMessage(msgToSend);
             }
         });
         mLoginAndRegisterForm.setOnRegisterListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String username = mLoginAndRegisterForm.getUsername();
                 String password = mLoginAndRegisterForm.getPassword();
-                sendMessage(String.format("reg|%s|%s", username, password));
+
+                String msgToSend = new MessageBuilder()
+                        .add("event", "reg")
+                        .add("username", username)
+                        .add("password", password)
+                        .build();
+
+                sendMessage(msgToSend);
             }
         });
         mLoginAndRegisterForm.setOnConfigListener(new ActionListener() {
@@ -81,7 +99,11 @@ public class Client {
         mChatRoomForm.setOnSendListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String msgToSend = mChatRoomForm.getSendMessage();
-                sendMessage(String.format("send|%s", msgToSend));
+                msgToSend = new MessageBuilder()
+                        .add("event", "send")
+                        .add("message", msgToSend)
+                        .build();
+                sendMessage(msgToSend);
                 mChatRoomForm.clearChatArea();
             }
         });
@@ -158,6 +180,7 @@ public class Client {
     }
 
     private void sendMessage(final String message) {
+        //String jsonString = JSON.toJSONString(message);
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
         //4表示传输结束
@@ -166,21 +189,21 @@ public class Client {
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
 
-                mSt = new StringTokenizer(message, "|");
-                String event = mSt.nextToken();
-                if (event.equals("send")) {
-                    sendMsgNum ++;
-                } else if (event.equals("login") || event.equals("reg")) {
-                    username = mSt.nextToken();
-                    password = mSt.nextToken();
-                }
+//                mSt = new StringTokenizer(message, "|");
+//                String event = mSt.nextToken();
+//                if (event.equals("send")) {
+//                    sendMsgNum ++;
+//                } else if (event.equals("login") || event.equals("reg")) {
+//                    username = mSt.nextToken();
+//                    password = mSt.nextToken();
+//                }
 
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-                mSt = new StringTokenizer(message, "|");
-                if (mSt.nextToken().equals("login"))
-                    loginFailNum ++;
+                //mSt = new StringTokenizer(message, "|");
+                //if (mSt.nextToken().equals("login"))
+                  //  loginFailNum ++;
                 System.out.println( "Fail to write the message to server");
             }
         });
@@ -192,27 +215,29 @@ public class Client {
     }
 
     private void dispatchMessage(String message) {
-        mSt = new StringTokenizer(message, "|");
-        String event = mSt.nextToken();
-        if (event.equals("login")) {
-            OnLogin();
-        } else if (event.equals("reg")) {
-            OnRegister();
-        } else if (event.equals("send")) {
-            OnSend();
-        } else if (event.equals("forward")) {
-            OnForward();
+        HashMap<String,String> msg = JSON.parseObject(message, HashMap.class);
+
+        if (msg.get("event").equals("login")) {
+            OnLogin(msg);
+        } else if (msg.get("event").equals("relogin"))  {
+            OnRelogin(msg);
+        } else if (msg.get("event").equals("reg")) {
+            OnRegister(msg);
+        } else if (msg.get("event").equals("send")) {
+            OnSend(msg);
+        } else if (msg.get("even").equals("forward")) {
+            OnForward(msg);
         } else {
-            OnError();
+            OnError(msg);
         }
     }
 
     /*
      * 事件定义
      */
-    private void OnLogin() {
-        String result = mSt.nextToken();
-        if (result.equals("success")) {
+    private void OnLogin(HashMap<String,String> msg) {
+
+        if (msg.get("result").equals("success")) {
             loginSuccessNum ++;
             mLoginAndRegisterForm.close();
             initChatRoomUI();
@@ -225,9 +250,15 @@ public class Client {
         }
     }
 
-    private void OnRegister() {
-        String result = mSt.nextToken();
-        if (result.equals("success")) {
+    private void OnRelogin(HashMap<String, String> msg) {
+        /*
+         * TODO:处理重新登陆的结果
+         */
+    }
+
+    private void OnRegister(HashMap<String,String> msg) {
+
+        if (msg.get("result").equals("success")) {
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
@@ -239,7 +270,7 @@ public class Client {
     }
 
     //消息发送结果
-    private void OnSend() {
+    private void OnSend(HashMap<String, String> msg) {
         //TODO:重新登录后需更新UI
         /*String result = mSt.nextToken();
         if (result.equals("Redo login")) {
@@ -249,16 +280,16 @@ public class Client {
     }
 
     //从其他客户端来的消息
-    private void OnForward() {
-        String from = mSt.nextToken();
-        String message = mSt.nextToken();
+    private void OnForward(HashMap<String,String> msg) {
+        String from = msg.get("from");
+        String message = msg.get("message");
 
         receiveMsgNum ++;
         mChatRoomForm.addMessage(from, message);
         //TODO: 通知服务器
     }
 
-    private void OnError() {
+    private void OnError(HashMap<String, String> msg) {
 
     }
 }
