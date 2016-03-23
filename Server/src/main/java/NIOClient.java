@@ -1,10 +1,13 @@
+import com.alibaba.fastjson.JSON;
+
+import javax.swing.plaf.basic.BasicScrollPaneUI;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -62,7 +65,6 @@ public class NIOClient {
     }
 
     private PackageHandler mPackageHandler = new PackageHandler();
-    private StringTokenizer mSt;
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
         this.mSocketChannel = socketChannel;
@@ -120,23 +122,30 @@ public class NIOClient {
         /*
          * TODO: 使用RxJava注册事件和分发事件
          */
-        mSt = new StringTokenizer(message, "|");
-        String event = mSt.nextToken();
-        if (event.equals("reg")) {
+
+        HashMap<String,String> msg = JSON.parseObject(message, HashMap.class);
+
+        if (msg.get("event").equals("reg")) {
             /*
              * 触发OnRegister事件
              */
-            OnRegister();
-        } else if (event.equals("login")) {
+            OnRegister(msg);
+        } else if (msg.get("event").equals("login")) {
             /*
              * 触发OnLogin事件
              */
-            OnLogin();
-        } else if(event.equals("send")) {
+            OnLogin(msg);
+        } else if (msg.get("event").equals("send")) {
             /*
              * 触发OnSend事件
              */
-            OnSend();
+            OnSend(msg);
+        } else if (msg.get("event").equals("relogin")) {
+            /*
+             * 出发OnRelogin事件
+             */
+            OnRelogin(msg);
+
         } else {
             /*
              * 触发OnError事件
@@ -168,9 +177,7 @@ public class NIOClient {
                 isWriting = false;
                 System.out.println("Fail to write message to client");
             }
-
         });
-
     }
 
     /*
@@ -187,7 +194,7 @@ public class NIOClient {
         mSocketChannel.close();
     }
 
-    private void OnRegister() {
+    private void OnRegister(Map<String,String> msg) {
         /*
          * 1.判断是否已经注册
          * 2.判断密码是否大于6位
@@ -196,12 +203,25 @@ public class NIOClient {
          * 5.失败则返回错误信息
          */
 
-        String username = mSt.nextToken();
-        String password = mSt.nextToken();
+        String username = msg.get("username");
+        String password = msg.get("password");
         if (DatabaseUtils.isExisted(username)) {
-            sendMessage("reg|Id already exists.");
+
+            String msgToSend = new MessageBuilder()
+                    .add("result","fail")
+                    .add("event","reg")
+                    .add("message","Id already exists.")
+                    .build();
+
+            sendMessage(msgToSend);
+
         } else if (password.length() < 6) {
-            sendMessage("reg|The password is too short (at least six).");
+            String msgToSend = new MessageBuilder()
+                    .add("result","fail")
+                    .add("event","reg")
+                    .add("message","The password is too short (at least six).")
+                    .build();
+            sendMessage(msgToSend);
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
             boolean b = DatabaseUtils.createAccount(username, encryptedPass);
@@ -209,14 +229,23 @@ public class NIOClient {
                 mUsername = username;
                 mPassword = encryptedPass;
                 mStatus = Settings.Status.LOGIN;
-                sendMessage("reg|success");
+                String msgToSend = new MessageBuilder()
+                        .add("result","success")
+                        .add("event","reg")
+                        .build();
+                sendMessage(msgToSend);
             } else {
-                sendMessage("reg|Registration failed due to an unexpected error.");
+                String msgToSend = new MessageBuilder()
+                        .add("result","fail")
+                        .add("event","reg")
+                        .add("message","Registration failed due to an unexpected error.")
+                        .build();
+                sendMessage(msgToSend);
             }
         }
     }
 
-    private void OnLogin() {
+    private void OnLogin(Map<String,String> meg) {
         /*
          * 1.判断用户名和密码
          * 2.判断是否已经登陆
@@ -224,34 +253,59 @@ public class NIOClient {
          * 4.失败返回错误信息
          */
 
-        String username = mSt.nextToken();
-        String encryptedPass = StringUtils.md5Hash(mSt.nextToken());
+        String username = meg.get("username");
+        String encryptedPass = StringUtils.md5Hash(meg.get("password"));
         if (DatabaseUtils.isValid(username, encryptedPass)) {
             for (NIOClient client : clients) {
                 if (client != this && client.mUsername != null &&
                         client.mUsername.equals(username) && client.mStatus != Settings.Status.LOGOUT) {
                     localInvalidLogin ++;
-                    sendMessage("login|Already login on another terminal.");
+                    MessageBuilder megBuilder = new MessageBuilder()
+                            .add("event","login")
+                            .add("result","fail")
+                            .add("message","Already login on another terminal.");
+                    String megToSend = megBuilder.build();
+                    sendMessage(megToSend);
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN) {
                 localInvalidLogin ++;
-                sendMessage("login|Already login.");
-            } else if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.RELOGIN) {
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("event","login")
+                        .add("result","fail")
+                        .add("message","Already login");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
+            } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
-                sendMessage("login|success");
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("event","login")
+                        .add("result","success");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
                 mStatus = Settings.Status.LOGIN;
                 mUsername = username;
                 mPassword = encryptedPass;
             }
         } else {
             localInvalidLogin ++;
-            sendMessage("login|Invalid account.");
+            MessageBuilder megBuilder = new MessageBuilder()
+                    .add("event","login")
+                    .add("result","fail")
+                    .add("message","Invalid account.");
+            String megToSend = megBuilder.build();
+            sendMessage(megToSend);
         }
     }
 
-    private void OnSend() {
+    private void OnRelogin(Map<String, String> msg) {
+        /*
+         * TODO:重新登陆
+         */
+    }
+
+    private void OnSend(Map<String,String> meg) {
         /*
          * 1.判断用户状态
          * 2.发送消息
@@ -284,26 +338,48 @@ public class NIOClient {
                 //mMsgPerSecond = 0;
                 mMsgSinceLogin = 0;
                 //mLastSendTime = 0;
-                sendMessage("send|Redo login");
+                String msgToSend = new MessageBuilder()
+                        .add("event","Redo login")
+                        .build();
+                sendMessage(msgToSend);
             } else {
-                sendMessage("send|success");
+                String msgToSend = new MessageBuilder()
+                        .add("event","send")
+                        .add("result","success")
+                        .build();
+                sendMessage(msgToSend);
             }
-            String message = mSt.nextToken();
+
+            String message = meg.get("message");
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.IGNORE)) {
-                    client.sendMessage(String.format("forward|%s|%s", this.mUsername, message));
+                    String msgToSend = new MessageBuilder()
+                            .add("event","forward")
+                            .add("from",this.mUsername)
+                            .add("message",message)
+                            .build();
+                    client.sendMessage(msgToSend);
                     localForwardMsgNum ++;
                 } else {
                     //发给自己的
-                    sendMessage(String.format("forward|你|%s", message));
+                    String msgToSend = new MessageBuilder()
+                            .add("event", "forward")
+                            .add("from", "你")
+                            .add("message", message)
+                            .build();
+                    sendMessage(msgToSend);
                 }
             }
         }
     }
 
     private void OnError() {
-        sendMessage("消息非法！");
+        String msgToSend = new MessageBuilder()
+                .add("event", "error")
+                .add("reason", "error")
+                .build();
+        sendMessage(msgToSend);
     }
 
 }
