@@ -26,6 +26,7 @@ public class Client {
     private AsynchronousSocketChannel mSocketChannel = null;
 
     private StringTokenizer mSt = null;
+    private PackageHandler mPackageHandler = new PackageHandler();
 
     private ScheduledExecutorService sc = null;
     private int loginSuccessNum = 0;
@@ -136,10 +137,13 @@ public class Client {
         mSocketChannel.read(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>(){
 
             public void completed(Integer result, AsynchronousSocketChannel channel) {
-                String message = StringUtils.bufToString(buf);
-                System.out.println("Read message:" + message);
 
-                dispatchMessage(message);
+                mPackageHandler.addPackage(buf);
+                while (mPackageHandler.hasPackage()) {
+                    String message = mPackageHandler.getPackage();
+                    System.out.println("Read message:" + message);
+                    dispatchMessage(message);
+                }
 
                 //继续处理下一条消息
                 readMessage();
@@ -156,6 +160,8 @@ public class Client {
     private void sendMessage(final String message) {
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
+        //4表示传输结束
+        buf.put((byte)4);
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
@@ -249,7 +255,7 @@ public class Client {
 
         receiveMsgNum ++;
         mChatRoomForm.addMessage(from, message);
-        //TODO: acknowledge server
+        //TODO: 通知服务器
     }
 
     private void OnError() {
