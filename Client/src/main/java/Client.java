@@ -14,7 +14,6 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -57,28 +56,32 @@ public class Client {
         mLoginAndRegisterForm = new LoginAndRegisterForm();
         mLoginAndRegisterForm.setOnLoginListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                String username = mLoginAndRegisterForm.getUsername();
-                String password = mLoginAndRegisterForm.getPassword();
+                String user = mLoginAndRegisterForm.getUsername();
+                String pass = mLoginAndRegisterForm.getPassword();
 
                 String msgToSend = new MessageBuilder()
                         .add("event", "login")
-                        .add("username", username)
-                        .add("password", password)
+                        .add("username", user)
+                        .add("password", pass)
                         .build();
+                username = user;
+                password = pass;
 
                 sendMessage(msgToSend);
             }
         });
         mLoginAndRegisterForm.setOnRegisterListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
-                String username = mLoginAndRegisterForm.getUsername();
-                String password = mLoginAndRegisterForm.getPassword();
+                String user = mLoginAndRegisterForm.getUsername();
+                String pass = mLoginAndRegisterForm.getPassword();
 
                 String msgToSend = new MessageBuilder()
                         .add("event", "reg")
-                        .add("username", username)
-                        .add("password", password)
+                        .add("username", user)
+                        .add("password", pass)
                         .build();
+                username = user;
+                password = pass;
 
                 sendMessage(msgToSend);
             }
@@ -103,6 +106,7 @@ public class Client {
                         .add("message", msgToSend)
                         .build();
                 sendMessage(msgToSend);
+                sendMsgNum ++;
                 mChatRoomForm.clearChatArea();
             }
         });
@@ -189,16 +193,7 @@ public class Client {
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel >() {
             public void completed(Integer result, AsynchronousSocketChannel channel ) {
-
-//                mSt = new StringTokenizer(message, "|");
-//                String event = mSt.nextToken();
-//                if (event.equals("send")) {
-//                    sendMsgNum ++;
-//                } else if (event.equals("login") || event.equals("reg")) {
-//                    username = mSt.nextToken();
-//                    password = mSt.nextToken();
-//                }
-
+                // Nothing to do
             }
 
             public void failed(Throwable exc, AsynchronousSocketChannel channel) {
@@ -261,6 +256,7 @@ public class Client {
             /*
              * 登陆失败，更新UI
              */
+            loginFailNum ++;
             mLoginAndRegisterForm.setError(msg.get("reason"));
         }
     }
@@ -282,7 +278,7 @@ public class Client {
     private void OnSend(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
             //TODO:成功，记录一下
-        } else if (msg.get("result").equals("relogin")) {
+        } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
                     .add("username", username)

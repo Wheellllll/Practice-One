@@ -1,6 +1,5 @@
 import com.alibaba.fastjson.JSON;
 
-import javax.swing.plaf.basic.BasicScrollPaneUI;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -8,7 +7,6 @@ import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 /**
  * Created by sweet on 3/20/16.
@@ -142,7 +140,7 @@ public class NIOClient {
             OnSend(msg);
         } else if (msg.get("event").equals("relogin")) {
             /*
-             * 出发OnRelogin事件
+             * 触发OnRelogin事件
              */
             OnRelogin(msg);
 
@@ -160,6 +158,7 @@ public class NIOClient {
          */
         while (isWriting) {
             //loop to wait current writing message finish
+            System.out.println("waiting...");
         }
         isWriting = true;
         ByteBuffer buf = ByteBuffer.allocate(2048);
@@ -277,7 +276,7 @@ public class NIOClient {
                         .add("reason","Already login");
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
-            } else if (mStatus == Settings.Status.LOGOUT) {
+            } else if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.RELOGIN) {
                 localValidLogin ++;
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
@@ -301,8 +300,9 @@ public class NIOClient {
 
     private void OnRelogin(Map<String, String> msg) {
         /*
-         * TODO:重新登陆，逻辑与登陆一致，复用一下？
+         * 复用登陆逻辑
          */
+        OnLogin(msg);
     }
 
     private void OnSend(Map<String,String> msg) {
