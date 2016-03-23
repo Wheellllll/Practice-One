@@ -12,7 +12,6 @@ import java.util.StringTokenizer;
  */
 public class NIOClient {
     private static ArrayList<NIOClient> clients = new ArrayList<NIOClient>();
-
     /*
      * mSocketChannel 绑定的socket
      * mUsername 用户名
@@ -62,6 +61,7 @@ public class NIOClient {
         return clients;
     }
 
+    private PackageHandler mPackageHandler = new PackageHandler();
     private StringTokenizer mSt;
 
     public NIOClient(AsynchronousSocketChannel socketChannel) {
@@ -96,9 +96,12 @@ public class NIOClient {
                     return;
                 }
 
-                String message = StringUtils.bufToString(buf);
-                dispatchMessage(message);
-                System.out.println(message);
+                mPackageHandler.addPackage(buf);
+                while (mPackageHandler.hasPackage()) {
+                    String message = mPackageHandler.getPackage();
+                    System.out.println(message);
+                    dispatchMessage(message);
+                }
 
                 /*
                  * 处理下一条信息
@@ -152,6 +155,8 @@ public class NIOClient {
         isWriting = true;
         ByteBuffer buf = ByteBuffer.allocate(2048);
         buf.put(message.getBytes());
+        //4表示传输结束
+        buf.put((byte)4);
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
 
