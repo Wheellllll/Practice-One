@@ -25,8 +25,7 @@ public class ServerLogger implements Runnable {
             ignoreMsgNum += client.getLocalIgnoreMsgNum();
             forwardMsgNum += client.getLocalForwardMsgNum();
         }
-        LogUtils.log(LogUtils.LogType.SERVERLOGIN, validLogin, invalidLogin);
-        LogUtils.log(LogUtils.LogType.SERVERMESSAGE, receiveMsgNum, ignoreMsgNum, forwardMsgNum);
+        LogUtils.log(LogUtils.LogType.SERVER, validLogin, invalidLogin, receiveMsgNum, ignoreMsgNum, forwardMsgNum);
         validLogin = 0;
         invalidLogin = 0;
         receiveMsgNum = 0;

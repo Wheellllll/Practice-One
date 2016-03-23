@@ -11,7 +11,7 @@ public class ClientLogger implements Runnable {
 
     @Override
     public void run() {
-        LogUtils.log(LogUtils.LogType.CLIENTLOGIN, client.getLoginSuccessNum(), client.getLoginFailNum());
-        LogUtils.log(LogUtils.LogType.CLIENTMESSAGE, client.getSendMsgNum(), client.getReceiveMsgNum());
+        LogUtils.log(LogUtils.LogType.CLIENT, client.getLoginSuccessNum(),
+                client.getLoginFailNum(), client.getSendMsgNum(), client.getReceiveMsgNum());
     }
 }

@@ -129,16 +129,4 @@ public class DatabaseUtils {
         return true;
     }
 
-    public static void createTable() {
-        Connection connection = getConnection();
-        try {
-            Statement statement = connection.createStatement();
-            statement.executeUpdate("CREATE TABLE account (username VARCHAR , password VARCHAR )");
-            statement.close();
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
 }

@@ -269,7 +269,7 @@ public class NIOClient {
                     return;
                 }
             }
-            if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
+            if (mStatus == Settings.Status.LOGIN) {
                 localInvalidLogin ++;
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
@@ -327,12 +327,12 @@ public class NIOClient {
 
         localReceiveMsgNum ++;
 
-        if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.IGNORE) {
+        if (mStatus != Settings.Status.LOGIN) {
             localIgnoreMsgNum ++;
         } else {
             mMsgSinceLogin ++;
             if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
-                mStatus = Settings.Status.LOGOUT;
+                mStatus = Settings.Status.RELOGIN;
                 //mUsername = null;
                 //mPassword = null;
                 //mMsgPerSecond = 0;
@@ -355,7 +355,7 @@ public class NIOClient {
             String message = msg.get("message");
             for (NIOClient client : clients) {
                 if (client != this &&
-                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
+                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.IGNORE)) {
                     String msgToSend = new MessageBuilder()
                             .add("event","forward")
                             .add("from",this.mUsername)
