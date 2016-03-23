@@ -149,9 +149,8 @@ public class NIOClient {
         /*
          * 发消息
          */
-        String jsonString = JSON.toJSONString(message);
         ByteBuffer buf = ByteBuffer.allocate(2048);
-        buf.put(jsonString.getBytes());
+        buf.put(message.getBytes());
         buf.flip();
         mSocketChannel.write(buf, mSocketChannel, new CompletionHandler<Integer, AsynchronousSocketChannel>() {
 
@@ -192,9 +191,22 @@ public class NIOClient {
         String username = meg.get("username");
         String password = meg.get("password");
         if (DatabaseUtils.isExisted(username)) {
-            sendMessage("fail|Id already exists.");
+
+            MessageBuilder megBuilder = new MessageBuilder()
+                    .add("result","fail")
+                    .add("event","reg")
+                    .add("message","Id already exists.");
+            String megToSend = megBuilder.build();
+
+            sendMessage(megToSend);
+
         } else if (password.length() < 6) {
-            sendMessage("fail|The password is too short (at least six).");
+            MessageBuilder megBuilder = new MessageBuilder()
+                    .add("result","fail")
+                    .add("event","reg")
+                    .add("message","The password is too short (at least six).");
+            String megToSend = megBuilder.build();
+            sendMessage(megToSend);
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
             boolean b = DatabaseUtils.createAccount(username, encryptedPass);
@@ -202,9 +214,18 @@ public class NIOClient {
                 mUsername = username;
                 mPassword = encryptedPass;
                 mStatus = Settings.Status.LOGIN;
-                sendMessage("reg|success");
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("result","success")
+                        .add("event","reg");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
             } else {
-                sendMessage("fail|Registration failed due to an unexpected error.");
+                MessageBuilder megBuild = new MessageBuilder()
+                        .add("result","fail")
+                        .add("event","reg")
+                        .add("message","Registration failed due to an unexpected error.");
+                String megToSend = megBuild.build();
+                sendMessage(megToSend);
             }
         }
     }
@@ -223,42 +244,42 @@ public class NIOClient {
             for (NIOClient client : clients) {
                 if (client != this && client.mUsername != null && client.mUsername.equals(username)) {
                     localInvalidLogin ++;
-                    HashMap<String,String> meg = new HashMap<String, String>();
-                    meg.put("event","login");
-                    meg.put("result","fail");
-                    meg.put("message","Already login on another terminal.");
-                    String jsonString = JSON.toJSONString(meg);
-                    sendMessage(jsonString);
+                    MessageBuilder megBuilder = new MessageBuilder()
+                            .add("event","login")
+                            .add("result","fail")
+                            .add("message","Already login on another terminal.");
+                    String megToSend = megBuilder.build();
+                    sendMessage(megToSend);
                     return;
                 }
             }
             if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
                 localInvalidLogin ++;
-                HashMap<String,String> meg = new HashMap<String, String>();
-                meg.put("event","login");
-                meg.put("result","fail");
-                meg.put("message","Already login");
-                String jsonString = JSON.toJSONString(meg);
-                sendMessage(jsonString);
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("event","login")
+                        .add("result","fail")
+                        .add("message","Already login");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
             } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
-                HashMap<String,String> meg = new HashMap<String, String>();
-                meg.put("event","login");
-                meg.put("result","success");
-                String jsonString = JSON.toJSONString(meg);
-                sendMessage(jsonString);
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("event","login")
+                        .add("result","success");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
                 mStatus = Settings.Status.LOGIN;
                 mUsername = username;
                 mPassword = encryptedPass;
             }
         } else {
             localInvalidLogin ++;
-            HashMap<String,String> meg = new HashMap<String, String>();
-            meg.put("event","login");
-            meg.put("result","fail");
-            meg.put("message","Invalid account.");
-            String jsonString = JSON.toJSONString(meg);
-            sendMessage(jsonString);
+            MessageBuilder megBuilder = new MessageBuilder()
+                    .add("event","login")
+                    .add("result","fail")
+                    .add("message","Invalid account.");
+            String megToSend = megBuilder.build();
+            sendMessage(megToSend);
         }
     }
 

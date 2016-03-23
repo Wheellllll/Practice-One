@@ -206,12 +206,12 @@ public class Client {
 //>>>>>>> a0a07e3191c1ba1fad2ac15d799a52d76ef47233
             }
 
-          //  public void failed(Throwable exc, AsynchronousSocketChannel channel) {
-          //      mSt = new StringTokenizer(message, "|");
-          //      if (mSt.nextToken().equals("login"))
-          //          loginFailNum ++;
-          //      System.out.println( "Fail to write the message to server");
-          //  }
+            public void failed(Throwable exc, AsynchronousSocketChannel channel) {
+                //mSt = new StringTokenizer(message, "|");
+                //if (mSt.nextToken().equals("login"))
+                  //  loginFailNum ++;
+                System.out.println( "Fail to write the message to server");
+            }
         });
     }
 
