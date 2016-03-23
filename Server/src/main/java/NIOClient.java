@@ -210,7 +210,7 @@ public class NIOClient {
             String msgToSend = new MessageBuilder()
                     .add("result","fail")
                     .add("event","reg")
-                    .add("message","Id already exists.")
+                    .add("reason","Id already exists.")
                     .build();
 
             sendMessage(msgToSend);
@@ -219,7 +219,7 @@ public class NIOClient {
             String msgToSend = new MessageBuilder()
                     .add("result","fail")
                     .add("event","reg")
-                    .add("message","The password is too short (at least six).")
+                    .add("reason","The password is too short (at least six).")
                     .build();
             sendMessage(msgToSend);
         } else {
@@ -238,7 +238,7 @@ public class NIOClient {
                 String msgToSend = new MessageBuilder()
                         .add("result","fail")
                         .add("event","reg")
-                        .add("message","Registration failed due to an unexpected error.")
+                        .add("reason","Registration failed due to an unexpected error.")
                         .build();
                 sendMessage(msgToSend);
             }
@@ -263,7 +263,7 @@ public class NIOClient {
                     MessageBuilder megBuilder = new MessageBuilder()
                             .add("event","login")
                             .add("result","fail")
-                            .add("message","Already login on another terminal.");
+                            .add("reason","Already login on another terminal.");
                     String megToSend = megBuilder.build();
                     sendMessage(megToSend);
                     return;
@@ -274,7 +274,7 @@ public class NIOClient {
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
                         .add("result","fail")
-                        .add("message","Already login");
+                        .add("reason","Already login");
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
             } else if (mStatus == Settings.Status.LOGOUT) {
@@ -293,7 +293,7 @@ public class NIOClient {
             MessageBuilder megBuilder = new MessageBuilder()
                     .add("event","login")
                     .add("result","fail")
-                    .add("message","Invalid account.");
+                    .add("reason","Invalid account.");
             String megToSend = megBuilder.build();
             sendMessage(megToSend);
         }

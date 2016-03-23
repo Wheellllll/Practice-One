@@ -12,6 +12,7 @@ import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.Executors;
@@ -28,7 +29,6 @@ public class Client {
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
 
-    private StringTokenizer mSt = null;
     private PackageHandler mPackageHandler = new PackageHandler();
 
     private ScheduledExecutorService sc = null;
@@ -133,7 +133,9 @@ public class Client {
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
         } catch (IOException e) {
-            System.out.format("Fail to connect to server: %s", e.getMessage());
+            mLoginAndRegisterForm.setError("连接服务器失败");
+        } catch (UnresolvedAddressException e) {
+            mLoginAndRegisterForm.setError("连接服务器失败");
         }
     }
 
@@ -143,13 +145,14 @@ public class Client {
         public void completed(Void result, AsynchronousSocketChannel socketChannel) {
             mSocketChannel = socketChannel;
             System.out.println("Connected");
+            mLoginAndRegisterForm.setCorrect("成功连接服务器");
 
             //开始读消息
             readMessage();
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
-            System.out.println("Fail to connect to server");
+            mLoginAndRegisterForm.setError("连接服务器失败");
         }
     }
 
@@ -241,9 +244,9 @@ public class Client {
             initChatRoomUI();
         } else {
             /*
-             * TODO:登陆失败，更新UI
-             * 等改完JSON再写
+             * 登陆失败，更新UI
              */
+            mLoginAndRegisterForm.setError(msg.get("reason"));
             loginFailNum ++;
         }
     }
@@ -256,8 +259,9 @@ public class Client {
             loginSuccessNum++;
         } else {
             /*
-             * TODO:登陆失败，更新UI
+             * 登陆失败，更新UI
              */
+            mLoginAndRegisterForm.setError(msg.get("reason"));
         }
     }
 
@@ -268,9 +272,9 @@ public class Client {
             initChatRoomUI();
         } else {
             /*
-             * TODO:注册失败，更新UI
-             * 等改完JSON再写
+             * 注册失败，更新UI
              */
+            mLoginAndRegisterForm.setError(msg.get("reason"));
         }
     }
 

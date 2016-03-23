@@ -2,7 +2,6 @@ package ui;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
@@ -17,7 +16,7 @@ public class LoginAndRegisterForm {
     private JButton loginBtn = new JButton("登陆");
     private JButton registerBtn = new JButton("注册");
     private JButton configBtn = new JButton("设置");
-    private JLabel errorLabel = new JLabel("错误");
+    private JLabel hintLabel = new JLabel("错误");
     public LoginAndRegisterForm(){
         frame.setSize(300,200);
         c.setLayout(new BorderLayout());
@@ -55,9 +54,8 @@ public class LoginAndRegisterForm {
         //中下部错误信息
         JPanel errorPanel = new JPanel();
         errorPanel.setLayout(new FlowLayout());
-        errorLabel.setForeground(Color.RED);
-        errorLabel.setVisible(false);
-        errorPanel.add(errorLabel);
+        hintLabel.setVisible(false);
+        errorPanel.add(hintLabel);
         formPanel.add(errorPanel, "South");
 
         //底部按钮
@@ -87,8 +85,15 @@ public class LoginAndRegisterForm {
     }
 
     public void setError(String error) {
-        errorLabel.setVisible(true);
-        errorLabel.setText(error);
+        hintLabel.setForeground(Color.RED);
+        hintLabel.setText(error);
+        hintLabel.setVisible(true);
+    }
+
+    public void setCorrect(String correct) {
+        hintLabel.setForeground(Color.GREEN);
+        hintLabel.setText(correct);
+        hintLabel.setVisible(true);
     }
 
     public void setOnLoginListener(ActionListener listener) {
