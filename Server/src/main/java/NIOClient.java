@@ -245,7 +245,7 @@ public class NIOClient {
         }
     }
 
-    private void OnLogin(Map<String,String> meg) {
+    private void OnLogin(Map<String,String> msg) {
         /*
          * 1.判断用户名和密码
          * 2.判断是否已经登陆
@@ -253,8 +253,8 @@ public class NIOClient {
          * 4.失败返回错误信息
          */
 
-        String username = meg.get("username");
-        String encryptedPass = StringUtils.md5Hash(meg.get("password"));
+        String username = msg.get("username");
+        String encryptedPass = StringUtils.md5Hash(msg.get("password"));
         if (DatabaseUtils.isValid(username, encryptedPass)) {
             for (NIOClient client : clients) {
                 if (client != this && client.mUsername != null &&
@@ -301,11 +301,11 @@ public class NIOClient {
 
     private void OnRelogin(Map<String, String> msg) {
         /*
-         * TODO:重新登陆
+         * TODO:重新登陆，逻辑与登陆一致，复用一下？
          */
     }
 
-    private void OnSend(Map<String,String> meg) {
+    private void OnSend(Map<String,String> msg) {
         /*
          * 1.判断用户状态
          * 2.发送消息
@@ -339,7 +339,9 @@ public class NIOClient {
                 mMsgSinceLogin = 0;
                 //mLastSendTime = 0;
                 String msgToSend = new MessageBuilder()
-                        .add("event","Redo login")
+                        .add("event","send")
+                        .add("result", "fail")
+                        .add("reason", "relogin")
                         .build();
                 sendMessage(msgToSend);
             } else {
@@ -350,7 +352,7 @@ public class NIOClient {
                 sendMessage(msgToSend);
             }
 
-            String message = meg.get("message");
+            String message = msg.get("message");
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {

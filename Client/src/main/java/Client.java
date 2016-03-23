@@ -236,7 +236,7 @@ public class Client {
     private void OnLogin(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
-            loginSuccessNum ++;
+            loginSuccessNum++;
             mLoginAndRegisterForm.close();
             initChatRoomUI();
         } else {
@@ -252,6 +252,13 @@ public class Client {
         /*
          * TODO:处理重新登陆的结果
          */
+        if (msg.get("result").equals("success")) {
+            loginSuccessNum++;
+        } else {
+            /*
+             * TODO:登陆失败，更新UI
+             */
+        }
     }
 
     private void OnRegister(HashMap<String,String> msg) {
@@ -269,12 +276,18 @@ public class Client {
 
     //消息发送结果
     private void OnSend(HashMap<String, String> msg) {
-        //TODO:重新登录后需更新UI
-        /*String result = mSt.nextToken();
-        if (result.equals("Redo login")) {
-            sendMessage(String.format("login|%s|%s", username, password));
-        }*/
-
+        if (msg.get("result").equals("success")) {
+            //TODO:成功，记录一下
+        } else if (msg.get("result").equals("relogin")) {
+            String msgToSend = new MessageBuilder()
+                    .add("event", "relogin")
+                    .add("username", username)
+                    .add("password", password)
+                    .build();
+            sendMessage(msgToSend);
+        } else {
+            //TODO:失败，为什么失败
+        }
     }
 
     //从其他客户端来的消息
