@@ -14,11 +14,11 @@ public class Settings {
     public static final String HOST = "localhost";
     public static final int PORT = 9001;
 
-    public static enum Status {
+    public enum Status {
         LOGIN, LOGOUT, RELOGIN, IGNORE
     }
 
     public static int maxNumberPerSecond = 5;
-    public static int maxNumberPerSession = 2;
+    public static int maxNumberPerSession = 100;
 
 }

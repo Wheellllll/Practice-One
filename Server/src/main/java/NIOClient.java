@@ -235,10 +235,10 @@ public class NIOClient {
                     return;
                 }
             }
-            if (mStatus == Settings.Status.LOGIN || mStatus == Settings.Status.RELOGIN) {
+            if (mStatus == Settings.Status.LOGIN) {
                 localInvalidLogin ++;
                 sendMessage("login|Already login.");
-            } else if (mStatus == Settings.Status.LOGOUT) {
+            } else if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.RELOGIN) {
                 localValidLogin ++;
                 sendMessage("login|success");
                 mStatus = Settings.Status.LOGIN;
@@ -273,12 +273,12 @@ public class NIOClient {
 
         localReceiveMsgNum ++;
 
-        if (mStatus == Settings.Status.LOGOUT || mStatus == Settings.Status.IGNORE) {
+        if (mStatus != Settings.Status.LOGIN) {
             localIgnoreMsgNum ++;
         } else {
             mMsgSinceLogin ++;
             if (mMsgSinceLogin >= Settings.maxNumberPerSession) {
-                mStatus = Settings.Status.LOGOUT;
+                mStatus = Settings.Status.RELOGIN;
                 //mUsername = null;
                 //mPassword = null;
                 //mMsgPerSecond = 0;
@@ -291,7 +291,7 @@ public class NIOClient {
             String message = mSt.nextToken();
             for (NIOClient client : clients) {
                 if (client != this &&
-                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
+                        (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.IGNORE)) {
                     client.sendMessage(String.format("forward|%s|%s", this.mUsername, message));
                     localForwardMsgNum ++;
                 } else {
