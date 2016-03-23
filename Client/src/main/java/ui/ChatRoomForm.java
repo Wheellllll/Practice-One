@@ -32,9 +32,16 @@ public class ChatRoomForm {
         bottomPanel.add(sendBtn, BorderLayout.EAST);
 
         //顶部消息区域
+        JScrollPane scrollPane = new JScrollPane(messageArea);
+        scrollPane.setHorizontalScrollBarPolicy(
+                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
+        );
+        scrollPane.setVerticalScrollBarPolicy(
+                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
+        );
         messageArea.setEditable(false);
 
-        container.add(messageArea, BorderLayout.CENTER);
+        container.add(scrollPane, BorderLayout.CENTER);
         container.add(bottomPanel, BorderLayout.SOUTH);
 
         frame.add(container);
