@@ -239,7 +239,7 @@ public class NIOClient {
                 meg.put("result","fail");
                 meg.put("message","Already login");
                 String jsonString = JSON.toJSONString(meg);
-                sendMessage(meg);
+                sendMessage(jsonString);
             } else if (mStatus == Settings.Status.LOGOUT) {
                 localValidLogin ++;
                 HashMap<String,String> meg = new HashMap<String, String>();
