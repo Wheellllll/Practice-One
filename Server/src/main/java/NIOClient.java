@@ -316,29 +316,29 @@ public class NIOClient {
                 //mMsgPerSecond = 0;
                 mMsgSinceLogin = 0;
                 //mLastSendTime = 0;
-                HashMap<String,String> mSt = new HashMap<String, String>();
-                mSt.put("event","Redo login");
-                String jsonStringMeg = JSON.toJSONString(mSt);
-                sendMessage(jsonStringMeg);
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("event","Redo login");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
             } else {
-                HashMap<String,String> mSt = new HashMap<String, String>();
-                mSt.put("event","send");
-                mSt.put("result","success");
-                String jsonStringMeg = JSON.toJSONString(mSt);
-                sendMessage(jsonStringMeg);
+                MessageBuilder megBuilder = new MessageBuilder()
+                        .add("event","send")
+                        .add("result","success");
+                String megToSend = megBuilder.build();
+                sendMessage(megToSend);
             }
 
             String message = meg.get("message");
             for (NIOClient client : clients) {
                 if (client != this &&
                         (client.mStatus == Settings.Status.LOGIN || client.mStatus == Settings.Status.RELOGIN)) {
-                    HashMap<String,String> mSt = new HashMap<String, String>();
-                    mSt.put("event","forward");
-                    mSt.put("from",this.mUsername);
-                    mSt.put("message", message);
-                    String jsonString = JSON.toJSONString(mSt);
-
-                    client.sendMessage(jsonString);
+                    MessageBuilder megBuilder = new MessageBuilder()
+                            .add("event","forward")
+                            .add("form",this.mUsername)
+                            .add("message",message);
+                    String megToSend = megBuilder.build()
+                    
+                    client.sendMessage(megToSend);
                     localForwardMsgNum ++;
                 } else {
                     //发给自己的
