@@ -6,8 +6,7 @@
 #### 注册
 ##### 客户端
 ```
-reg
-message {
+{
  "event":"reg",
  "username":"XXX",
  "password":"XXXXXX"
@@ -16,32 +15,37 @@ message {
 
 ##### 服务器
 ```
-reg|success
-message {
+{
  "event":"reg",
- "result":"success/fail",
- "reason":"XXXXX"
+ "result":"success"
+}
+{
+ "event":"reg",
+ "result":"fail",
+ "reason":"XXXXXX"
 }
 ```
 
 ####登陆
 ##### 客户端
 ```
-login
-message{
-"event":"login",
-"username":"XXXXXX",
-"password":"XXXXXX"
+{
+ "event":"login",
+ "username":"XXXXXX",
+ "password":"XXXXXX"
 }
 ```
 
 ##### 服务器
 ```
-login
-message{
-"event":"login",
-"result":"success/fail",
-"reason":"XXXXXX"
+{
+ "event":"login",
+ "result":"success",
+}
+{
+ "event":"login",
+ "result":"fail",
+ "reason":"XXXXXX"
 }
 ```
 
@@ -57,11 +61,11 @@ message{
 
 ##### 服务器
 ```
-message{
+{
 "event":"relogin",
 "result":"success"
 }
-message{
+{
 "event":"relogin",
 "result":"fail",
 "reason":"XXXXXX"
@@ -71,8 +75,7 @@ message{
 #### 发送消息
 ##### 客户端
 ```
-send
-message{
+{
 "event":"send",
 "message":"XXXXXXX"
 }
@@ -80,16 +83,16 @@ message{
 
 ##### 服务器
 ```
-message{
+{
 "event":"send",
 "result":"success"
 }
-message{
+{
 "event":"send",
 "result":"fail",
 "reason":"XXXXXX"
 }
-message{
+{
 "event":"forward",
 "from": senderName
 "message":"XXXXXX"
