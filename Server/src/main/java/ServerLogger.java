@@ -7,20 +7,20 @@ import java.util.ArrayList;
  */
 public class ServerLogger implements Runnable {
 
-    private ArrayList<NIOClient> clients = null;
+    private ArrayList<BaseClient> clients = null;
     private int validLogin = 0;
     private int invalidLogin = 0;
     private int receiveMsgNum = 0;
     private int ignoreMsgNum = 0;
     private int forwardMsgNum = 0;
 
-    public ServerLogger(ArrayList<NIOClient> c) {
+    public ServerLogger(ArrayList<BaseClient> c) {
         clients = c;
     }
 
     @Override
     public void run() {
-        for (NIOClient client : clients) {
+        for (BaseClient client : clients) {
             validLogin += client.getLocalValidLogin();
             invalidLogin += client.getLocalInvalidLogin();
             receiveMsgNum += client.getLocalReceiveMsgNum();

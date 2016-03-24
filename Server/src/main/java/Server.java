@@ -16,47 +16,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by sweet on 3/16/16.
  */
-public class Server {
-
-    private ScheduledExecutorService sc = null;
-
-    public Server() {
-        try {
-            Config.setConfigName("server");
-            String host = Config.getConfig().getProperty("host");
-            String port = Config.getConfig().getProperty("port");
-            InetSocketAddress socketAddress = new InetSocketAddress(host, Integer.parseInt(port));
-            AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
-                    .open()
-                    .bind(socketAddress);
-            System.out.format("Server is listening at %s%n", socketAddress);
-            serverSocketChannel.accept(serverSocketChannel, new ConnectionHandler());
-            sc = Executors.newScheduledThreadPool(1);
-            sc.scheduleAtFixedRate(new ServerLogger(NIOClient.getClients()), 0, 1, TimeUnit.MINUTES);
-            Thread.currentThread().join();
-        } catch (IOException e) {
-            System.out.format("Server failed to start: %s", e.getMessage());
-        } catch (InterruptedException e) {
-            System.out.println("Server Stopped");
-        }
-    }
-
+public class Server extends BaseServer {
     public static void main(String[] args) {
         new Server();
-    }
-
-    class ConnectionHandler implements
-            CompletionHandler<AsynchronousSocketChannel, AsynchronousServerSocketChannel> {
-
-        public void completed(AsynchronousSocketChannel clientSock, AsynchronousServerSocketChannel serverSock) {
-            new NIOClient(clientSock);
-
-            //处理下一条连接
-            serverSock.accept(serverSock, this);
-        }
-
-        public void failed(Throwable e, AsynchronousServerSocketChannel asynchronousServerSocketChannel) {
-            System.out.println("Fail to connect to client");
-        }
     }
 }

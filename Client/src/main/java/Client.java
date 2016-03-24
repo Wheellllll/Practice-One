@@ -4,7 +4,7 @@ import utils.Config;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
 import utils.MessageBuilder;
-import utils.PackageHandler;
+import handler.PackageHandler;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,6 +73,7 @@ public class Client {
                 sendMessage(msgToSend);
             }
         });
+
         mLoginAndRegisterForm.setOnRegisterListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String user = mLoginAndRegisterForm.getUsername();
