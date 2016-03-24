@@ -5,9 +5,9 @@ import utils.LogUtils;
  */
 public class ClientLogger implements Runnable {
 
-    private Client client = null;
+    private BaseClient client = null;
 
-    public ClientLogger(Client c) {
+    public ClientLogger(BaseClient c) {
         client = c;
     }
 
