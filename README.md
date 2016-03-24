@@ -3,64 +3,95 @@
 
 ### 消息范式
 
-#### 
+#### 注册
 ##### 客户端
-- reg
+```
+reg
 message {
  "event":"reg",
  "username":"XXX",
  "password":"XXXXXX"
 }
+```
 
 ##### 服务器
-- reg|success
+```
+reg|success
 message {
  "event":"reg",
  "result":"success/fail",
- "message":"XXXXX"
+ "reason":"XXXXX"
 }
+```
 
 ####登陆
 ##### 客户端
-- login
- message{
+```
+login
+message{
 "event":"login",
-"username":"XXX",
+"username":"XXXXXX",
 "password":"XXXXXX"
 }
+```
 
 ##### 服务器
-- login
+```
+login
 message{
 "event":"login",
 "result":"success/fail",
-"message":"login failed due to XXX"
+"reason":"XXXXXX"
 }
+```
+
+#### 重新登陆
+##### 客户端
+```
+message{
+"event":"relogin",
+"username":"XXXXXX",
+"password":"XXXXXX"
+}
+```
+
+##### 服务器
+```
+message{
+"event":"relogin",
+"result":"success"
+}
+message{
+"event":"relogin",
+"result":"fail",
+"reason":"XXXXXX"
+}
+```
 
 #### 发送消息
-
 ##### 客户端
-- send
+```
+send
 message{
 "event":"send",
 "message":"XXXXXXX"
 }
+```
 
 ##### 服务器
-- send|success (给自己)
+```
 message{
 "event":"send",
-"from":"你",
-"message":"XXXXX"
+"result":"success"
 }
-- forward (从其他客户端来的)
+message{
+"event":"send",
+"result":"fail",
+"reason":"XXXXXX"
+}
 message{
 "event":"forward",
 "from": senderName
 "message":"XXXXXX"
 }
-- send|{reason}              (发送失败，理由)
-message{
-"event":"send",
-"reason":"XXXXXX"
-}
+```
