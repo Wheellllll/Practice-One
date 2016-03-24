@@ -2,6 +2,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.functions.Action1;
 import rx.observers.Observers;
+import utils.Config;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -21,7 +22,10 @@ public class Server {
 
     public Server() {
         try {
-            InetSocketAddress socketAddress = new InetSocketAddress(Settings.HOST, Settings.PORT);
+            Config.setConfigName("server");
+            String host = Config.getConfig().getProperty("host");
+            String port = Config.getConfig().getProperty("port");
+            InetSocketAddress socketAddress = new InetSocketAddress(host, Integer.parseInt(port));
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
                     .open()
                     .bind(socketAddress);

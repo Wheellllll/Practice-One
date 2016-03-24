@@ -1,8 +1,10 @@
 import com.alibaba.fastjson.JSON;
 import ui.ChatRoomForm;
-import ui.Config;
+import utils.Config;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
+import utils.MessageBuilder;
+import utils.PackageHandler;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,6 +42,7 @@ public class Client {
 
     public Client() {
         try {
+            Config.setConfigName("client");
             initWelcomeUI();
             tryConnect();
 

@@ -1,3 +1,5 @@
+package utils;
+
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;

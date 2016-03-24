@@ -1,4 +1,4 @@
-package ui;
+package utils;
 
 import java.io.*;
 import java.util.Properties;
@@ -12,9 +12,14 @@ public class Config {
      */
 
     private Properties mProps;
+    private static String configName = "application";
 
     private static class ConfigHolder {
         private static final Config INSTANCE = new Config();
+    }
+
+    public static void setConfigName(String configName) {
+        Config.configName =configName;
     }
 
     public static final Config getConfig() {
@@ -24,13 +29,13 @@ public class Config {
 
     public Config() {
         try {
-            File configFile = new File("application.conf");
+            File configFile = new File(String.format("%s.conf", configName));
             FileReader reader = new FileReader(configFile);
             mProps = new Properties();
             mProps.load(reader);
         } catch (FileNotFoundException e) {
             mProps = new Properties();
-            setProperty("host", "localost");
+            setProperty("host", "localhost");
             setProperty("port", "9001");
         } catch (IOException e) {
             e.printStackTrace();
