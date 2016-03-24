@@ -55,9 +55,6 @@ public class Client extends BaseClient {
 
     @Override
     public void OnRelogin(HashMap<String, String> msg) {
-        /*
-         * TODO:处理重新登陆的结果
-         */
         if (msg.get("result").equals("success")) {
             incLoginSuccessNum();
         } else {
@@ -65,7 +62,13 @@ public class Client extends BaseClient {
              * 登陆失败，更新UI
              */
             incLoginFailNum();
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            String msgToSend = new MessageBuilder()
+                    .add("event", "relogin")
+                    .add("username", getUsername())
+                    .add("password", getPassword())
+                    .build();
+            sendMessage(msgToSend);
+            //getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
