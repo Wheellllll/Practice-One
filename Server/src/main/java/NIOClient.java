@@ -58,10 +58,17 @@ public class NIOClient extends BaseClient {
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
             } else if (getStatus() == Status.LOGOUT || getStatus() == Status.RELOGIN) {
-                incLocalInvalidLogin();
-                MessageBuilder megBuilder = new MessageBuilder()
-                        .add("event","login")
-                        .add("result","success");
+                MessageBuilder megBuilder = null;
+                if (getStatus() == Status.LOGOUT) {
+                    megBuilder = new MessageBuilder()
+                            .add("event","login")
+                            .add("result","success");
+                } else {
+                    megBuilder = new MessageBuilder()
+                            .add("event","relogin")
+                            .add("result","success");
+                }
+                incLocalValidLogin();
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);

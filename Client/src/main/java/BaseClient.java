@@ -166,7 +166,7 @@ public abstract class BaseClient {
                         .add("message", msgToSend)
                         .build();
                 sendMessage(msgToSend);
-                sendMsgNum ++;
+                incSendMsgNum();
                 mChatRoomForm.clearChatArea();
             }
         });
