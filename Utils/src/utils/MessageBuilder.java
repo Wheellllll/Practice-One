@@ -14,6 +14,8 @@ public class MessageBuilder {
         message.put(key, value);
         return this;
     }
+
+    
     public String build()
     {
         String jsonString = JSON.toJSONString(message);

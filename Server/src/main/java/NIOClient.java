@@ -167,7 +167,7 @@ public class NIOClient extends BaseClient {
             incLocalIgnoreMsgNum();
         } else {
             incMsgSinceLogin();
-            if (getMsgSinceLogin() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) {
+            if (getMsgSinceLogin() > Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) {
                 setStatus(Status.RELOGIN);
                 setMsgSinceLogin(0);
                 String msgToSend = new MessageBuilder()
