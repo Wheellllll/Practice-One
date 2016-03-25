@@ -2,10 +2,10 @@
 | 姓名      | 学号      | Github账号          |
 | :-------: | :-------: | :-----------------: |
 | 罗毅      | 1352388   | [blackbbc][1]       |
-| 冯夏令    | 135xxxx   | [WishSummer][2]     |
-| 廖山河    | 135xxxx   | [mirrordust][3]     |
-| 彭程      | 135xxxx   | [KrisCheng][4]      |
-| 范亮      | 135xxxx   | [fanliangandrew][5] |
+| 冯夏令    | 1352920   | [WishSummer][2]     |
+| 廖山河    | 1352921   | [mirrordust][3]     |
+| 彭程      | 1352905   | [KrisCheng][4]      |
+| 范亮      | 1352899   | [fanliangandrew][5] |
 
 ###依赖
 - sqlite
