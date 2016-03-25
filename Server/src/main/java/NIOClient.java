@@ -186,15 +186,16 @@ public class NIOClient extends BaseClient {
 
             String message = args.get("message");
             for (BaseClient client : getClients()) {
-                if (client != this &&
-                        (getStatus() == Status.LOGIN || getStatus() == Status.IGNORE)) {
-                    String msgToSend = new MessageBuilder()
-                            .add("event","forward")
-                            .add("from",getUsername())
-                            .add("message",message)
-                            .build();
-                    client.sendMessage(msgToSend);
-                    incLocalForwardMsgNum();
+                if (client != this) {
+                    if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
+                        String msgToSend = new MessageBuilder()
+                                .add("event","forward")
+                                .add("from",getUsername())
+                                .add("message",message)
+                                .build();
+                        client.sendMessage(msgToSend);
+                        incLocalForwardMsgNum();
+                    }
                 } else {
                     //发给自己的
                     String msgToSend = new MessageBuilder()
