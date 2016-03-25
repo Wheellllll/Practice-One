@@ -19,7 +19,7 @@ public abstract class BaseClient {
      * mSocketChannel 绑定的socket
      * mUsername 用户名
      * mPassword 密码
-     * mStatus 当前状态->Settings.Status
+     * mStatus 当前状态->Status
      * mMsgPerSecond最近1秒发送的消息数
      * mMsgSinceLogin自从登陆起发送的消息数
      * mLastSendTime上次发送的时间戳
