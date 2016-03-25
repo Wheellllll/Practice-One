@@ -19,7 +19,7 @@ public class Config {
     }
 
     public static void setConfigName(String configName) {
-        Config.configName =configName;
+        Config.configName = configName;
     }
 
     public static final Config getConfig() {
@@ -46,14 +46,14 @@ public class Config {
         return mProps.getProperty(key);
     }
 
-    public String getPropery(String key, String defaultValue) {
+    public String getProperty(String key, String defaultValue) {
         return mProps.getProperty(key, defaultValue);
     }
 
     public void setProperty(String key, String value) {
         try {
             mProps.setProperty(key, value);
-            File configFile = new File("application.conf");
+            File configFile = new File(String.format("%s.conf", configName));
             FileWriter writer = new FileWriter(configFile);
             mProps.store(writer, "host settings");
             writer.close();

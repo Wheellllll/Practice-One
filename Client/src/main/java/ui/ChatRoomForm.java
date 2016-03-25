@@ -71,5 +71,6 @@ public class ChatRoomForm {
 
     public void setOnSendListener(ActionListener listener) {
         sendBtn.addActionListener(listener);
+        chatArea.addActionListener(listener);
     }
 }

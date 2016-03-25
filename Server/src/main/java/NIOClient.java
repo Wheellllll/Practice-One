@@ -1,3 +1,4 @@
+import utils.Config;
 import utils.DatabaseUtils;
 import utils.MessageBuilder;
 import utils.StringUtils;
@@ -5,7 +6,6 @@ import utils.StringUtils;
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by sweet on 3/20/16.
@@ -154,7 +154,7 @@ public class NIOClient extends BaseClient {
         long currentSendTime = System.currentTimeMillis() / 1000;
         if (getLastSendTime() == currentSendTime) {
             incMsgPerSecond();
-            if (getMsgPerSecond() >= Settings.maxNumberPerSecond) setStatus(Status.IGNORE);
+            if (getMsgPerSecond() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SECOND", "5"))) setStatus(Status.IGNORE);
         } else {
             setMsgPerSecond(0);
             if (getStatus() == Status.IGNORE) setStatus(Status.LOGIN);
@@ -167,7 +167,7 @@ public class NIOClient extends BaseClient {
             incLocalIgnoreMsgNum();
         } else {
             incMsgSinceLogin();
-            if (getMsgSinceLogin() >= Settings.maxNumberPerSession) {
+            if (getMsgSinceLogin() > Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) {
                 setStatus(Status.RELOGIN);
                 setMsgSinceLogin(0);
                 String msgToSend = new MessageBuilder()

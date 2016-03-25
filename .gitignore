@@ -3,7 +3,6 @@ Client/target/
 Server/target/
 *.db
 *.log
-*.conf
 
 # User-specific stuff:
 .idea/workspace.xml
