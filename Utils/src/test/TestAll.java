@@ -12,6 +12,7 @@ public class TestAll extends TestSuite {
     public static Test suite() {
         TestSuite testSuite = new TestSuite("TestSuite Test");
         testSuite.addTestSuite(MessageBuilderTest.class);
+        testSuite.addTestSuite(StringUtilsTest.class);
         return testSuite;
     }
 
