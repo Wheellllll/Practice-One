@@ -1,7 +1,4 @@
-import utils.Config;
-import utils.DatabaseUtils;
-import utils.MessageBuilder;
-import utils.StringUtils;
+import utils.*;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -207,6 +204,11 @@ public class NIOClient extends BaseClient {
                 }
             }
         }
+    }
+
+    @Override
+    public void OnForward(HashMap<String, String> args) {
+        System.out.println(String.format("%s has received message", args.get("username")));
     }
 
     @Override
