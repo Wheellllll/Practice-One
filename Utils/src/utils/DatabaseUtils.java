@@ -3,13 +3,24 @@ package utils;
 import java.sql.*;
 
 /**
- * Created by LiaoShanhe on 2016/3/19.
+ * This class provide methods for SQLite database.
+ *
+ * @author LiaoShanhe
  */
 public class DatabaseUtils {
 
+    /**
+     * JDBC_DRIVER of SQLite & database url
+     */
     private static String JDBC_DRIVER = "org.sqlite.JDBC";
     private static String DB_URL = "jdbc:sqlite:application.db";
 
+    /**
+     * This method create a connection to database use the <code>JDBC_DRIVER</code>
+     * and <code>DB_URL</code>. The table will be created if it is not existing.
+     *
+     * @return Connection A connection to the database
+     */
     private static Connection getConnection() {
         Connection connection = null;
         Statement statement = null;
@@ -33,6 +44,12 @@ public class DatabaseUtils {
         return connection;
     }
 
+    /**
+     * This method check whether a username exist in database.
+     *
+     * @param username The username that needs to check existence
+     * @return boolean Return true if the username exist, otherwise false
+     */
     public static boolean isExisted(String username) {
         String sql = "SELECT * FROM account WHERE username = ?";
         PreparedStatement pstmt = null;
@@ -66,6 +83,13 @@ public class DatabaseUtils {
         return false;
     }
 
+    /**
+     * This method check whether a username and password combination is existed in database.
+     *
+     * @param username Username of client
+     * @param password Password of client, the password is encrypted with md5
+     * @return boolean Return true if the username and password combination exists in database, otherwise false
+     */
     public static boolean isValid(String username, String password) {
         String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
         PreparedStatement pstmt = null;
@@ -100,6 +124,13 @@ public class DatabaseUtils {
         return false;
     }
 
+    /**
+     * This method create a new account in database.
+     *
+     * @param username Username of client
+     * @param password Password if client
+     * @return boolean Return true if creating account successfully, otherwise false
+     */
     public static boolean createAccount(String username, String password) {
         String sql = "INSERT INTO account VALUES (?, ?)";
         PreparedStatement pstmt = null;
