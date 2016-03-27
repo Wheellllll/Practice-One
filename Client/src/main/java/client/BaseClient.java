@@ -229,9 +229,9 @@ public abstract class BaseClient {
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
         } catch (IOException e) {
-            mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
         } catch (UnresolvedAddressException e) {
-            mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
         }
     }
 
@@ -240,7 +240,7 @@ public abstract class BaseClient {
 
         public void completed(Void result, AsynchronousSocketChannel socketChannel) {
             mSocketChannel = socketChannel;
-            mLoginAndRegisterForm.setCorrect("成功连接服务器");
+            if (!DEBUG) mLoginAndRegisterForm.setCorrect("成功连接服务器");
             OnConnect(null);
 
             /*
@@ -250,7 +250,7 @@ public abstract class BaseClient {
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
-            mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
         }
     }
 

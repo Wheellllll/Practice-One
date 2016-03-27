@@ -10,7 +10,9 @@ import java.util.HashMap;
 public class LoginTest {
     public static void main(String args[])
     {
+        Server.DEBUG_MODE(true);
         Client.DEBUG_MODE(true);
+        Server server = new Server();
         Client client = new Client() {
             @Override
             public void OnConnect(HashMap<String, String> args) {
@@ -20,7 +22,8 @@ public class LoginTest {
 
             @Override
             public void OnLogin(HashMap<String, String> args) {
-                System.out.println("HHH");
+                assert("login" == args.get("event"));
+                assert("fail" == args.get("result"));
             }
         };
 

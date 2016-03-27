@@ -26,13 +26,13 @@ public class Client extends BaseClient {
 
         if (msg.get("result").equals("success")) {
             incLoginSuccessNum();
-            getLoginAndRegisterForm().close();
+            if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
         } else {
             /*
              * 登陆失败，更新UI
              */
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
             incLoginFailNum();
         }
     }
@@ -52,7 +52,6 @@ public class Client extends BaseClient {
                     .add("password", getPassword())
                     .build();
             sendMessage(msgToSend);
-            //getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
@@ -60,13 +59,13 @@ public class Client extends BaseClient {
     public void OnRegister(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
-            getLoginAndRegisterForm().close();
-            if (!DEBUG) initChatRoomUI();
+            if (!DEBUG) getLoginAndRegisterForm().close();
+            initChatRoomUI();
         } else {
             /*
              * 注册失败，更新UI
              */
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
@@ -88,7 +87,7 @@ public class Client extends BaseClient {
             /*
              * 发送失败，记录一下
              */
-            getChatRoomForm().addMessage("管理员", msg.get("reason"));
+            if (!DEBUG) getChatRoomForm().addMessage("管理员", msg.get("reason"));
         }
     }
 
@@ -98,7 +97,7 @@ public class Client extends BaseClient {
         String message = msg.get("message");
 
         incReceiveMsgNum();
-        getChatRoomForm().addMessage(from, message);
+        if (!DEBUG) getChatRoomForm().addMessage(from, message);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
                 .add("username", getUsername())
