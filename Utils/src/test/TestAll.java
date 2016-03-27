@@ -13,6 +13,7 @@ public class TestAll extends TestSuite {
         TestSuite testSuite = new TestSuite("TestSuite Test");
         testSuite.addTestSuite(MessageBuilderTest.class);
         testSuite.addTestSuite(StringUtilsTest.class);
+        //testSuite.addTestSuite(LogUtilsTest.class);
         return testSuite;
     }
 

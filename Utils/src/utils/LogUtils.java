@@ -10,7 +10,9 @@ import java.util.Date;
 /**
  * Created by LiaoShanhe on 2016/3/21.
  */
+
 public class LogUtils {
+    protected File OpenFile(String fileName) { return new File(fileName);}
 
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
@@ -77,11 +79,11 @@ public class LogUtils {
             fileWriter = new FileWriter(file.getName(), true);
             bufferedWriter = new BufferedWriter(fileWriter);
             String record = String.format("Log at %s:\n" +
-                            "\tValid login number: %d,\n" +
-                            "\tInvalid login number: %d,\n" +
-                            "\tReceive message number: %d,\n" +
-                            "\tIgnore message number: %d,\n" +
-                            "\tForward message number: %d.\n\n",
+                            "\tValid login number: %d ,\n" +
+                            "\tInvalid login number: %d ,\n" +
+                            "\tReceive message number: %d ,\n" +
+                            "\tIgnore message number: %d ,\n" +
+                            "\tForward message number: %d .\n\n",
                     df.format(new Date()), validLoginNum, invalidLoginNum, receiveMsgNum, ignoreMsgNum, forwardMsgNum);
             bufferedWriter.write(record);
         } catch (IOException e) {

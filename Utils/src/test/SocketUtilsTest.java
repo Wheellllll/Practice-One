@@ -2,6 +2,9 @@ package test;
 
 import org.junit.Test;
 
+import java.nio.channels.AsynchronousByteChannel;
+import java.nio.channels.AsynchronousSocketChannel;
+
 import static org.junit.Assert.*;
 
 /**
@@ -11,6 +14,7 @@ public class SocketUtilsTest {
 
     @Test
     public void testSendMessage() throws Exception {
+        AsynchronousSocketChannel channel = (AsynchronousSocketChannel.open());
 
     }
 
