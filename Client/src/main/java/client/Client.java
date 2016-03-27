@@ -27,7 +27,7 @@ public class Client extends BaseClient {
         if (msg.get("result").equals("success")) {
             incLoginSuccessNum();
             getLoginAndRegisterForm().close();
-            initChatRoomUI();
+            if (!DEBUG) initChatRoomUI();
         } else {
             /*
              * 登陆失败，更新UI
@@ -61,7 +61,7 @@ public class Client extends BaseClient {
 
         if (msg.get("result").equals("success")) {
             getLoginAndRegisterForm().close();
-            initChatRoomUI();
+            if (!DEBUG) initChatRoomUI();
         } else {
             /*
              * 注册失败，更新UI

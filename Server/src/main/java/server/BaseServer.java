@@ -20,6 +20,12 @@ public abstract class BaseServer {
         new Server();
     }
 
+    protected static boolean DEBUG = false;
+
+    public static void DEBUG_MODE(boolean flag) {
+        DEBUG = flag;
+    }
+
     public BaseServer() {
         try {
             Config.setConfigName("server");
@@ -33,7 +39,8 @@ public abstract class BaseServer {
             serverSocketChannel.accept(serverSocketChannel, new ConnectionHandler());
             sc = Executors.newScheduledThreadPool(1);
             sc.scheduleAtFixedRate(new ServerLogger(NIOClient.getClients()), 0, 1, TimeUnit.MINUTES);
-            Thread.currentThread().join();
+
+            if (!DEBUG) Thread.currentThread().join();
         } catch (IOException e) {
             System.out.format("Server failed to start: %s", e.getMessage());
         } catch (InterruptedException e) {

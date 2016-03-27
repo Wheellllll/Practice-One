@@ -43,6 +43,12 @@ public abstract class BaseClient {
     private String username = null;
     private String password = null;
 
+    protected static boolean DEBUG = false;
+
+    public static void DEBUG_MODE(boolean flag) {
+        DEBUG = flag;
+    }
+
     public int getLoginSuccessNum() {
         return loginSuccessNum;
     }
@@ -99,12 +105,12 @@ public abstract class BaseClient {
         try {
             Config.setConfigName("client");
             initEvent();
-            initWelcomeUI();
+            if (!DEBUG) initWelcomeUI();
             tryConnect();
 
             sc = Executors.newScheduledThreadPool(1);
             sc.scheduleAtFixedRate(new ClientLogger(this), 0, 1, TimeUnit.MINUTES);
-            Thread.currentThread().join();
+            if (!DEBUG) Thread.currentThread().join();
         } catch (InterruptedException e) {
             System.out.format("Stop to connect to server");
         }
