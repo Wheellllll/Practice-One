@@ -29,17 +29,16 @@ public class SocketUtils {
             handler = new WriteHandler();
         }
 
-        socketChannel.write(buf, socketChannel, handler);
+        socketChannel.write(buf, new Attachment(socketChannel, buf), handler);
     }
 
-    public static void readMessage(AsynchronousSocketChannel socketChannel, ReadHandler handler) {
+    public static void readMessage(AsynchronousSocketChannel socketChannel, CompletionHandler handler) {
         /*
          * 读消息
          */
         final ByteBuffer buf = ByteBuffer.allocate(2048);
-        handler.setBuffer(buf);
 
-        socketChannel.read(buf, socketChannel, handler);
+        socketChannel.read(buf, new Attachment(socketChannel, buf), handler);
     }
 
     public static void dispatchMessage(EventManager eventManager, String message) {
