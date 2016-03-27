@@ -1,3 +1,12 @@
+##组员
+| 姓名      | 学号      | Github账号          |
+| :-------: | :-------: | :-----------------: |
+| 罗毅      | 1352388   | [blackbbc][1]       |
+| 冯夏令    | 1352920   | [WishSummer][2]     |
+| 廖山河    | 1352921   | [mirrordust][3]     |
+| 彭程      | 1352905   | [KrisCheng][4]      |
+| 范亮      | 1352899   | [fanliangandrew][5] |
+
 ###依赖
 - sqlite
 
@@ -98,3 +107,9 @@ message{
 "message":"XXXXXX"
 }
 ```
+
+[1]: https://github.com/blackbbc
+[2]: https://github.com/WishSummer
+[3]: https://github.com/mirrordust
+[4]: https://github.com/KrisCheng
+[5]: https://github.com/fanliangandrew
