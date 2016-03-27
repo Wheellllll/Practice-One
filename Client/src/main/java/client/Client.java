@@ -1,25 +1,8 @@
-import com.alibaba.fastjson.JSON;
-import ui.ChatRoomForm;
-import utils.Config;
-import ui.ConfigDialog;
-import ui.LoginAndRegisterForm;
-import utils.MessageBuilder;
-import handler.PackageHandler;
-import utils.SocketUtils;
+package client;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.channels.UnresolvedAddressException;
+import utils.MessageBuilder;
+
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 /**

@@ -1,3 +1,5 @@
+package server;
+
 import event.EventListener;
 import event.EventManager;
 import handler.PackageHandler;
@@ -5,7 +7,6 @@ import handler.ReadHandler;
 import utils.*;
 
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 

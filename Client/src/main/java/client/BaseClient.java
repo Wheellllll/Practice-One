@@ -1,4 +1,5 @@
-import com.alibaba.fastjson.JSON;
+package client;
+
 import event.EventListener;
 import event.EventManager;
 import handler.PackageHandler;
@@ -15,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
