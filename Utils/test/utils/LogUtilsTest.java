@@ -1,4 +1,4 @@
-package test;
+package utils;
 
 import junit.framework.TestCase;
 import org.easymock.EasyMock;
@@ -18,7 +18,6 @@ import static org.junit.Assert.*;
 public class LogUtilsTest extends TestCase{
 
     @Test
-    File file = EasyMock.createNiceMock(File.class);
 
     public void testLog() throws Exception {
         int[] par1 = {1,1,2,2};
