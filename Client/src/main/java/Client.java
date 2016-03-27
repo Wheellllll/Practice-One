@@ -5,6 +5,7 @@ import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
 import utils.MessageBuilder;
 import handler.PackageHandler;
+import utils.SocketUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -89,7 +90,10 @@ public class Client extends BaseClient {
     @Override
     public void OnSend(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
-            //TODO:成功，记录一下
+            /*
+             * 发送成功，记录一下
+             */
+            incSendMsgNum();
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -98,7 +102,10 @@ public class Client extends BaseClient {
                     .build();
             sendMessage(msgToSend);
         } else {
-            //TODO:失败，为什么失败
+            /*
+             * 发送失败，记录一下
+             */
+            getChatRoomForm().addMessage("管理员", msg.get("reason"));
         }
     }
 
@@ -109,7 +116,12 @@ public class Client extends BaseClient {
 
         incReceiveMsgNum();
         getChatRoomForm().addMessage(from, message);
-        //TODO: 通知服务器
+        String msgToSend = new MessageBuilder()
+                .add("event", "forward")
+                .add("username", getUsername())
+                .add("ack", "success")
+                .build();
+        sendMessage(msgToSend);
     }
 
     @Override
