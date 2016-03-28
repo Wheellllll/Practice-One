@@ -12,9 +12,17 @@ import java.nio.channels.CompletionHandler;
 import java.util.HashMap;
 
 /**
- * Created by sweet on 3/18/16.
+ * This class provide methods for sending message to socket
+ * or reading message from socket
  */
 public class SocketUtils {
+    /**
+     * This method send a message to <code>AsynchronousSocketChannel</code>
+     *
+     * @param socketWrapper Socket where message should be send to
+     * @param message A string to send
+     * @param handler Handler to invoke after finish reading message from socket
+     */
     public static void sendMessage(AsynchronousSocketChannelWrapper socketWrapper, String message, CompletionHandler handler) {
         /*
          * 发消息
@@ -49,6 +57,12 @@ public class SocketUtils {
         socketWrapper.write(buf);
     }
 
+    /**
+     * This method read a message from <code>AsynchronousSocketChannel</code>
+     *
+     * @param socketChannel Socket where message should be send to
+     * @param handler Handler to invoke after finish reading message from socket
+     */
     public static void readMessage(AsynchronousSocketChannel socketChannel, CompletionHandler handler) {
         /*
          * 读消息
@@ -58,6 +72,12 @@ public class SocketUtils {
         socketChannel.read(buf, new Attachment(socketChannel, buf), handler);
     }
 
+    /**
+     * This method dispatch event depending on the message
+     *
+     * @param eventManager A event manager that charge for the dispatch
+     * @param message A message which include the event
+     */
     public static void dispatchMessage(EventManager eventManager, String message) {
         HashMap<String,String> args = JSON.parseObject(message, HashMap.class);
         String event = args.get("event");

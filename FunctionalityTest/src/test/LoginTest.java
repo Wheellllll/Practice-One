@@ -1,7 +1,8 @@
+package test;
+
 import utils.MessageBuilder;
 import client.Client;
 import server.Server;
-import utils.MessageBuilder;
 
 import java.util.HashMap;
 /**

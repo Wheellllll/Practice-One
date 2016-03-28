@@ -3,7 +3,7 @@ package event;
 import java.util.HashMap;
 
 /**
- * Created by sweet on 3/24/16.
+ * runnable for event
  */
 public interface EventRunnable {
     public void run(HashMap<String, String> args);

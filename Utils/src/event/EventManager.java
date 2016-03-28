@@ -3,7 +3,7 @@ package event;
 import java.util.*;
 
 /**
- * Created by sweet on 3/24/16.
+ * event manager manages events
  */
 public class EventManager {
     private HashMap<String, EventListener> listeners;

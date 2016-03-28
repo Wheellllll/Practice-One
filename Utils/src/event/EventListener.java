@@ -1,7 +1,7 @@
 package event;
 
 /**
- * Created by sweet on 3/24/16.
+ * listener for event
  */
 public abstract class EventListener implements EventRunnable {
 }

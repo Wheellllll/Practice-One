@@ -1,4 +1,5 @@
 out/
+doc/
 Client/target/
 Server/target/
 *.db

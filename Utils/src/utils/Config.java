@@ -4,7 +4,7 @@ import java.io.*;
 import java.util.Properties;
 
 /**
- * Created by sweet on 3/22/16.
+ * This class provide methods for config
  */
 public class Config {
     /*
@@ -18,10 +18,18 @@ public class Config {
         private static final Config INSTANCE = new Config();
     }
 
+    /**
+     * Set config file name
+     * @param configName config file name
+     */
     public static void setConfigName(String configName) {
         Config.configName = configName;
     }
 
+    /**
+     * Get a singleton config
+     * @return Config
+     */
     public static final Config getConfig() {
         return ConfigHolder.INSTANCE;
     }
@@ -42,14 +50,30 @@ public class Config {
         }
     }
 
+    /**
+     * Get property from config
+     * @param key Key for the property
+     * @return String value for the property
+     */
     public String getProperty(String key) {
         return mProps.getProperty(key);
     }
 
+    /**
+     * Get property from config. If not existed, use default value
+     * @param key Key for the property
+     * @param defaultValue Default value for the property
+     * @return String value for the property
+     */
     public String getProperty(String key, String defaultValue) {
         return mProps.getProperty(key, defaultValue);
     }
 
+    /**
+     * Store a property to the config
+     * @param key Key for the property
+     * @param value Value for the property
+     */
     public void setProperty(String key, String value) {
         try {
             mProps.setProperty(key, value);
