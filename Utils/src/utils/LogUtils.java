@@ -1,11 +1,13 @@
 package utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 /**
  * This class provide methods for logging.
@@ -133,6 +135,7 @@ public class LogUtils {
             }
         }
     }
+
 
     protected File OpenFile(String fileName) {
         return new File(fileName);

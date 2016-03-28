@@ -11,6 +11,6 @@ public class ConfigTest {
         Config conf = new Config();
         conf.setProperty("host","127.0.0.1");
         assert ("127.0.0.1" == conf.getProperty("host"));
-        
+
     }
 }
