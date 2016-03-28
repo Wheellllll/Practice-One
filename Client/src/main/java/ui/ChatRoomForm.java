@@ -7,7 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
 /**
- * Created by sweet on 3/21/16.
+ * Provide a GUI of the chat rom for the client. Users use this GUI to interact with the server.
  */
 public class ChatRoomForm {
     private JFrame frame = new JFrame("最简单的聊天室");
@@ -48,27 +48,42 @@ public class ChatRoomForm {
 
     }
 
-    public JFrame getFrame() {
-        return frame;
-    }
-
+    /**
+     * Close this chat room
+     */
     public void close() {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
+    /**
+     * Get message that users type in the text field
+     * @return String of the message
+     */
     public String getSendMessage() {
         return chatArea.getText();
     }
 
+    /**
+     * Add message received from the server to the message area
+     * @param from user who sends this message
+     * @param message message send by the user
+     */
     public void addMessage(String from, String message) {
         messageArea.append(from + ":" + message + "\n");
         messageArea.setCaretPosition(messageArea.getDocument().getLength());
     }
 
+    /**
+     * Clear the message that user type in the text field
+     */
     public void clearChatArea() {
         chatArea.setText("");
     }
 
+    /**
+     * Add a listener to the send event
+     * @param listener listener called when send message
+     */
     public void setOnSendListener(ActionListener listener) {
         sendBtn.addActionListener(listener);
         chatArea.addActionListener(listener);

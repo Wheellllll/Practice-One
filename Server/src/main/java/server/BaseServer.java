@@ -12,7 +12,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by sweet on 3/24/16.
+ * Base server which implement the dirty works
  */
 public abstract class BaseServer {
     private ScheduledExecutorService sc = null;

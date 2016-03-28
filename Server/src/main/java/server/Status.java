@@ -1,16 +1,23 @@
 package server;
 
 /**
- * Created by sweet on 3/24/16.
+ * Status for the client
  */
 public enum Status {
-    /*
-     * socket状态
-     * LOGOUT--已登出
-     * LOGIN--已登陆
-     * RELOGIN--已发送100条消息，需重新登陆
-     * IGNORE--超过5条/秒的限制，忽略
-     *
+    /**
+     * Already login in. Available to send and read message
      */
-    LOGIN, LOGOUT, RELOGIN, IGNORE
+    LOGIN,
+    /**
+     * Already logout. Unavailable to send and read message
+     */
+    LOGOUT,
+    /**
+     * Need to relogin due to message limit per session. Unavailable to send and read message
+     */
+    RELOGIN,
+    /**
+     * Already to login. Available to read message and Unavailable to send message due to message limit per second
+     */
+    IGNORE
 }

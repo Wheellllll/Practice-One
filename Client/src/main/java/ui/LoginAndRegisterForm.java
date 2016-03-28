@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
 /**
- * Created by sweet on 3/21/16.
+ * Provide a GUI of the login and register for the client. Users need to login or register in the GUI.
  */
 public class LoginAndRegisterForm {
     private JFrame frame = new JFrame("欢迎界面");
@@ -72,38 +72,69 @@ public class LoginAndRegisterForm {
         return frame;
     }
 
+    /**
+     * Close this form
+     */
     public void close() {
         frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
     }
 
+    /**
+     * Get username that user type in the text field
+     * @return String of the username
+     */
     public String getUsername() {
         return username.getText();
     }
 
+    /**
+     * Get password that user type in the text field
+     * @return String of the password
+     */
     public String getPassword() {
         return new String(password.getPassword());
     }
 
+    /**
+     * Set error notification in the GUI
+     * @param error Error notification
+     */
     public void setError(String error) {
         hintLabel.setForeground(Color.RED);
         hintLabel.setText(error);
         hintLabel.setVisible(true);
     }
 
+    /**
+     * Set correct message in the GUI
+     * @param correct correct notification
+     */
     public void setCorrect(String correct) {
         hintLabel.setForeground(Color.GREEN);
         hintLabel.setText(correct);
         hintLabel.setVisible(true);
     }
 
+    /**
+     * Add a listener to the login event
+     * @param listener listener called when login
+     */
     public void setOnLoginListener(ActionListener listener) {
         loginBtn.addActionListener(listener);
     }
 
+    /**
+     * Add a listener to the register event
+     * @param listener listener called when register
+     */
     public void setOnRegisterListener(ActionListener listener) {
         registerBtn.addActionListener(listener);
     }
 
+    /**
+     * Add a listener to the config event
+     * @param listener listener called when config
+     */
     public void setOnConfigListener(ActionListener listener) {
         configBtn.addActionListener(listener);
     }

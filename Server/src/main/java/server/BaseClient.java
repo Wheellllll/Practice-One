@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by sweet on 3/24/16.
+ * Base client which implement the dirty works
  */
 public abstract class BaseClient {
     private static ArrayList<BaseClient> clients = new ArrayList<BaseClient>();
