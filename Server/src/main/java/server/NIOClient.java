@@ -7,7 +7,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.util.HashMap;
 
 /**
- * Created by sweet on 3/20/16.
+ * Client inherited from BaseClient. You may need to implement the event handler.
  */
 public class NIOClient extends BaseClient {
 
