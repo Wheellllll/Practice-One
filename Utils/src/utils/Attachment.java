@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 
 /**
- * Created by sweet on 3/28/16.
+ * Attachment include some necessary information for socket to use
  */
 public class Attachment {
     public AsynchronousSocketChannel socketChannel;

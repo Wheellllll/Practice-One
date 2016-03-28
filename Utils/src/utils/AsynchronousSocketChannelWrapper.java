@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by sweet on 3/28/16.
+ * This class provide a wrapper for <code>AsynchronousSocketChannel</code>
  */
 public class AsynchronousSocketChannelWrapper {
     private final AsynchronousSocketChannel asynchronousSocketChannel;
@@ -98,6 +98,11 @@ public class AsynchronousSocketChannelWrapper {
         this.iov = new ByteBuffer[16];
     }
 
+    /**
+     * This method write a <code>ByteBuffer</code> to socket
+     * @param byteBuffer ByteBuffer to write
+     * @return True if write successful or False if socket is closed
+     */
     public boolean write( ByteBuffer byteBuffer )
     {
         lock.lock();

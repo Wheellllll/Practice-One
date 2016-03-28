@@ -14,8 +14,6 @@ public class ChatRoomForm {
     private JTextArea messageArea = new JTextArea();
     private JTextField chatArea = new JTextField();
     private JButton sendBtn = new JButton("发送");
-    private JScrollPane scrollPane;
-
 
     public ChatRoomForm() {
         frame.setSize(500, 300);
@@ -33,7 +31,7 @@ public class ChatRoomForm {
         bottomPanel.add(sendBtn, BorderLayout.EAST);
 
         //顶部消息区域
-        scrollPane = new JScrollPane(messageArea);
+        JScrollPane scrollPane = new JScrollPane(messageArea);
         scrollPane.setHorizontalScrollBarPolicy(
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED
         );

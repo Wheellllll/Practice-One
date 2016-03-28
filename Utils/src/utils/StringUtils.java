@@ -6,7 +6,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by sweet on 3/18/16.
+ * This class provide methods for transforming strings
  */
 public class StringUtils {
     /**

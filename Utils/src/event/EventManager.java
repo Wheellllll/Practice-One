@@ -3,7 +3,7 @@ package event;
 import java.util.*;
 
 /**
- * Created by sweet on 3/24/16.
+ * event manager manages events
  */
 public class EventManager {
     private HashMap<String, EventListener> listeners;
@@ -21,6 +21,10 @@ public class EventManager {
         EventListener listener = listeners.get(event);
         if (event != null) {
             listener.run(args);
+        } else {
+            args.put("event", "error");
+            args.put("reason", "Event is illegal!");
+            listeners.get("error").run(args);
         }
     }
 }

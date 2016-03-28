@@ -26,7 +26,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by sweet on 3/24/16.
+ * Base class for client
  */
 public abstract class BaseClient {
     private LoginAndRegisterForm mLoginAndRegisterForm = null;

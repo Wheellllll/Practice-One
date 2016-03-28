@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * This class provide related methods for logging.
+ * This class provide methods for logging.
  *
  * @author LiaoShanhe
  */
