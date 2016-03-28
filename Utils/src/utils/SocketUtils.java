@@ -15,7 +15,7 @@ import java.util.HashMap;
  * Created by sweet on 3/18/16.
  */
 public class SocketUtils {
-    public static void sendMessage(AsynchronousSocketChannel socketChannel, String message, CompletionHandler handler) {
+    public static void sendMessage(AsynchronousSocketChannelWrapper socketWrapper, String message, CompletionHandler handler) {
         /*
          * 发消息
          */
@@ -29,7 +29,7 @@ public class SocketUtils {
             handler = new WriteHandler();
         }
 
-        socketChannel.write(buf, new Attachment(socketChannel, buf), handler);
+        socketWrapper.write(buf);
     }
 
     public static void readMessage(AsynchronousSocketChannel socketChannel, CompletionHandler handler) {

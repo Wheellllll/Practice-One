@@ -7,6 +7,7 @@ import handler.ReadHandler;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
+import utils.AsynchronousSocketChannelWrapper;
 import utils.Config;
 import utils.MessageBuilder;
 import utils.SocketUtils;
@@ -31,6 +32,7 @@ public abstract class BaseClient {
     private LoginAndRegisterForm mLoginAndRegisterForm = null;
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
+    private AsynchronousSocketChannelWrapper mSocketWrapper = null;
 
     private PackageHandler mPackageHandler = new PackageHandler();
     private EventManager mEventManager = new EventManager();
@@ -98,7 +100,7 @@ public abstract class BaseClient {
     }
 
     public void sendMessage(String message) {
-        SocketUtils.sendMessage(mSocketChannel, message, null);
+        SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
     public BaseClient() {
@@ -240,6 +242,7 @@ public abstract class BaseClient {
 
         public void completed(Void result, AsynchronousSocketChannel socketChannel) {
             mSocketChannel = socketChannel;
+            mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
             if (!DEBUG) mLoginAndRegisterForm.setCorrect("成功连接服务器");
             OnConnect(null);
 
