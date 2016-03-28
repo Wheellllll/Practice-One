@@ -5,7 +5,7 @@ import utils.Attachment;
 import java.nio.channels.CompletionHandler;
 
 /**
- * Created by sweet on 3/28/16.
+ * A general handler for socket to use. You can use this class to implement you custom handler.
  */
 public abstract class GeneralHandler implements CompletionHandler<Integer, Attachment> {
 }

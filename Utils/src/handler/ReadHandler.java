@@ -9,7 +9,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
 /**
- * Created by sweet on 3/24/16.
+ * A read handler for this project which will be used by the socket
  */
 public class ReadHandler implements CompletionHandler<Integer, Attachment> {
     private PackageHandler mPackageHandler;
