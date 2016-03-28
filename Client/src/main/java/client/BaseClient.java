@@ -1,4 +1,5 @@
-import com.alibaba.fastjson.JSON;
+package client;
+
 import event.EventListener;
 import event.EventManager;
 import handler.PackageHandler;
@@ -15,7 +16,6 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
@@ -42,6 +42,12 @@ public abstract class BaseClient {
     private int receiveMsgNum = 0;
     private String username = null;
     private String password = null;
+
+    protected static boolean DEBUG = false;
+
+    public static void DEBUG_MODE(boolean flag) {
+        DEBUG = flag;
+    }
 
     public int getLoginSuccessNum() {
         return loginSuccessNum;
@@ -99,12 +105,12 @@ public abstract class BaseClient {
         try {
             Config.setConfigName("client");
             initEvent();
-            initWelcomeUI();
+            if (!DEBUG) initWelcomeUI();
             tryConnect();
 
             sc = Executors.newScheduledThreadPool(1);
             sc.scheduleAtFixedRate(new ClientLogger(this), 0, 1, TimeUnit.MINUTES);
-            Thread.currentThread().join();
+            if (!DEBUG) Thread.currentThread().join();
         } catch (InterruptedException e) {
             System.out.format("Stop to connect to server");
         }
@@ -223,9 +229,9 @@ public abstract class BaseClient {
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
         } catch (IOException e) {
-            mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
         } catch (UnresolvedAddressException e) {
-            mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
         }
     }
 
@@ -234,7 +240,7 @@ public abstract class BaseClient {
 
         public void completed(Void result, AsynchronousSocketChannel socketChannel) {
             mSocketChannel = socketChannel;
-            mLoginAndRegisterForm.setCorrect("成功连接服务器");
+            if (!DEBUG) mLoginAndRegisterForm.setCorrect("成功连接服务器");
             OnConnect(null);
 
             /*
@@ -244,7 +250,7 @@ public abstract class BaseClient {
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
-            mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
         }
     }
 

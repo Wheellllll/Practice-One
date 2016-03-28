@@ -1,3 +1,5 @@
+package server;
+
 import utils.Config;
 
 import java.io.IOException;
@@ -5,7 +7,6 @@ import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
-import java.util.EventListener;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,6 +18,12 @@ public abstract class BaseServer {
     private ScheduledExecutorService sc = null;
     public static void main(String[] args) {
         new Server();
+    }
+
+    protected static boolean DEBUG = false;
+
+    public static void DEBUG_MODE(boolean flag) {
+        DEBUG = flag;
     }
 
     public BaseServer() {
@@ -32,7 +39,8 @@ public abstract class BaseServer {
             serverSocketChannel.accept(serverSocketChannel, new ConnectionHandler());
             sc = Executors.newScheduledThreadPool(1);
             sc.scheduleAtFixedRate(new ServerLogger(NIOClient.getClients()), 0, 1, TimeUnit.MINUTES);
-            Thread.currentThread().join();
+
+            if (!DEBUG) Thread.currentThread().join();
         } catch (IOException e) {
             System.out.format("Server failed to start: %s", e.getMessage());
         } catch (InterruptedException e) {

@@ -1,25 +1,8 @@
-import com.alibaba.fastjson.JSON;
-import ui.ChatRoomForm;
-import utils.Config;
-import ui.ConfigDialog;
-import ui.LoginAndRegisterForm;
-import utils.MessageBuilder;
-import handler.PackageHandler;
-import utils.SocketUtils;
+package client;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.channels.UnresolvedAddressException;
+import utils.MessageBuilder;
+
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -43,13 +26,13 @@ public class Client extends BaseClient {
 
         if (msg.get("result").equals("success")) {
             incLoginSuccessNum();
-            getLoginAndRegisterForm().close();
-            initChatRoomUI();
+            if (!DEBUG) getLoginAndRegisterForm().close();
+            if (!DEBUG) initChatRoomUI();
         } else {
             /*
              * 登陆失败，更新UI
              */
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
             incLoginFailNum();
         }
     }
@@ -69,7 +52,6 @@ public class Client extends BaseClient {
                     .add("password", getPassword())
                     .build();
             sendMessage(msgToSend);
-            //getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
@@ -77,13 +59,13 @@ public class Client extends BaseClient {
     public void OnRegister(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
-            getLoginAndRegisterForm().close();
+            if (!DEBUG) getLoginAndRegisterForm().close();
             initChatRoomUI();
         } else {
             /*
              * 注册失败，更新UI
              */
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
@@ -105,7 +87,7 @@ public class Client extends BaseClient {
             /*
              * 发送失败，记录一下
              */
-            getChatRoomForm().addMessage("管理员", msg.get("reason"));
+            if (!DEBUG) getChatRoomForm().addMessage("管理员", msg.get("reason"));
         }
     }
 
@@ -115,7 +97,7 @@ public class Client extends BaseClient {
         String message = msg.get("message");
 
         incReceiveMsgNum();
-        getChatRoomForm().addMessage(from, message);
+        if (!DEBUG) getChatRoomForm().addMessage(from, message);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
                 .add("username", getUsername())
