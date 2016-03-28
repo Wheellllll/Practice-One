@@ -9,7 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
 /**
- * Created by sweet on 3/22/16.
+ * Provide a GUI of the dialog for the client. Users can config host and port in this dialog
  */
 public class ConfigDialog {
     private JDialog dialog;
