@@ -128,7 +128,7 @@ public class DatabaseUtils {
      * This method create a new account in database.
      *
      * @param username Username of client
-     * @param password Password if client
+     * @param password Password of client
      * @return boolean Return true if creating account successfully, otherwise false
      */
     public static boolean createAccount(String username, String password) {
