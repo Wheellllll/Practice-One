@@ -19,16 +19,30 @@ public class SocketUtils {
         /*
          * 发消息
          */
-        ByteBuffer buf = ByteBuffer.allocate(2048);
-        buf.put(message.getBytes());
-        //4表示传输结束
-        buf.put((byte)4);
-        buf.flip();
+        ByteBuffer buf;
+        String pkgToSend;
+        StringBuilder sb = new StringBuilder(message);
 
         if (handler == null) {
             handler = new WriteHandler();
         }
 
+        while (sb.length() > 5) {
+            pkgToSend = sb.substring(0, 5);
+            sb.delete(0, 5);
+
+            buf = ByteBuffer.allocate(2048);
+            buf.put(pkgToSend.getBytes());
+            buf.flip();
+            socketWrapper.write(buf);
+        }
+
+        pkgToSend = sb.toString();
+
+        buf = ByteBuffer.allocate(2048);
+        buf.put(pkgToSend.getBytes());
+        buf.put((byte)4);
+        buf.flip();
         socketWrapper.write(buf);
     }
 
