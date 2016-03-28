@@ -1,4 +1,4 @@
-package test;
+package utils;
 
 import com.alibaba.fastjson.JSON;
 import junit.framework.TestCase;

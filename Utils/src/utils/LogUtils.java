@@ -1,19 +1,34 @@
 package utils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 /**
- * Created by LiaoShanhe on 2016/3/21.
+ * This class provide methods for logging.
+ *
+ * @author LiaoShanhe
  */
-public class LogUtils {
 
+public class LogUtils {
+    /**
+     * A <code>SimpleDateFormat</code> to format time to customer standard
+     */
     private static SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    /**
+     * This method is a common entrance for client logger and server logger.
+     *
+     * @param type    The type of <code>log</code>
+     * @param numbers Parameters that need to be recorded, 4 parameters for <code>CLIENT</code>
+     *                logType and 5 parameters for <code>SERVER</code> logType
+     * @see LogType
+     */
     public static void log(LogType type, int... numbers) {
         switch (type) {
             case CLIENT:
@@ -26,6 +41,14 @@ public class LogUtils {
         }
     }
 
+    /**
+     * This method is a private method for logging for client.
+     *
+     * @param loginSuccessNum Login success number of client
+     * @param loginFailNum    Login fail number for client
+     * @param sendMsgNum      Send message number of client
+     * @param receiveMsgNum   Receive message number for client
+     */
     private static void logForClient(int loginSuccessNum, int loginFailNum, int sendMsgNum, int receiveMsgNum) {
         File file = null;
         FileWriter fileWriter = null;
@@ -64,6 +87,15 @@ public class LogUtils {
         }
     }
 
+    /**
+     * This method is a private method for logging for server.
+     *
+     * @param validLoginNum   Valid login number of client
+     * @param invalidLoginNum Invalid login number for client
+     * @param receiveMsgNum   Received message number from all clients
+     * @param ignoreMsgNum    Ignored message number from all clients
+     * @param forwardMsgNum   Forwarded message number, adding one for every client every message
+     */
     private static void logForServer(int validLoginNum, int invalidLoginNum,
                                      int receiveMsgNum, int ignoreMsgNum, int forwardMsgNum) {
         File file = null;
@@ -77,11 +109,11 @@ public class LogUtils {
             fileWriter = new FileWriter(file.getName(), true);
             bufferedWriter = new BufferedWriter(fileWriter);
             String record = String.format("Log at %s:\n" +
-                            "\tValid login number: %d,\n" +
-                            "\tInvalid login number: %d,\n" +
-                            "\tReceive message number: %d,\n" +
-                            "\tIgnore message number: %d,\n" +
-                            "\tForward message number: %d.\n\n",
+                            "\tValid login number: %d ,\n" +
+                            "\tInvalid login number: %d ,\n" +
+                            "\tReceive message number: %d ,\n" +
+                            "\tIgnore message number: %d ,\n" +
+                            "\tForward message number: %d .\n\n",
                     df.format(new Date()), validLoginNum, invalidLoginNum, receiveMsgNum, ignoreMsgNum, forwardMsgNum);
             bufferedWriter.write(record);
         } catch (IOException e) {
@@ -104,6 +136,15 @@ public class LogUtils {
         }
     }
 
+
+    protected File OpenFile(String fileName) {
+        return new File(fileName);
+    }
+
+    /**
+     * Type of logging, <code>CLIENT</code> represents logging for client, <code>SERVER</code>
+     * represents logging for server.
+     */
     public enum LogType {
         CLIENT, SERVER
     }

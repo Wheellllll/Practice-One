@@ -1,3 +1,5 @@
+package server;
+
 import event.EventListener;
 import event.EventManager;
 import handler.PackageHandler;
@@ -5,7 +7,6 @@ import handler.ReadHandler;
 import utils.*;
 
 import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -26,6 +27,7 @@ public abstract class BaseClient {
      *
      */
     private AsynchronousSocketChannel mSocketChannel = null;
+    private AsynchronousSocketChannelWrapper mSocketWrapper = null;
     private PackageHandler mPackageHandler = new PackageHandler();
 
     private String mUsername = null;
@@ -146,13 +148,14 @@ public abstract class BaseClient {
     }
 
     public void sendMessage(String message) {
-        SocketUtils.sendMessage(mSocketChannel, message, null);
+        SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
 
     public BaseClient(AsynchronousSocketChannel socketChannel) {
         initialEvent();
         this.mSocketChannel = socketChannel;
+        this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
         /*
          * 触发OnConnect事件
          */
@@ -191,6 +194,11 @@ public abstract class BaseClient {
             public void run(HashMap<String, String> args) {
                 OnSend(args);
             }
+        }).addEventListener("forward", new EventListener() {
+            @Override
+            public void run(HashMap<String, String> args) {
+                OnForward(args);
+            }
         }).addEventListener("disconnect", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
@@ -209,6 +217,7 @@ public abstract class BaseClient {
     public abstract void OnRegister(HashMap<String, String> args);
     public abstract void OnRelogin(HashMap<String, String> args);
     public abstract void OnSend(HashMap<String, String> args);
+    public abstract void OnForward(HashMap<String, String> args);
     public abstract void OnDisconnect(HashMap<String, String> args);
     public abstract void OnError(HashMap<String, String> args);
 

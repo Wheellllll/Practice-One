@@ -1,14 +1,13 @@
-import utils.Config;
-import utils.DatabaseUtils;
-import utils.MessageBuilder;
-import utils.StringUtils;
+package server;
+
+import utils.*;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.HashMap;
 
 /**
- * Created by sweet on 3/20/16.
+ * Client inherited from BaseClient. You may need to implement the event handler.
  */
 public class NIOClient extends BaseClient {
 
@@ -16,14 +15,20 @@ public class NIOClient extends BaseClient {
         super(socketChannel);
     }
 
-    /*
-     * 事件定义
+
+    /**
+     * Triggered when connect to the client
+     * @param args Json params passed to this method
      */
     @Override
     public void OnConnect(HashMap<String, String> args) {
         getClients().add(this);
     }
 
+    /**
+     * Triggered when received login request from the client
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnLogin(HashMap<String, String> args) {
         /*
@@ -86,6 +91,10 @@ public class NIOClient extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received register request from the client
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnRegister(HashMap<String, String> args) {
        /*
@@ -138,11 +147,19 @@ public class NIOClient extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received relogin request from the client
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnRelogin(HashMap<String, String> args) {
         OnLogin(args);
     }
 
+    /**
+     * Triggered when received send request from the client
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnSend(HashMap<String, String> args) {
         /*
@@ -209,6 +226,19 @@ public class NIOClient extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received forward request from the client
+     * @param args Json params passed to this method
+     */
+    @Override
+    public void OnForward(HashMap<String, String> args) {
+        System.out.println(String.format("%s has received message", args.get("username")));
+    }
+
+    /**
+     * Triggered when disconnect from the client
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnDisconnect(HashMap<String, String> args) {
         try {
@@ -220,6 +250,10 @@ public class NIOClient extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received error message from the client
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnError(HashMap<String, String> args) {
         String msgToSend = new MessageBuilder()

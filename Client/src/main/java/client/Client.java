@@ -1,58 +1,51 @@
-import com.alibaba.fastjson.JSON;
-import ui.ChatRoomForm;
-import utils.Config;
-import ui.ConfigDialog;
-import ui.LoginAndRegisterForm;
-import utils.MessageBuilder;
-import handler.PackageHandler;
+package client;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousSocketChannel;
-import java.nio.channels.CompletionHandler;
-import java.nio.channels.UnresolvedAddressException;
+import utils.MessageBuilder;
+
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 
 /**
- * Created by sweet on 3/16/16.
+ * Client inherited from BaseClient. You may need to implement the event handler.
  */
 public class Client extends BaseClient {
     public static void main(String[] args) {
         new Client();
     }
 
-    /*
-     * 事件定义
+    /**
+     * Triggered when connect to the server
+     * @param msg Json params passed to this method
      */
     @Override
-    public void OnConnect(HashMap<String, String> args) {
+    public void OnConnect(HashMap<String, String> msg) {
         System.out.println("Connected");
     }
 
+    /**
+     * Triggered when received login result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnLogin(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
             incLoginSuccessNum();
-            getLoginAndRegisterForm().close();
-            initChatRoomUI();
+            if (!DEBUG) getLoginAndRegisterForm().close();
+            if (!DEBUG) initChatRoomUI();
         } else {
             /*
              * 登陆失败，更新UI
              */
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
             incLoginFailNum();
         }
     }
 
+    /**
+     * Triggered when received relogin result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
@@ -68,28 +61,38 @@ public class Client extends BaseClient {
                     .add("password", getPassword())
                     .build();
             sendMessage(msgToSend);
-            //getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
+    /**
+     * Triggered when received register result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnRegister(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
-            getLoginAndRegisterForm().close();
+            if (!DEBUG) getLoginAndRegisterForm().close();
             initChatRoomUI();
         } else {
             /*
              * 注册失败，更新UI
              */
-            getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
         }
     }
 
+    /**
+     * Triggered when received send result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnSend(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
-            //TODO:成功，记录一下
+            /*
+             * 发送成功，记录一下
+             */
+            incSendMsgNum();
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -98,29 +101,47 @@ public class Client extends BaseClient {
                     .build();
             sendMessage(msgToSend);
         } else {
-            //TODO:失败，为什么失败
+            /*
+             * 发送失败，记录一下
+             */
+            if (!DEBUG) getChatRoomForm().addMessage("管理员", msg.get("reason"));
         }
     }
 
+    /**
+     * Triggered when received forward result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnForward(HashMap<String,String> msg) {
         String from = msg.get("from");
         String message = msg.get("message");
 
         incReceiveMsgNum();
-        getChatRoomForm().addMessage(from, message);
-        //TODO: 通知服务器
+        if (!DEBUG) getChatRoomForm().addMessage(from, message);
+        String msgToSend = new MessageBuilder()
+                .add("event", "forward")
+                .add("username", getUsername())
+                .add("ack", "success")
+                .build();
+        sendMessage(msgToSend);
     }
 
-    @Override
-    public void OnError(HashMap<String, String> msg) {
-
-    }
-
+    /**
+     * Triggered when disconnect from the server
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnDisconnect(HashMap<String, String> args) {
         System.out.println("Disconnect");
     }
 
+    /**
+     * Triggered when received error message from the server
+     * @param msg Json params passed to this method
+     */
+    @Override
+    public void OnError(HashMap<String, String> msg) {
 
+    }
 }

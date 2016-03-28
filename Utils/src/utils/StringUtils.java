@@ -6,9 +6,15 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by sweet on 3/18/16.
+ * This class provide methods for transforming strings
  */
 public class StringUtils {
+    /**
+     * This method convert a <code>ByteBuffer</code> to a <code>String</code>
+     *
+     * @param buf ByteBuffer needs to convert
+     * @return String The converted result of input
+     */
     public static String bufToString(ByteBuffer buf) {
         buf.flip();
         int limits = buf.limit();
@@ -18,6 +24,12 @@ public class StringUtils {
         return new String(bytes, cs);
     }
 
+    /**
+     * This method calculate the md5 value of a input
+     *
+     * @param plainText The plain text needs to be encrypted
+     * @return Encrypted valve of input
+     */
     public static String md5Hash(String plainText) {
         String str = null;
         try {

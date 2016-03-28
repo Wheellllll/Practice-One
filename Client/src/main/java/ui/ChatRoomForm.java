@@ -15,7 +15,6 @@ public class ChatRoomForm {
     private JTextField chatArea = new JTextField();
     private JButton sendBtn = new JButton("发送");
 
-
     public ChatRoomForm() {
         frame.setSize(500, 300);
         initFrame();
@@ -63,6 +62,7 @@ public class ChatRoomForm {
 
     public void addMessage(String from, String message) {
         messageArea.append(from + ":" + message + "\n");
+        messageArea.setCaretPosition(messageArea.getDocument().getLength());
     }
 
     public void clearChatArea() {
