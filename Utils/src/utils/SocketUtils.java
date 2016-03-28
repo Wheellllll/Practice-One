@@ -19,29 +19,32 @@ public class SocketUtils {
         /*
          * 发消息
          */
+        message = message + "\u0004";
+
         ByteBuffer buf;
-        String pkgToSend;
-        StringBuilder sb = new StringBuilder(message);
+        byte[] bytes = message.getBytes();
+        byte[] pkgToSend = new byte[2048];
+        int pos = 0;
 
         if (handler == null) {
             handler = new WriteHandler();
         }
 
-        while (sb.length() > 5) {
-            pkgToSend = sb.substring(0, 5);
-            sb.delete(0, 5);
+        while (bytes.length - pos > 2048) {
+            System.arraycopy(bytes, pos, pkgToSend, 0, 2048);
+            pos += 2048;
 
             buf = ByteBuffer.allocate(2048);
-            buf.put(pkgToSend.getBytes());
+            buf.put(pkgToSend);
             buf.flip();
             socketWrapper.write(buf);
         }
 
-        pkgToSend = sb.toString();
+        pkgToSend = new byte[bytes.length - pos];
+        System.arraycopy(bytes, pos, pkgToSend, 0, bytes.length - pos);
 
         buf = ByteBuffer.allocate(2048);
-        buf.put(pkgToSend.getBytes());
-        buf.put((byte)4);
+        buf.put(pkgToSend);
         buf.flip();
         socketWrapper.write(buf);
     }
