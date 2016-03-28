@@ -6,21 +6,26 @@ import java.util.HashMap;
 
 
 /**
- * Created by sweet on 3/16/16.
+ * Client inherited from BaseClient. You may need to implement the event handler.
  */
 public class Client extends BaseClient {
     public static void main(String[] args) {
         new Client();
     }
 
-    /*
-     * 事件定义
+    /**
+     * Triggered when connect to the server
+     * @param msg Json params passed to this method
      */
     @Override
-    public void OnConnect(HashMap<String, String> args) {
+    public void OnConnect(HashMap<String, String> msg) {
         System.out.println("Connected");
     }
 
+    /**
+     * Triggered when received login result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnLogin(HashMap<String,String> msg) {
 
@@ -37,6 +42,10 @@ public class Client extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received relogin result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
@@ -55,6 +64,10 @@ public class Client extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received register result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnRegister(HashMap<String,String> msg) {
 
@@ -69,6 +82,10 @@ public class Client extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received send result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnSend(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
@@ -91,6 +108,10 @@ public class Client extends BaseClient {
         }
     }
 
+    /**
+     * Triggered when received forward result from the server
+     * @param msg Json params passed to this method
+     */
     @Override
     public void OnForward(HashMap<String,String> msg) {
         String from = msg.get("from");
@@ -106,15 +127,21 @@ public class Client extends BaseClient {
         sendMessage(msgToSend);
     }
 
-    @Override
-    public void OnError(HashMap<String, String> msg) {
-
-    }
-
+    /**
+     * Triggered when disconnect from the server
+     * @param args Json params passed to this method
+     */
     @Override
     public void OnDisconnect(HashMap<String, String> args) {
         System.out.println("Disconnect");
     }
 
+    /**
+     * Triggered when received error message from the server
+     * @param msg Json params passed to this method
+     */
+    @Override
+    public void OnError(HashMap<String, String> msg) {
 
+    }
 }

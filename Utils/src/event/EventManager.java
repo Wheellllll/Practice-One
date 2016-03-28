@@ -21,6 +21,10 @@ public class EventManager {
         EventListener listener = listeners.get(event);
         if (event != null) {
             listener.run(args);
+        } else {
+            args.put("event", "error");
+            args.put("reason", "Event is illegal!");
+            listeners.get("error").run(args);
         }
     }
 }

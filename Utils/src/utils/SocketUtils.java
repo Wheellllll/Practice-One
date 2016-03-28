@@ -79,9 +79,16 @@ public class SocketUtils {
      * @param message A message which include the event
      */
     public static void dispatchMessage(EventManager eventManager, String message) {
-        HashMap<String,String> args = JSON.parseObject(message, HashMap.class);
-        String event = args.get("event");
-        eventManager.triggerEvent(event, args);
+        try {
+            HashMap<String,String> args = JSON.parseObject(message, HashMap.class);
+            String event = args.get("event");
+            eventManager.triggerEvent(event, args);
+        } catch (Exception e) {
+            HashMap<String, String> args = new HashMap<>();
+            args.put("event", "error");
+            args.put("reason", "message is not a valid json string!");
+            eventManager.triggerEvent("error", args);
+        }
     }
 
 }
