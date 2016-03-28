@@ -27,6 +27,7 @@ public abstract class BaseClient {
      *
      */
     private AsynchronousSocketChannel mSocketChannel = null;
+    private AsynchronousSocketChannelWrapper mSocketWrapper = null;
     private PackageHandler mPackageHandler = new PackageHandler();
 
     private String mUsername = null;
@@ -147,13 +148,14 @@ public abstract class BaseClient {
     }
 
     public void sendMessage(String message) {
-        SocketUtils.sendMessage(mSocketChannel, message, null);
+        SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
 
     public BaseClient(AsynchronousSocketChannel socketChannel) {
         initialEvent();
         this.mSocketChannel = socketChannel;
+        this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
         /*
          * 触发OnConnect事件
          */
