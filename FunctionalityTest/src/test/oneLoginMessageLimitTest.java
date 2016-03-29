@@ -40,6 +40,8 @@ public class oneLoginMessageLimitTest {
         msgBuilder.add("username","funcTest");
         msgBuilder.add("password","123456");
         String msg = msgBuilder.build();
+        client.setUsername("funcTest");
+        client.setPassword("123456");
         client.sendMessage(msg);
 
         MessageBuilder msgToSendBuilder = new MessageBuilder();
@@ -61,6 +63,11 @@ public class oneLoginMessageLimitTest {
         }
         //发送第101条消息
         client.sendMessage(message);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         client.sendMessage(message);
     }
 }
