@@ -28,7 +28,6 @@ public class SendNumLimitTest {
             {
                 assert("event" == "send");
                 assert("message" == msgToSend);
-
             }
         };
 
