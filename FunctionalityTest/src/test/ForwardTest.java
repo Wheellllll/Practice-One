@@ -3,6 +3,7 @@ package test;
 import client.Client;
 import com.sun.tools.internal.xjc.model.CBuiltinLeafInfo;
 import server.Server;
+import utils.MessageBuilder;
 
 import java.util.HashMap;
 
@@ -14,7 +15,10 @@ public class ForwardTest {
     {
         Server.DEBUG_MODE(true);
         Client.DEBUG_MODE(true);
-        Server server = new Server();
+        Server server = new Server()
+        {
+
+        };
         Client client = new Client() {
 
 
@@ -32,5 +36,19 @@ public class ForwardTest {
             }
 
         };
+
+        MessageBuilder msgBuilder = new MessageBuilder();
+        msgBuilder.add("event","login");
+        msgBuilder.add("username","funcTest");
+        msgBuilder.add("password","123456");
+        String msg = msgBuilder.build();
+        client.sendMessage(msg);
+
+        String msgToSend = "test";
+        MessageBuilder msgToSendBuilder = new MessageBuilder();
+        msgToSendBuilder.add("event","send");
+        msgToSendBuilder.add("message",msgToSend);
+        String message = msgToSendBuilder.build();
+        client.sendMessage(message);
     }
 }
