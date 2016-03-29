@@ -20,12 +20,28 @@ public class oneLoginMessageLimitTest {
 
 
             @Override
-            public void OnRelogin(HashMap<String, String> msg)
-            {
-                assert("event" == "relogin");
+            public void OnLogin(HashMap<String, String> args) {
+                assert("login" == args.get("event"));
+                assert("fail" == args.get("result"));
+
 
             }
+
+            @Override
+            public void OnRelogin(HashMap<String, String> args)
+            {
+                assert("relogin" == args.get("event"));
+
+            }
+
         };
+        MessageBuilder msgBuilder = new MessageBuilder();
+        msgBuilder.add("event","login");
+        msgBuilder.add("username","funcTest");
+        msgBuilder.add("password","123456");
+        String msg = msgBuilder.build();
+        client.sendMessage(msg);
+
         MessageBuilder msgToSendBuilder = new MessageBuilder();
         msgToSendBuilder.add("event","send");
         msgToSendBuilder.add("message",msgToSend);
@@ -44,6 +60,7 @@ public class oneLoginMessageLimitTest {
             }
         }
         //发送第101条消息
+        client.sendMessage(message);
         client.sendMessage(message);
     }
 }

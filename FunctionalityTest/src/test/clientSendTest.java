@@ -23,10 +23,10 @@ public class clientSendTest {
             }
 
             @Override
-            public void OnSend(HashMap<String, String> msg)
+            public void OnSend(HashMap<String, String> args)
             {
-                assert("event" == "send");
-                assert("message" == msgToSend);
+                assert("send" ==  args.get("event"));
+                assert(msgToSend == args.get("message"));
 
             }
         };
