@@ -48,7 +48,7 @@ public class NIOClient extends BaseClient {
                     MessageBuilder megBuilder = new MessageBuilder()
                             .add("event","login")
                             .add("result","fail")
-                            .add("reason","Already login on another terminal.");
+                            .add("reason","该用户已在其他终端登陆");
                     String megToSend = megBuilder.build();
                     sendMessage(megToSend);
                     return;
@@ -59,7 +59,7 @@ public class NIOClient extends BaseClient {
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
                         .add("result","fail")
-                        .add("reason","Already login");
+                        .add("reason","用户已登陆");
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
             } else if (getStatus() == Status.LOGOUT || getStatus() == Status.RELOGIN) {
@@ -77,6 +77,8 @@ public class NIOClient extends BaseClient {
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
+                setMsgPerSecond(0);
+                setMsgSinceLogin(0);
                 setUsername(username);
                 setPassword(encryptedPass);
             }
@@ -85,7 +87,7 @@ public class NIOClient extends BaseClient {
             MessageBuilder megBuilder = new MessageBuilder()
                     .add("event","login")
                     .add("result","fail")
-                    .add("reason","Invalid account.");
+                    .add("reason","登陆失败！请检查用户名和密码");
             String megToSend = megBuilder.build();
             sendMessage(megToSend);
         }
@@ -112,7 +114,7 @@ public class NIOClient extends BaseClient {
             String msgToSend = new MessageBuilder()
                     .add("result", "failt")
                     .add("event", "reg")
-                    .add("reason", "The username cannot be empty.")
+                    .add("reason", "用户名不能为空")
                     .build();
             sendMessage(msgToSend);
             return;
@@ -123,7 +125,7 @@ public class NIOClient extends BaseClient {
             String msgToSend = new MessageBuilder()
                     .add("result","fail")
                     .add("event","reg")
-                    .add("reason","Id already exists.")
+                    .add("reason","用户名已存在")
                     .build();
 
             sendMessage(msgToSend);
@@ -132,7 +134,7 @@ public class NIOClient extends BaseClient {
             String msgToSend = new MessageBuilder()
                     .add("result","fail")
                     .add("event","reg")
-                    .add("reason","The password is too short (at least six).")
+                    .add("reason","密码太短（至少6位）")
                     .build();
             sendMessage(msgToSend);
         } else {
@@ -142,6 +144,8 @@ public class NIOClient extends BaseClient {
                 setUsername(username);
                 setPassword(encryptedPass);
                 setStatus(Status.LOGIN);
+                setMsgPerSecond(0);
+                setMsgSinceLogin(0);
                 String msgToSend = new MessageBuilder()
                         .add("result","success")
                         .add("event","reg")
@@ -151,7 +155,7 @@ public class NIOClient extends BaseClient {
                 String msgToSend = new MessageBuilder()
                         .add("result","fail")
                         .add("event","reg")
-                        .add("reason","Registration failed due to an unexpected error.")
+                        .add("reason","注册失败！请不要输入奇怪的字符")
                         .build();
                 sendMessage(msgToSend);
             }
@@ -179,62 +183,106 @@ public class NIOClient extends BaseClient {
          * 3.更新用户状态
          */
 
-        long currentSendTime = System.currentTimeMillis() / 1000;
-        if (getLastSendTime() == currentSendTime) {
-            incMsgPerSecond();
-            if (getMsgPerSecond() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SECOND", "5"))) setStatus(Status.IGNORE);
-        } else {
-            setMsgPerSecond(0);
-            if (getStatus() == Status.IGNORE) setStatus(Status.LOGIN);
-        }
-        setLastSendTime(currentSendTime);
+        String message;
+        String msgToSend;
+        long currentSendTime;
 
         incLocalReceiveMsgNum();
 
-        if (getStatus() != Status.LOGIN) {
-            incLocalIgnoreMsgNum();
-        } else {
-            incMsgSinceLogin();
-            if (getMsgSinceLogin() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) {
-                setStatus(Status.RELOGIN);
-                setMsgSinceLogin(0);
-                String msgToSend = new MessageBuilder()
-                        .add("event","send")
-                        .add("result", "fail")
-                        .add("reason", "relogin")
-                        .build();
-                sendMessage(msgToSend);
-            } else {
-                String msgToSend = new MessageBuilder()
+        if (getStatus() == Status.LOGIN && 0 == Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SECOND", "5"))) setStatus(Status.IGNORE);
+        if (getStatus() == Status.LOGIN && 0 == Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) setStatus(Status.RELOGIN);
+
+        switch (getStatus()) {
+            case LOGOUT:
+                incLocalIgnoreMsgNum();
+                break;
+            case LOGIN:
+                message = args.get("message");
+                for (BaseClient client : getClients()) {
+                    if (client != this) {
+                        if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
+                            msgToSend = new MessageBuilder()
+                                    .add("event","forward")
+                                    .add("from",getUsername())
+                                    .add("message",message)
+                                    .build();
+                            client.sendMessage(msgToSend);
+                            incLocalForwardMsgNum();
+                        }
+                    } else {
+                        //发给自己的
+                        msgToSend = new MessageBuilder()
+                                .add("event", "forward")
+                                .add("from", "你")
+                                .add("message", message)
+                                .build();
+                        sendMessage(msgToSend);
+                    }
+                }
+
+                msgToSend = new MessageBuilder()
                         .add("event","send")
                         .add("result","success")
                         .build();
                 sendMessage(msgToSend);
-            }
 
-            String message = args.get("message");
-            for (BaseClient client : getClients()) {
-                if (client != this) {
-                    if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
-                        String msgToSend = new MessageBuilder()
-                                .add("event","forward")
-                                .add("from",getUsername())
-                                .add("message",message)
-                                .build();
-                        client.sendMessage(msgToSend);
-                        incLocalForwardMsgNum();
-                    }
+                incMsgSinceLogin();
+
+                currentSendTime = System.currentTimeMillis() / 1000;
+                if (getLastSendTime() == currentSendTime) {
+                    incMsgPerSecond();
+                    if (getMsgPerSecond() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SECOND", "5"))) setStatus(Status.IGNORE);
                 } else {
-                    //发给自己的
-                    String msgToSend = new MessageBuilder()
-                            .add("event", "forward")
-                            .add("from", "你")
-                            .add("message", message)
-                            .build();
-                    sendMessage(msgToSend);
+                    setMsgPerSecond(0);
                 }
-            }
+                setLastSendTime(currentSendTime);
+
+                if (getMsgSinceLogin() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) setStatus(Status.RELOGIN);
+
+                break;
+            case IGNORE:
+                msgToSend = new MessageBuilder()
+                        .add("event", "send")
+                        .add("result", "fail")
+                        .add("reason", "You have exceeded message number per second")
+                        .build();
+                sendMessage(msgToSend);
+
+                msgToSend = new MessageBuilder()
+                        .add("event", "forward")
+                        .add("from", "管理员")
+                        .add("message", "发送的太快了！请休息一下...")
+                        .build();
+                sendMessage(msgToSend);
+
+                currentSendTime = System.currentTimeMillis() / 1000;
+                if (getLastSendTime() != currentSendTime) {
+                    setMsgPerSecond(0);
+                    setStatus(Status.LOGIN);
+                }
+                setLastSendTime(currentSendTime);
+
+                incLocalIgnoreMsgNum();
+                break;
+            case RELOGIN:
+                msgToSend = new MessageBuilder()
+                        .add("event", "send")
+                        .add("result", "fail")
+                        .add("reason", "relogin")
+                        .build();
+                sendMessage(msgToSend);
+
+                msgToSend = new MessageBuilder()
+                        .add("event", "forward")
+                        .add("from", "管理员")
+                        .add("message", "超过每个用户发送消息次数，尝试重新登陆中...")
+                        .build();
+                sendMessage(msgToSend);
+
+                incLocalIgnoreMsgNum();
+                break;
         }
+
     }
 
     /**

@@ -36,6 +36,7 @@ public abstract class BaseClient {
     private int mMsgPerSecond = 0;
     private int mMsgSinceLogin = 0;
     private long mLastSendTime = 0;
+    private int mReloginNum = 0;
 
     private int localValidLogin = 0;
     private int localInvalidLogin = 0;

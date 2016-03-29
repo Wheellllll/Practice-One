@@ -49,11 +49,13 @@ public class Client extends BaseClient {
     @Override
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
+            if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
             incLoginSuccessNum();
         } else {
             /*
-             * 登陆失败，更新UI
+             * 重新登陆失败，再来一次
              */
+            if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
             incLoginFailNum();
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -102,9 +104,8 @@ public class Client extends BaseClient {
             sendMessage(msgToSend);
         } else {
             /*
-             * 发送失败，记录一下
+             * 发送失败
              */
-            if (!DEBUG) getChatRoomForm().addMessage("管理员", msg.get("reason"));
         }
     }
 
