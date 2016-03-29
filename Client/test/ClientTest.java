@@ -20,7 +20,7 @@ public class ClientTest {
 
     @Test
     public void testOnLogin() throws Exception {
-
+        System.out.println("Logined");
     }
 
     @Test
