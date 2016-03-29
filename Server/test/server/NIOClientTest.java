@@ -1,3 +1,5 @@
+package server;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,6 +10,10 @@ import static org.junit.Assert.*;
  */
 public class NIOClientTest {
 
+    /**
+     * 测试连接数目
+     * @throws Exception
+     */
     @Test
     public void testOnConnect() throws Exception {
 
