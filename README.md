@@ -12,11 +12,11 @@
 
 ### 启动方式
 #### Windows
-1. 启动终端，输入以下命令：
-```
-java -jar Server.jar
-```
-server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
+1. 在目录下打开`CMD`，输入以下命令：
+ ```
+ java -jar Server.jar
+ ```
+ server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
 
 2. 启动Client: 双击`Client.jar`，图形化界面启动。Client可多次启动，每次启动代表建立一个新的客户端
 
@@ -24,16 +24,16 @@ server成功启动后， 控制台中输出：`Server is listening at localhost/
 
 #### Linux/Mac OS
 1. 启动终端，输入以下命令：
-```
-java -jar Server.jar
-```
-server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
+ ```
+ java -jar Server.jar
+ ```
+ server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
 
 2. 启动终端，输入以下命令：
-```
-java -jar Client.jar
-```
-client成功启动后就会弹出GUI界面，按照指示操作即可
+ ```
+ java -jar Client.jar
+ ```
+ client成功启动后就会弹出GUI界面，按照指示操作即可
 
 3. 相关可配置参数请在`server.conf`和`client.conf`中进行修改
 
