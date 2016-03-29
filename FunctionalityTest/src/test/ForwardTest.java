@@ -1,7 +1,6 @@
 package test;
 
 import client.Client;
-import com.sun.tools.internal.xjc.model.CBuiltinLeafInfo;
 import server.Server;
 import utils.MessageBuilder;
 

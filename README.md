@@ -61,7 +61,7 @@
 #### 重新登陆
 ##### 客户端
 ```
-message{
+{
 "event":"relogin",
 "username":"XXXXXX",
 "password":"XXXXXX"
