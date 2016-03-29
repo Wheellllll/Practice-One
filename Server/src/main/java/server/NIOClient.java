@@ -107,6 +107,17 @@ public class NIOClient extends BaseClient {
 
         String username = args.get("username");
         String password = args.get("password");
+
+        if (username == null || username.equals("")) {
+            String msgToSend = new MessageBuilder()
+                    .add("result", "failt")
+                    .add("event", "reg")
+                    .add("reason", "The username cannot be empty.")
+                    .build();
+            sendMessage(msgToSend);
+            return;
+        }
+
         if (DatabaseUtils.isExisted(username)) {
 
             String msgToSend = new MessageBuilder()
