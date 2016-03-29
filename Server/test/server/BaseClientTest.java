@@ -1,3 +1,5 @@
+package server;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,6 +10,10 @@ import static org.junit.Assert.*;
  */
 public class BaseClientTest {
 
+    /**
+     * 测试通信通道
+     * @throws Exception
+     */
     @Test
     public void testGetSocketChannel() throws Exception {
 

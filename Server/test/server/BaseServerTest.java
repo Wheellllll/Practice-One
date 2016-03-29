@@ -1,3 +1,5 @@
+package server;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,6 +10,10 @@ import static org.junit.Assert.*;
  */
 public class BaseServerTest {
 
+    /**
+     * 服务端测试入口
+     * @throws Exception
+     */
     @Test
     public void testMain() throws Exception {
 

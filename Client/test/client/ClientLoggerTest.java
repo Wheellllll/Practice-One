@@ -1,3 +1,5 @@
+package client;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,6 +10,10 @@ import static org.junit.Assert.*;
  */
 public class ClientLoggerTest {
 
+    /**
+     * 测试运行状态
+     * @throws Exception
+     */
     @Test
     public void testRun() throws Exception {
 

@@ -1,3 +1,5 @@
+package client;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -8,6 +10,10 @@ import static org.junit.Assert.*;
  */
 public class ClientTest {
 
+    /**
+     * 测试主页面
+     * @throws Exception
+     */
     @Test
     public void testMain() throws Exception {
 
@@ -20,7 +26,7 @@ public class ClientTest {
 
     @Test
     public void testOnLogin() throws Exception {
-
+        System.out.println("Logined");
     }
 
     @Test
