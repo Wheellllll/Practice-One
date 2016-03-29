@@ -1,34 +1,40 @@
 package test;
 
 import client.Client;
+import com.sun.tools.internal.xjc.model.CBuiltinLeafInfo;
 import server.Server;
 import utils.MessageBuilder;
 
 import java.util.HashMap;
 
 /**
- * Created by summer on 3/28/16.
+ * Created by summer on 3/29/16.
  */
-public class clientSendTest {
+public class ForwardTest {
     public static void main(String args[])
     {
         Server.DEBUG_MODE(true);
         Client.DEBUG_MODE(true);
-        Server server = new Server();
-        String msgToSend = "test";
+        Server server = new Server()
+        {
+
+        };
         Client client = new Client() {
+
+
             @Override
-            public void OnConnect(HashMap<String, String> args) {
-                System.out.println("HHH");
+            public void OnLogin(HashMap<String, String> args) {
+                assert("login" == args.get("event"));
+                assert("fail" == args.get("result"));
             }
 
             @Override
-            public void OnSend(HashMap<String, String> args)
-            {
-                assert("send" ==  args.get("event"));
-                assert(msgToSend == args.get("message"));
+            public void OnForward(HashMap<String,String> args) {
+                assert ("forward" == args.get("event"));
+                assert ("success" == args.get("ack"));
 
             }
+
         };
 
         MessageBuilder msgBuilder = new MessageBuilder();
@@ -38,12 +44,11 @@ public class clientSendTest {
         String msg = msgBuilder.build();
         client.sendMessage(msg);
 
+        String msgToSend = "test";
         MessageBuilder msgToSendBuilder = new MessageBuilder();
         msgToSendBuilder.add("event","send");
         msgToSendBuilder.add("message",msgToSend);
         String message = msgToSendBuilder.build();
         client.sendMessage(message);
-
-
     }
 }
