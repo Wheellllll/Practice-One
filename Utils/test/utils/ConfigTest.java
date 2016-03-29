@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created by summer on 3/26/16.
+ * This class is written for testing configuration
  */
 public class ConfigTest {
 

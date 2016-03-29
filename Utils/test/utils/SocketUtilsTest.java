@@ -8,7 +8,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import static org.junit.Assert.*;
 
 /**
- * Created by summer on 3/26/16.
+* This class is written for testing socket utils
  */
 public class SocketUtilsTest {
 

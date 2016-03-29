@@ -3,7 +3,7 @@ package test;
 import utils.LogUtils;
 
 /**
- * Created by summer on 3/28/16.
+ * This class is written for testing record test
  */
 public class RecordTest {
     public void loginServerRecordTest()

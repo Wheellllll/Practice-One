@@ -8,7 +8,7 @@ import utils.MessageBuilder;
 import java.util.HashMap;
 
 /**
- * Created by summer on 3/29/16.
+ * This class is written for testing server forward message
  */
 public class ForwardTest {
     public static void main(String args[])

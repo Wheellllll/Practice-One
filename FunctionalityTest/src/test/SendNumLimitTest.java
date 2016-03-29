@@ -8,7 +8,7 @@ import java.io.Console;
 import java.util.HashMap;
 
 /**
- * Created by summer on 3/29/16.
+ * This class is written for testing client send message limit in 1s
  */
 public class SendNumLimitTest {
     public static void main(String args[])

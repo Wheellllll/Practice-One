@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import static org.junit.Assert.*;
 
 /**
- * Created by summer on 3/25/16.
+ * This class is written for testing database
  */
 public class DatabaseUtilsTest extends TestCase{
 

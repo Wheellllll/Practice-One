@@ -6,7 +6,7 @@ import server.Server;
 
 import java.util.HashMap;
 /**
- * Created by summer on 3/27/16.
+ * This class is written for testing client login
  */
 public class LoginTest {
     public static void main(String args[])

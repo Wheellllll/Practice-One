@@ -1,7 +1,7 @@
 package test;
 
 /**
- * Created by summer on 3/28/16.
+ * This class is written for testing connection keeping
  */
 public class KeepConnectionTest {
     public static void main(String args[])

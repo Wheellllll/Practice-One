@@ -7,7 +7,7 @@ import utils.MessageBuilder;
 import java.util.HashMap;
 
 /**
- * Created by summer on 3/29/16.
+ * This class is written for testing client send message limit in one login
  */
 public class oneLoginMessageLimitTest {
     public static void main(String args[])

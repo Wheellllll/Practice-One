@@ -3,7 +3,7 @@ package test;
 import utils.Config;
 
 /**
- * Created by summer on 3/28/16.
+ * This class is written for testing the configuration of server address
  */
 public class ConfigTest {
     public static void main(String args[])

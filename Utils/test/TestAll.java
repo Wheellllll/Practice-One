@@ -5,7 +5,7 @@ import utils.MessageBuilderTest;
 import utils.StringUtilsTest;
 
 /**
- * Created by summer on 3/25/16.
+ * This class is written for testing all test case of utils
  */
 //在测试单元中增加测试用例
 public class TestAll extends TestSuite {

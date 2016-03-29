@@ -10,7 +10,7 @@ import java.util.HashMap;
 import static org.junit.Assert.*;
 
 /**
- * Created by summer on 3/25/16.
+ * This class is written for testing message builder
  */
 public class MessageBuilderTest extends TestCase{
 

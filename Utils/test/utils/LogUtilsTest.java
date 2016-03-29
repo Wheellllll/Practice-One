@@ -13,7 +13,7 @@ import java.util.Scanner;
 import static org.junit.Assert.*;
 
 /**
- * Created by summer on 3/27/16.
+ * This class is written for testing login utils
  */
 public class LogUtilsTest extends TestCase{
 

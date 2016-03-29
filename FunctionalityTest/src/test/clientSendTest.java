@@ -7,7 +7,7 @@ import utils.MessageBuilder;
 import java.util.HashMap;
 
 /**
- * Created by summer on 3/28/16.
+ * This class is written for tesing client send message
  */
 public class clientSendTest {
     public static void main(String args[])

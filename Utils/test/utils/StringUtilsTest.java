@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
 import static org.junit.Assert.*;
 
 /**
- * Created by summer on 3/25/16.
+ * This class is written for testing string utils
  */
 public class StringUtilsTest extends TestCase {
 
