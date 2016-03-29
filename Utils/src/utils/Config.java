@@ -45,6 +45,8 @@ public class Config {
             mProps = new Properties();
             setProperty("host", "localhost");
             setProperty("port", "9001");
+            setProperty("MAX_NUMBER_PER_SECOND", "5");
+            setProperty("MAX_NUMBER_PER_SESSION", "100");
         } catch (IOException e) {
             e.printStackTrace();
         }

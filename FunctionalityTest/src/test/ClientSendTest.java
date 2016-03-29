@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * Created by summer on 3/28/16.
  */
-public class clientSendTest {
+public class ClientSendTest {
     public static void main(String args[])
     {
         Server.DEBUG_MODE(true);

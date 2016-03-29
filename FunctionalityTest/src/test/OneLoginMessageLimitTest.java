@@ -9,7 +9,7 @@ import java.util.HashMap;
 /**
  * Created by summer on 3/29/16.
  */
-public class oneLoginMessageLimitTest {
+public class OneLoginMessageLimitTest {
     public static void main(String args[])
     {
         Server.DEBUG_MODE(true);
@@ -37,11 +37,11 @@ public class oneLoginMessageLimitTest {
         };
         MessageBuilder msgBuilder = new MessageBuilder();
         msgBuilder.add("event","login");
-        msgBuilder.add("username","funcTest");
-        msgBuilder.add("password","123456");
+        msgBuilder.add("username","q");
+        msgBuilder.add("password","qqqqqq");
         String msg = msgBuilder.build();
-        client.setUsername("funcTest");
-        client.setPassword("123456");
+        client.setUsername("w");
+        client.setPassword("wwwwww");
         client.sendMessage(msg);
 
         MessageBuilder msgToSendBuilder = new MessageBuilder();
@@ -63,11 +63,13 @@ public class oneLoginMessageLimitTest {
         }
         //发送第101条消息
         client.sendMessage(message);
+        client.sendMessage(message);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        //发送第102条消息
         client.sendMessage(message);
     }
 }
