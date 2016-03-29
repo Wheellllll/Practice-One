@@ -10,18 +10,39 @@
 ###依赖
 - sqlite
 
-### 使用说明
-1. 启动Server: 运行`Server.jar`， server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
+### 启动方式
+#### Windows
+1. 启动终端，输入以下命令：
+```
+java -jar Server.jar
+```
+server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
 
-2. 启动Client: 运行`Client.jar`，图形化界面启动。Client可多次启动，每次启动代表建立一个新的客户端。
+2. 启动Client: 双击`Client.jar`，图形化界面启动。Client可多次启动，每次启动代表建立一个新的客户端
 
-3. 用户可以点击界面上的设置按钮来设置服务器的地址和端口号。
+3. 相关可配置参数请在`server.conf`和`client.conf`中进行修改
 
-4. 用户输入用户名和密码后，可点击登录/注册按钮进行登录或注册，随后进入聊天室界面。
+#### Linux/Mac OS
+1. 启动终端，输入以下命令：
+```
+java -jar Server.jar
+```
+server成功启动后， 控制台中输出：`Server is listening at localhost/127.0.0.1:9001`
 
-5. 在聊天室界面中，用户在输入框内输入需要发送的消息，点击发送后即可发送消息。
+2. 启动终端，输入以下命令：
+```
+java -jar Client.jar
+```
+client成功启动后就会弹出GUI界面，按照指示操作即可
 
- 
+3. 相关可配置参数请在`server.conf`和`client.conf`中进行修改
+
+### 使用方法
+1. 用户可以点击界面上的设置按钮来设置服务器的地址和端口号。
+
+2. 用户输入用户名和密码后，可点击登录/注册按钮进行登录或注册，随后进入聊天室界面。
+
+3. 在聊天室界面中，用户在输入框内输入需要发送的消息，点击发送或使用快捷键`Ctrl+Enter`即可发送消息。
 
 ### 消息范式
 
