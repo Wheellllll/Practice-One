@@ -1,6 +1,7 @@
 package client;
 
 import org.junit.Test;
+import ui.LoginAndRegisterForm;
 
 import static org.junit.Assert.*;
 
@@ -16,6 +17,7 @@ public class BaseClientTest {
      */
     @Test
     public void testGetLoginSuccessNum() throws Exception {
+
 
     }
 
@@ -128,21 +130,23 @@ public class BaseClientTest {
     }
 
     /**
-     * 登录ui界面
+     * 登录ui界面是否能成功打开
      * @throws Exception
      */
     @Test
     public void testInitWelcomeUI() throws Exception {
-
+        LoginAndRegisterForm mLoginAndRegisterForm = new LoginAndRegisterForm();
+        assertNotNull(mLoginAndRegisterForm);
     }
 
     /**
-     * 初始化ui界面
+     * 初始化ui界面能否成功打开
      * @throws Exception
      */
     @Test
     public void testInitChatRoomUI() throws Exception {
-
+        LoginAndRegisterForm mLoginAndRegisterForm = new LoginAndRegisterForm();
+        assertNotNull(mLoginAndRegisterForm);
     }
 
     /**

@@ -16,7 +16,8 @@ public class ClientTest {
      */
     @Test
     public void testMain() throws Exception {
-
+        Client testClient = new Client();
+        assertNotNull(testClient);
     }
 
     @Test

@@ -1,6 +1,10 @@
 package server;
 
+import com.sun.deploy.util.SessionState;
+import com.sun.security.ntlm.Client;
 import org.junit.Test;
+
+import java.nio.channels.AsynchronousSocketChannel;
 
 import static org.junit.Assert.*;
 

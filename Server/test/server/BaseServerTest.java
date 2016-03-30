@@ -16,6 +16,8 @@ public class BaseServerTest {
      */
     @Test
     public void testMain() throws Exception {
+        Server server = new Server();
+        assertNotNull(server);
 
     }
 }
