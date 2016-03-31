@@ -7,10 +7,5 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Client" />
-    <orderEntry type="module" module-name="Server" />
-    <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="module" module-name="Event" />
-    <orderEntry type="module" module-name="Config" />
   </component>
 </module>

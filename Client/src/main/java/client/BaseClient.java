@@ -1,16 +1,16 @@
 package client;
 
-import event.EventListener;
-import event.EventManager;
 import handler.PackageHandler;
 import handler.ReadHandler;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
 import utils.AsynchronousSocketChannelWrapper;
-import utils.Config;
 import utils.MessageBuilder;
 import utils.SocketUtils;
+import wheellllll.config.Config;
+import wheellllll.event.EventListener;
+import wheellllll.event.EventManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

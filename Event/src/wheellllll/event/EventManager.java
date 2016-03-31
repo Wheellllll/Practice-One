@@ -1,6 +1,6 @@
-package event;
+package wheellllll.event;
 
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * event manager manages events

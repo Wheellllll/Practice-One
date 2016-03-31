@@ -1,4 +1,4 @@
-package utils;
+package wheellllll.config;
 
 import java.io.*;
 import java.util.Properties;

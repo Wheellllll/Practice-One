@@ -1,6 +1,6 @@
 package ui;
 
-import utils.Config;
+import wheellllll.config.Config;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,6 +1,6 @@
 package server;
 
-import utils.Config;
+import wheellllll.config.Config;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

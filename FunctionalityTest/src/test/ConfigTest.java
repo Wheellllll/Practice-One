@@ -1,6 +1,6 @@
 package test;
 
-import utils.Config;
+import wheellllll.config.Config;
 
 /**
  * This class is written for testing the configuration of server address
