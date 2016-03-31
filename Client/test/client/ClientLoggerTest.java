@@ -56,5 +56,4 @@ public class ClientLoggerTest {
         assertEquals(result2,par2);
 
     }
-    }
 }

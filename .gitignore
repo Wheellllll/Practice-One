@@ -1,6 +1,5 @@
 out/
-Client/target/
-Server/target/
+*/target/
 *.db
 *.log
 *.conf
