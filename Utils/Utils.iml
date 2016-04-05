@@ -8,7 +8,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: org.xerial:sqlite-jdbc:3.8.11.2" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.5" level="project" />
     <orderEntry type="module-library" scope="TEST">
       <library name="JUnit4">
@@ -20,9 +19,5 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Maven: junit:junit:4.8.2" level="project" />
-    <orderEntry type="library" name="Maven: org.easymock:easymock:3.4" level="project" />
-    <orderEntry type="module" module-name="Event" />
-    <orderEntry type="module" module-name="Logger" scope="TEST" />
   </component>
 </module>

@@ -49,7 +49,7 @@ public class LogUtils {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         try {
-            file = new File("clientRecord.utils");
+            file = new File("clientRecord.log");
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -97,7 +97,7 @@ public class LogUtils {
         FileWriter fileWriter = null;
         BufferedWriter bufferedWriter = null;
         try {
-            file = new File("serverRecord.utils");
+            file = new File("serverRecord.log");
             if (!file.exists()) {
                 file.createNewFile();
             }
