@@ -23,5 +23,6 @@
     <orderEntry type="library" name="Maven: junit:junit:4.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.easymock:easymock:3.4" level="project" />
     <orderEntry type="module" module-name="Event" />
+    <orderEntry type="module" module-name="Logger" scope="TEST" />
   </component>
 </module>

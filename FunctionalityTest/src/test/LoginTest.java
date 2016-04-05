@@ -1,6 +1,6 @@
 package test;
 
-import utils.MessageBuilder;
+import wheellllll.utils.MessageBuilder;
 import client.Client;
 import server.Server;
 

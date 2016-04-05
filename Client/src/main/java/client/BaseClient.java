@@ -1,13 +1,13 @@
 package client;
 
-import handler.PackageHandler;
-import handler.ReadHandler;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
-import utils.AsynchronousSocketChannelWrapper;
-import utils.MessageBuilder;
-import utils.SocketUtils;
+import wheellllll.socket.SocketUtils;
+import wheellllll.socket.handler.PackageHandler;
+import wheellllll.socket.handler.ReadHandler;
+import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
+import wheellllll.utils.MessageBuilder;
 import wheellllll.config.Config;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;

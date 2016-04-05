@@ -1,6 +1,6 @@
 package server;
 
-import utils.LogUtils;
+import wheellllll.utils.LogUtils;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * logging the relative data of server.
  * <p>
  * This class is designed to be called as a parameter of a <code>ScheduledExecutorService</code>
- * to log the numbers counted during the server running time every minute, including valid login
+ * to utils the numbers counted during the server running time every minute, including valid login
  * number, invalid login number, received message number, ignored message number, forwarded
  * message number.
  *
@@ -51,12 +51,12 @@ public class ServerLogger implements Runnable {
 
     /**
      * Override the <code>run</code> method of <code>Runnable</code> interface. In this method
-     * static method <code>log</code> of <code>LogUtils</code> will be called.
+     * static method <code>utils</code> of <code>LogUtils</code> will be called.
      * <p>
      * Because for every connect between server and a client there is a <code>NIOClient</code>
      * instance, so the total number must be the sum of all NIOClient instance.
      *
-     * @see utils.LogUtils#log(LogUtils.LogType, int...)
+     * @see wheellllll.utils.LogUtils#log(LogUtils.LogType, int...)
      */
     @Override
     public void run() {

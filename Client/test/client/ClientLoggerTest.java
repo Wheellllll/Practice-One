@@ -22,7 +22,7 @@ public class ClientLoggerTest {
     public void testRun() throws Exception {
         int[] par1 = {};
         int[] par2 = {};
-        Path filePath1 = Paths.get("clientRecord.log");
+        Path filePath1 = Paths.get("clientRecord.utils");
         int[] result1 = new int[4];
         Scanner scanner1 =  new Scanner(filePath1);
         for (int i = 0; i < 4 ; ++i)
@@ -37,7 +37,7 @@ public class ClientLoggerTest {
             }
         }
 
-        Path filePath2 = Paths.get("serverRecord.log");
+        Path filePath2 = Paths.get("serverRecord.utils");
         int[] result2 = new int[5];
         Scanner scanner2 = new Scanner(filePath2);
         for(int i = 0; i < 5; ++i)

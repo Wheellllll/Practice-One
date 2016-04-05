@@ -1,11 +1,11 @@
 import junit.framework.Test;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
-import utils.MessageBuilderTest;
-import utils.StringUtilsTest;
+import wheellllll.utils.MessageBuilderTest;
+import wheellllll.utils.StringUtilsTest;
 
 /**
- * This class is written for testing all test case of utils
+ * This class is written for testing all test case of wheellllll.utils
  */
 //在测试单元中增加测试用例
 public class TestAll extends TestSuite {
