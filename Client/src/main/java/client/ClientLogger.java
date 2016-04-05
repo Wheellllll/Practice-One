@@ -1,6 +1,6 @@
 package client;
 
-import wheellllll.utils.LogUtils;
+import wheellllll.log.LogUtils;
 
 /**
  * The <code>ClientLogger</code> class implement <code>Runnable</code> interface, it is used for
@@ -30,7 +30,7 @@ public class ClientLogger implements Runnable {
      * Override the <code>run</code> method of <code>Runnable</code> interface. In this method
      * static method <code>utils</code> of <code>LogUtils</code> will be called.
      *
-     * @see wheellllll.utils.LogUtils#log(LogUtils.LogType, int...)
+     * @see LogUtils#log(LogUtils.LogType, int...)
      */
     @Override
     public void run() {

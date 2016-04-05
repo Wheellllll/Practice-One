@@ -1,11 +1,11 @@
-package wheellllll.utils;
+package wheellllll.socket;
 
 import org.junit.Test;
 
 import java.nio.channels.AsynchronousSocketChannel;
 
 /**
-* This class is written for testing socket wheellllll.utils
+* This class is written for testing wheellllll.socket wheellllll.utils
  */
 public class SocketUtilsTest {
 

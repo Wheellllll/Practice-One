@@ -1,6 +1,6 @@
 package server;
 
-import wheellllll.utils.LogUtils;
+import wheellllll.log.LogUtils;
 
 import java.util.ArrayList;
 
@@ -56,7 +56,7 @@ public class ServerLogger implements Runnable {
      * Because for every connect between server and a client there is a <code>NIOClient</code>
      * instance, so the total number must be the sum of all NIOClient instance.
      *
-     * @see wheellllll.utils.LogUtils#log(LogUtils.LogType, int...)
+     * @see LogUtils#log(LogUtils.LogType, int...)
      */
     @Override
     public void run() {

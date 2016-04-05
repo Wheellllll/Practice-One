@@ -1,23 +1,23 @@
-package wheellllll.utils;
+package wheellllll.database;
 
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * This class is written for testing database
  */
-public class DatabaseUtilsTest extends TestCase{
+public class DatabaseUtilsTest{
 
-    @org.junit.Test
+    @Test
     public void testIsExisted() throws Exception {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testIsValid() throws Exception {
 
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateAccount() throws Exception {
 
     }

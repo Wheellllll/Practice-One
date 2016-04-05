@@ -12,8 +12,8 @@ import java.nio.channels.CompletionHandler;
 import java.util.HashMap;
 
 /**
- * This class provide methods for sending message to socket
- * or reading message from socket
+ * This class provide methods for sending message to wheellllll.socket
+ * or reading message from wheellllll.socket
  */
 public class SocketUtils {
     /**
@@ -21,7 +21,7 @@ public class SocketUtils {
      *
      * @param socketWrapper Socket where message should be send to
      * @param message A string to send
-     * @param handler Handler to invoke after finish reading message from socket
+     * @param handler Handler to invoke after finish reading message from wheellllll.socket
      */
     public static void sendMessage(AsynchronousSocketChannelWrapper socketWrapper, String message, CompletionHandler handler) {
         /*
@@ -61,7 +61,7 @@ public class SocketUtils {
      * This method read a message from <code>AsynchronousSocketChannel</code>
      *
      * @param socketChannel Socket where message should be send to
-     * @param handler Handler to invoke after finish reading message from socket
+     * @param handler Handler to invoke after finish reading message from wheellllll.socket
      */
     public static void readMessage(AsynchronousSocketChannel socketChannel, CompletionHandler handler) {
         /*

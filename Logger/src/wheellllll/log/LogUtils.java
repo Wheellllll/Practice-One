@@ -1,4 +1,4 @@
-package wheellllll.utils;
+package wheellllll.log;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

@@ -7,7 +7,7 @@ import wheellllll.socket.model.Attachment;
 import java.nio.channels.CompletionHandler;
 
 /**
- * A read wheellllll.handler for this project which will be used by the socket
+ * A read wheellllll.handler for this project which will be used by the wheellllll.socket
  */
 public class ReadHandler implements CompletionHandler<Integer, Attachment> {
     private PackageHandler mPackageHandler;

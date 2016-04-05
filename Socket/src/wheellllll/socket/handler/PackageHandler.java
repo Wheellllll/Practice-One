@@ -6,7 +6,7 @@ import wheellllll.utils.StringUtils;
 import java.nio.ByteBuffer;
 
 /**
- * This class is used to solve some common issues which may occur in the socket
+ * This class is used to solve some common issues which may occur in the wheellllll.socket
  */
 public class PackageHandler {
     /*
@@ -27,8 +27,8 @@ public class PackageHandler {
     }
 
     /**
-     * Add a package read from the socket to this class
-     * @param buf ButeBuffer read from the socket
+     * Add a package read from the wheellllll.socket to this class
+     * @param buf ButeBuffer read from the wheellllll.socket
      */
     public void addPackage(ByteBuffer buf) {
         mSb.append(StringUtils.bufToString(buf));

@@ -19,6 +19,7 @@
     <orderEntry type="library" name="Maven: junit:junit:4.11" level="project" />
     <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.5" level="project" />
+    <orderEntry type="library" name="Maven: groupId:Socket:1.0-SNAPSHOT" level="project" />
     <orderEntry type="module" module-name="Socket" />
   </component>
 </module>

@@ -1,4 +1,4 @@
-package wheellllll.utils;
+package wheellllll.log;
 
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -10,10 +10,9 @@ import java.util.Scanner;
 /**
  * This class is written for testing login wheellllll.utils
  */
-public class LogUtilsTest extends TestCase{
+public class LogUtilsTest{
 
     @Test
-
     public void testLog() throws Exception {
         int[] par1 = {1,1,2,2};
         int[] par2 = {1,1,2,2,1};
@@ -49,8 +48,8 @@ public class LogUtilsTest extends TestCase{
             }
         }
 
-        assertEquals(result1,par1);
-        assertEquals(result2,par2);
+        TestCase.assertEquals(result1,par1);
+        TestCase.assertEquals(result2,par2);
 
     }
 }

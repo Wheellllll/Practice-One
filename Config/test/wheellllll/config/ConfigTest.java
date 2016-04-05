@@ -1,4 +1,4 @@
-package wheellllll.utils;
+package wheellllll.config;
 
 import org.junit.Test;
 

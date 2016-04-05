@@ -1,6 +1,6 @@
 package test;
 
-import wheellllll.utils.LogUtils;
+import wheellllll.log.LogUtils;
 
 /**
  * This class is written for testing record test

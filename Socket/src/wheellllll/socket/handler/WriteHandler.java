@@ -6,7 +6,7 @@ import wheellllll.socket.model.Attachment;
 import java.nio.channels.CompletionHandler;
 
 /**
- * A write wheellllll.handler for this project which will be used by the socket
+ * A write wheellllll.handler for this project which will be used by the wheellllll.socket
  */
 public class WriteHandler implements CompletionHandler<Integer, Attachment> {
     @Override

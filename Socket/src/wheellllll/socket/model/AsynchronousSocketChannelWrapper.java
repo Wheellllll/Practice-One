@@ -75,7 +75,7 @@ public class AsynchronousSocketChannelWrapper {
         public void failed( Throwable exc, Integer attachment )
         {
             /* Called when the write operation failed,
-             * most probably the underlying socket is being closed.
+             * most probably the underlying wheellllll.socket is being closed.
              */
             lock.lock();
             try {
@@ -99,9 +99,9 @@ public class AsynchronousSocketChannelWrapper {
     }
 
     /**
-     * This method write a <code>ByteBuffer</code> to socket
+     * This method write a <code>ByteBuffer</code> to wheellllll.socket
      * @param byteBuffer ByteBuffer to write
-     * @return True if write successful or False if socket is closed
+     * @return True if write successful or False if wheellllll.socket is closed
      */
     public boolean write( ByteBuffer byteBuffer )
     {
