@@ -1,6 +1,6 @@
 package client;
 
-import wheellllll.log.LogUtils;
+import wheellllll.performance.LogUtils;
 
 /**
  * The <code>ClientLogger</code> class implement <code>Runnable</code> interface, it is used for

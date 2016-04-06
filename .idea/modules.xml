@@ -8,7 +8,6 @@
       <module fileurl="file://$PROJECT_DIR$/Event/Event.iml" filepath="$PROJECT_DIR$/Event/Event.iml" />
       <module fileurl="file://$PROJECT_DIR$/FunctionalityTest/FunctionalityTest.iml" filepath="$PROJECT_DIR$/FunctionalityTest/FunctionalityTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/License/License.iml" filepath="$PROJECT_DIR$/License/License.iml" />
-      <module fileurl="file://$PROJECT_DIR$/Logger/Logger.iml" filepath="$PROJECT_DIR$/Logger/Logger.iml" />
       <module fileurl="file://$PROJECT_DIR$/Performance/Performance.iml" filepath="$PROJECT_DIR$/Performance/Performance.iml" />
       <module fileurl="file://$PROJECT_DIR$/PracticeOne.iml" filepath="$PROJECT_DIR$/PracticeOne.iml" />
       <module fileurl="file://$PROJECT_DIR$/Server/Server.iml" filepath="$PROJECT_DIR$/Server/Server.iml" />
