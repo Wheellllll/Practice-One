@@ -40,9 +40,9 @@ public class ConfigDialog {
         fieldPanel.add(l1);
         fieldPanel.add(l2);
         hostField.setBounds(110, 20, 120, 20);
-        hostField.setText(Config.getConfig().getProperty("host"));
+        hostField.setText(Config.getConfig().getString("host", "localhost"));
         portField.setBounds(110, 60, 120, 20);
-        portField.setText(Config.getConfig().getProperty("port"));
+        portField.setText(Config.getConfig().getString("port", "9001"));
         fieldPanel.add(hostField);
         fieldPanel.add(portField);
         c.add(fieldPanel, "Center");

@@ -191,8 +191,8 @@ public class NIOClient extends BaseClient {
 
         incLocalReceiveMsgNum();
 
-        if (getStatus() == Status.LOGIN && 0 == Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SECOND", "5"))) setStatus(Status.IGNORE);
-        if (getStatus() == Status.LOGIN && 0 == Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) setStatus(Status.RELOGIN);
+        if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5)) setStatus(Status.IGNORE);
+        if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)) setStatus(Status.RELOGIN);
 
         switch (getStatus()) {
             case LOGOUT:
@@ -233,13 +233,13 @@ public class NIOClient extends BaseClient {
                 currentSendTime = System.currentTimeMillis() / 1000;
                 if (getLastSendTime() == currentSendTime) {
                     incMsgPerSecond();
-                    if (getMsgPerSecond() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SECOND", "5"))) setStatus(Status.IGNORE);
+                    if (getMsgPerSecond() >= Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5)) setStatus(Status.IGNORE);
                 } else {
                     setMsgPerSecond(0);
                 }
                 setLastSendTime(currentSendTime);
 
-                if (getMsgSinceLogin() >= Integer.parseInt(Config.getConfig().getProperty("MAX_NUMBER_PER_SESSION", "100"))) setStatus(Status.RELOGIN);
+                if (getMsgSinceLogin() >= Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)) setStatus(Status.RELOGIN);
 
                 break;
             case IGNORE:
