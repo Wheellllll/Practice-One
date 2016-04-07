@@ -16,9 +16,6 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseServer {
     private ScheduledExecutorService sc = null;
-    public static void main(String[] args) {
-        new Server();
-    }
 
     protected static boolean DEBUG = false;
 
