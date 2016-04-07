@@ -28,11 +28,6 @@
         <module name="Server" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8">
-      <module name="Client" target="1.8" />
-      <module name="Config" target="1.8" />
-      <module name="PracticeOne" target="1.8" />
-      <module name="Server" target="1.8" />
-    </bytecodeTargetLevel>
+    <bytecodeTargetLevel target="1.8" />
   </component>
 </project>

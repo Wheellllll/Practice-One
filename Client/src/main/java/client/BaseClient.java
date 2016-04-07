@@ -233,9 +233,9 @@ public abstract class BaseClient {
 
     private void tryConnect() {
         try {
-            String host = Config.getConfig().getProperty("host");
-            String port = Config.getConfig().getProperty("port");
-            SocketAddress serverAddress = new InetSocketAddress(host, Integer.parseInt(port));
+            String host = Config.getConfig().getString("host", "localhost");
+            int port = Config.getConfig().getInt("port", 9001);
+            SocketAddress serverAddress = new InetSocketAddress(host, port);
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
         } catch (IOException e) {
