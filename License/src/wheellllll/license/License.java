@@ -45,14 +45,14 @@ public class License {
             capacityOn = true;
             this.capacityLimit = limit;
             currentCapacity = 0;
-            previousCapacity = 0; // 忽略 timeUnit
+            previousCapacity = 0;
         } else {
             throw new IllegalArgumentException("Missing parameter, both throughput limit and capacity limit are required.");
         }
     }
 
     public License(FunctionType type, int limit) {
-        new License(type, limit, defaultTimeUnit);
+        this(type, limit, defaultTimeUnit);
     }
 
 
@@ -79,7 +79,7 @@ public class License {
     }
 
     public License(FunctionType type, int capacityLimit, int throughputLimit) {
-        new License(type, capacityLimit, throughputLimit, defaultTimeUnit);
+        this(type, capacityLimit, throughputLimit, defaultTimeUnit);
     }
 
     public static TimeUnit getDefaultTimeUnit() {
@@ -96,11 +96,7 @@ public class License {
         currentCapacity = maintain ? previousCapacity : 0;
     }
 
-    public void enableCapacity(int capacityLimit) {
-        enableCapacity(capacityLimit, false);
-    }
-
-    public void enableThroughput(int throughputLimit, TimeUnit timeUnit, boolean maintain) {
+    public void enableThroughput(int throughputLimit, boolean maintain, TimeUnit timeUnit) {
         throughputOn = true;
         this.throughputLimit = throughputLimit;
         if (oldTimeUnit == null) {
@@ -112,17 +108,10 @@ public class License {
         currentThroughput = maintain ? previousThroughput : 0;
     }
 
-    public void enableThroughput(int throughputLimit) {
-        enableThroughput(throughputLimit, defaultTimeUnit, false);
-    }
-
     public void enableThroughput(int throughputLimit, boolean maintain) {
-        enableThroughput(throughputLimit, defaultTimeUnit, maintain);
+        enableThroughput(throughputLimit, maintain, defaultTimeUnit);
     }
 
-    public void enableThroughput(int throughputLimit, TimeUnit timeUnit) {
-        enableThroughput(throughputLimit, timeUnit, false);
-    }
 
     public void disableCapacity() {
         capacityOn = false;
@@ -134,12 +123,56 @@ public class License {
         previousThroughput = currentThroughput;
     }
 
-    public boolean increaseCapacity() {
+    public Availability use() {
+        boolean capacityAvailability = false, throughputAvailability = false;
+        if (capacityOn && throughputOn) {
+            capacityAvailability = increaseCapacity();
+            throughputAvailability = increaseThroughput();
+            if (capacityAvailability && throughputAvailability)
+                return Availability.AVAILABLE;
+            else if (capacityAvailability)
+                return Availability.THROUGHPUTEXCEEDED;
+            else if (throughputAvailability)
+                return Availability.CAPACITYEXCEEDED;
+            else
+                return Availability.BOTHEXCEEDED;
+        } else if (capacityOn) {
+            capacityAvailability = increaseCapacity();
+            if (capacityAvailability)
+                return Availability.AVAILABLE;
+            else
+                return Availability.CAPACITYEXCEEDED;
+        } else if (throughputOn) {
+            throughputAvailability = increaseThroughput();
+            if (throughputAvailability)
+                return Availability.AVAILABLE;
+            else
+                return Availability.THROUGHPUTEXCEEDED;
+        } else {
+            return Availability.AVAILABLE;
+        }
+    }
+
+    public void clear(FunctionType type) {
+        switch (type) {
+            case CAPACITY:
+                currentCapacity = 0;
+                break;
+            case THROUGHPUT:
+                currentCapacity = 0;
+                break;
+            default:
+                currentCapacity = 0;
+                currentCapacity = 0;
+        }
+    }
+
+    private boolean increaseCapacity() {
         currentCapacity++;
         return currentCapacity <= capacityLimit;
     }
 
-    public boolean increaseThroughput() {
+    private boolean increaseThroughput() {
         long nowTime = 0;
         if (timeUnit == oldTimeUnit) {
             nowTime = System.currentTimeMillis() / timeUnit.getValue();
@@ -158,25 +191,6 @@ public class License {
         return currentThroughput <= throughputLimit;
     }
 
-    public Availability use() {
-        boolean capacityAvailability = increaseCapacity();
-        boolean throughputAvailability = increaseThroughput();
-        if (capacityAvailability) {
-            if (throughputAvailability) {
-                return Availability.AVAILABLE;
-            } else {
-                return Availability.THROUGHPUTEXCEEDED;
-            }
-        } else {
-            if (throughputAvailability) {
-                return Availability.CAPACITYEXCEEDED;
-            } else {
-                return Availability.BOTHEXCEEDED;
-            }
-        }
-    }
-
-
     public enum FunctionType {CAPACITY, THROUGHPUT, BOTH}
 
     public enum Availability {AVAILABLE, CAPACITYEXCEEDED, THROUGHPUTEXCEEDED, BOTHEXCEEDED}
@@ -188,7 +202,6 @@ public class License {
         HOURS(1000 * 60 * 60),
         DAYS(1000 * 60 * 60 * 24),
         WEEKS(1000 * 60 * 60 * 24 * 7);
-
         private final long value;
 
         TimeUnit(long value) {
