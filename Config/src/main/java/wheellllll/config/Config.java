@@ -1,6 +1,10 @@
 package wheellllll.config;
 
+import org.apache.commons.vfs2.*;
+import org.apache.commons.vfs2.impl.DefaultFileMonitor;
+
 import java.io.*;
+import java.io.FileNotFoundException;
 import java.util.Properties;
 
 /**
@@ -41,6 +45,7 @@ public class Config {
             FileReader reader = new FileReader(configFile);
             mProps = new Properties();
             mProps.load(reader);
+            reader.close();
         } catch (FileNotFoundException e) {
             mProps = new Properties();
             setProperty("host", "localhost");
@@ -49,7 +54,52 @@ public class Config {
             setProperty("MAX_NUMBER_PER_SESSION", "100");
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                FileSystemManager fsManager = VFS.getManager();
+                FileObject listendir = null;
+                File configFile = new File(String.format("%s.conf", configName));
+                listendir = fsManager.resolveFile(configFile.getAbsolutePath());
+                DefaultFileMonitor fm = new DefaultFileMonitor(new FileListener() {
+                    @Override
+                    public void fileCreated(FileChangeEvent fileChangeEvent) throws Exception {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void fileDeleted(FileChangeEvent fileChangeEvent) throws Exception {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void fileChanged(FileChangeEvent fileChangeEvent) throws Exception {
+                        File configFile = new File(String.format("%s.conf", configName));
+                        FileReader reader = new FileReader(configFile);
+                        mProps = new Properties();
+                        mProps.load(reader);
+                        reader.close();
+                    }
+                });
+                fm.setRecursive(true);
+                fm.addFile(listendir);
+                fm.start();
+            } catch (FileSystemException e) {
+                e.printStackTrace();
+            }
+
         }
+    }
+
+    public String getString(String key) {
+        return mProps.getProperty(key);
+    }
+
+    public String getString(String key, String defaultValue) {
+        return mProps.getProperty(key, defaultValue);
+    }
+
+    public Integer getInt(String key) {
+        return Integer.parseInt(mProps.getProperty(key));
     }
 
     /**

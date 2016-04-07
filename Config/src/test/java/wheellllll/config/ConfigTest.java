@@ -14,7 +14,9 @@ public class ConfigTest {
 
     @Test
     public void testGetConfig() throws Exception {
+        Config.getConfig();
 
+        Thread.currentThread().join();
     }
 
     @Test
