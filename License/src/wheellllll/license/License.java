@@ -10,7 +10,6 @@ public class License {
     private boolean throughputOn;
     private int throughputLimit;
     private TimeUnit timeUnit;
-    private TimeUnit oldTimeUnit;
     private int currentThroughput;
     private int previousThroughput;
     private long lastTime;
@@ -26,22 +25,20 @@ public class License {
         currentThroughput = 0;
         previousThroughput = 0;
         lastTime = 0;
-        System.out.println(this.oldTimeUnit);
     }
 
-    public License(FunctionType type, int limit, TimeUnit timeUnit) {
+    public License(LicenseType type, int limit, TimeUnit timeUnit) {
         if (limit < 0) {
             throw new IllegalArgumentException("Limit value cannot be negative.");
         }
-        if (type == FunctionType.THROUGHPUT) {
+        if (type == LicenseType.THROUGHPUT) {
             throughputOn = true;
             this.throughputLimit = limit;
             this.timeUnit = timeUnit;
-            oldTimeUnit = timeUnit;
             currentThroughput = 0;
             previousThroughput = 0;
             lastTime = 0;
-        } else if (type == FunctionType.CAPACITY) {
+        } else if (type == LicenseType.CAPACITY) {
             capacityOn = true;
             this.capacityLimit = limit;
             currentCapacity = 0;
@@ -51,16 +48,16 @@ public class License {
         }
     }
 
-    public License(FunctionType type, int limit) {
+    public License(LicenseType type, int limit) {
         this(type, limit, defaultTimeUnit);
     }
 
 
-    public License(FunctionType type, int capacityLimit, int throughputLimit, TimeUnit timeUnit) {
+    public License(LicenseType type, int capacityLimit, int throughputLimit, TimeUnit timeUnit) {
         if (throughputLimit < 0 || capacityLimit < 0) {
             throw new IllegalArgumentException("Limit value cannot be negative.");
         }
-        if (type == FunctionType.BOTH) {
+        if (type == LicenseType.BOTH) {
             capacityOn = true;
             this.capacityLimit = capacityLimit;
             currentCapacity = 0;
@@ -69,16 +66,15 @@ public class License {
             throughputOn = true;
             this.throughputLimit = throughputLimit;
             this.timeUnit = timeUnit;
-            oldTimeUnit = timeUnit;
             currentThroughput = 0;
             previousThroughput = 0;
             lastTime = 0;
         } else {
-            throw new IllegalArgumentException("Too many parameters, consider change the FunctionType or remove a parameter.");
+            throw new IllegalArgumentException("Too many parameters, consider change the LicenseType or remove a parameter.");
         }
     }
 
-    public License(FunctionType type, int capacityLimit, int throughputLimit) {
+    public License(LicenseType type, int capacityLimit, int throughputLimit) {
         this(type, capacityLimit, throughputLimit, defaultTimeUnit);
     }
 
@@ -99,11 +95,6 @@ public class License {
     public void enableThroughput(int throughputLimit, boolean maintain, TimeUnit timeUnit) {
         throughputOn = true;
         this.throughputLimit = throughputLimit;
-        if (oldTimeUnit == null) {
-            oldTimeUnit = timeUnit;
-        } else {
-            oldTimeUnit = this.timeUnit;
-        }
         this.timeUnit = timeUnit;
         currentThroughput = maintain ? previousThroughput : 0;
     }
@@ -153,17 +144,17 @@ public class License {
         }
     }
 
-    public void clear(FunctionType type) {
+    public void reset(LicenseType type) {
         switch (type) {
             case CAPACITY:
                 currentCapacity = 0;
                 break;
             case THROUGHPUT:
-                currentCapacity = 0;
+                currentThroughput = 0;
                 break;
             default:
                 currentCapacity = 0;
-                currentCapacity = 0;
+                currentThroughput = 0;
         }
     }
 
@@ -174,24 +165,18 @@ public class License {
 
     private boolean increaseThroughput() {
         long nowTime = 0;
-        if (timeUnit == oldTimeUnit) {
-            nowTime = System.currentTimeMillis() / timeUnit.getValue();
-        } else {
-            lastTime = lastTime * oldTimeUnit.getValue() / timeUnit.getValue();
-            nowTime = System.currentTimeMillis() / timeUnit.getValue();
-            oldTimeUnit = timeUnit;
-        }
-        if (nowTime != lastTime) {
+        nowTime = System.currentTimeMillis();
+        if (lastTime / timeUnit.getValue() != nowTime / timeUnit.getValue()) {
             lastTime = nowTime;
             currentThroughput = 1;
             return true;
         }
         lastTime = nowTime;
-        currentThroughput++;
+        currentThroughput ++;
         return currentThroughput <= throughputLimit;
     }
 
-    public enum FunctionType {CAPACITY, THROUGHPUT, BOTH}
+    public enum LicenseType {CAPACITY, THROUGHPUT, BOTH}
 
     public enum Availability {AVAILABLE, CAPACITYEXCEEDED, THROUGHPUTEXCEEDED, BOTHEXCEEDED}
 
@@ -200,8 +185,7 @@ public class License {
         SECONDS(1000),
         MINUTES(1000 * 60),
         HOURS(1000 * 60 * 60),
-        DAYS(1000 * 60 * 60 * 24),
-        WEEKS(1000 * 60 * 60 * 24 * 7);
+        DAYS(1000 * 60 * 60 * 24);
         private final long value;
 
         TimeUnit(long value) {

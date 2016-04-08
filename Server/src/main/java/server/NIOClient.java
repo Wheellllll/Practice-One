@@ -1,6 +1,7 @@
 package server;
 
 import wheellllll.database.DatabaseUtils;
+import wheellllll.license.License;
 import wheellllll.utils.*;
 import wheellllll.config.Config;
 
@@ -79,8 +80,7 @@ public class NIOClient extends BaseClient {
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
-                setMsgPerSecond(0);
-                setMsgSinceLogin(0);
+                getLicense().reset(License.LicenseType.BOTH);
                 setUsername(username);
                 setPassword(encryptedPass);
             }
@@ -146,8 +146,7 @@ public class NIOClient extends BaseClient {
                 setUsername(username);
                 setPassword(encryptedPass);
                 setStatus(Status.LOGIN);
-                setMsgPerSecond(0);
-                setMsgSinceLogin(0);
+                getLicense().reset(License.LicenseType.BOTH);
                 String msgToSend = new MessageBuilder()
                         .add("result","success")
                         .add("event","reg")
@@ -187,12 +186,19 @@ public class NIOClient extends BaseClient {
 
         String message;
         String msgToSend;
-        long currentSendTime;
 
         incLocalReceiveMsgNum();
 
-        if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5)) setStatus(Status.IGNORE);
-        if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)) setStatus(Status.RELOGIN);
+        License.Availability availability = getLicense().use();
+        if (availability == License.Availability.AVAILABLE)
+            setStatus(Status.LOGIN);
+        else if (availability == License.Availability.THROUGHPUTEXCEEDED)
+            setStatus(Status.IGNORE);
+        else
+            setStatus(Status.RELOGIN);
+
+        /*if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5)) setStatus(Status.IGNORE);
+        if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)) setStatus(Status.RELOGIN);*/
 
         switch (getStatus()) {
             case LOGOUT:
@@ -228,19 +234,6 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
-                incMsgSinceLogin();
-
-                currentSendTime = System.currentTimeMillis() / 1000;
-                if (getLastSendTime() == currentSendTime) {
-                    incMsgPerSecond();
-                    if (getMsgPerSecond() >= Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5)) setStatus(Status.IGNORE);
-                } else {
-                    setMsgPerSecond(0);
-                }
-                setLastSendTime(currentSendTime);
-
-                if (getMsgSinceLogin() >= Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)) setStatus(Status.RELOGIN);
-
                 break;
             case IGNORE:
                 msgToSend = new MessageBuilder()
@@ -256,13 +249,6 @@ public class NIOClient extends BaseClient {
                         .add("message", "发送的太快了！请休息一下...")
                         .build();
                 sendMessage(msgToSend);
-
-                currentSendTime = System.currentTimeMillis() / 1000;
-                if (getLastSendTime() != currentSendTime) {
-                    setMsgPerSecond(0);
-                    setStatus(Status.LOGIN);
-                }
-                setLastSendTime(currentSendTime);
 
                 incLocalIgnoreMsgNum();
                 break;
