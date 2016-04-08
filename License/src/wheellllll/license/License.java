@@ -1,4 +1,5 @@
 package wheellllll.license;
+
 /**
  * This class provide two license functions, capacity and throughput.
  */
@@ -35,8 +36,9 @@ public class License {
     /**
      * Constructor for single functional type, if use capacity function only or not set the time
      * unit, the time unit will be set as the default value.
-     * @param type Functional type of <code>License</code>
-     * @param limit Limit value for the license
+     *
+     * @param type     Functional type of <code>License</code>
+     * @param limit    Limit value for the license
      * @param timeUnit Time unit value for throughput function, the default time unit
      *                 is <code>TimeUnit.SECONDS</code> without change
      */
@@ -63,22 +65,23 @@ public class License {
 
     /**
      * Brief constructor for single function type
-     * @param type Functional type of <code>License</code>
+     *
+     * @param type  Functional type of <code>License</code>
      * @param limit Limit value for the license
      */
     public License(LicenseType type, int limit) {
         this(type, limit, defaultTimeUnit);
     }
 
-
     /**
      * Constructor for full functions, if not set the time
      * unit, the time unit will be set as the default value.
-     * @param type Functional type of <code>License</code>
-     * @param capacityLimit Limit value for capacity
+     *
+     * @param type            Functional type of <code>License</code>
+     * @param capacityLimit   Limit value for capacity
      * @param throughputLimit Limit value for throughput
-     * @param timeUnit Time unit value for throughput function, the default time unit
-     *                 is <code>TimeUnit.SECONDS</code> without change
+     * @param timeUnit        Time unit value for throughput function, the default time unit
+     *                        is <code>TimeUnit.SECONDS</code> without change
      */
     public License(LicenseType type, int capacityLimit, int throughputLimit, TimeUnit timeUnit) {
         if (throughputLimit < 0 || capacityLimit < 0) {
@@ -103,8 +106,9 @@ public class License {
 
     /**
      * Brief constructor for full functions.
-     * @param type Functional type of <code>License</code>
-     * @param capacityLimit Limit value for capacity
+     *
+     * @param type            Functional type of <code>License</code>
+     * @param capacityLimit   Limit value for capacity
      * @param throughputLimit Limit value for throughput
      */
     public License(LicenseType type, int capacityLimit, int throughputLimit) {
@@ -125,11 +129,92 @@ public class License {
         License.defaultTimeUnit = defaultTimeUnit;
     }
 
+    public boolean isCapacityOn() {
+        return capacityOn;
+    }
+
+    public void setCapacityOn(boolean capacityOn) {
+        this.capacityOn = capacityOn;
+    }
+
+    public int getCapacityLimit() {
+        return capacityLimit;
+    }
+
+    public void setCapacityLimit(int capacityLimit) {
+        this.capacityLimit = capacityLimit;
+    }
+
+    public int getCurrentCapacity() {
+        return currentCapacity;
+    }
+
+    public void setCurrentCapacity(int currentCapacity) {
+        this.currentCapacity = currentCapacity;
+    }
+
+    public int getPreviousCapacity() {
+        return previousCapacity;
+    }
+
+    public void setPreviousCapacity(int previousCapacity) {
+        this.previousCapacity = previousCapacity;
+    }
+
+    public boolean isThroughputOn() {
+        return throughputOn;
+    }
+
+    public void setThroughputOn(boolean throughputOn) {
+        this.throughputOn = throughputOn;
+    }
+
+    public int getThroughputLimit() {
+        return throughputLimit;
+    }
+
+    public void setThroughputLimit(int throughputLimit) {
+        this.throughputLimit = throughputLimit;
+    }
+
+    public TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
+    public void setTimeUnit(TimeUnit timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+
+    public int getCurrentThroughput() {
+        return currentThroughput;
+    }
+
+    public void setCurrentThroughput(int currentThroughput) {
+        this.currentThroughput = currentThroughput;
+    }
+
+    public int getPreviousThroughput() {
+        return previousThroughput;
+    }
+
+    public void setPreviousThroughput(int previousThroughput) {
+        this.previousThroughput = previousThroughput;
+    }
+
+    public long getLastTime() {
+        return lastTime;
+    }
+
+    public void setLastTime(long lastTime) {
+        this.lastTime = lastTime;
+    }
+
     /**
      * Enable the capacity function.
+     *
      * @param capacityLimit Limit value for capacity
-     * @param maintain This value reflect whether continue from the old place. If set as True, the initial
-     *                 capacity value will be set to previous capacity value, otherwise it will be set to 0
+     * @param maintain      This value reflect whether continue from the old place. If set as true, the initial
+     *                      capacity value will be set to previous capacity value, otherwise it will be set to 0
      */
     public void enableCapacity(int capacityLimit, boolean maintain) {
         capacityOn = true;
@@ -139,10 +224,11 @@ public class License {
 
     /**
      * Enable the throughput function.
+     *
      * @param throughputLimit Limit value for throughput
-     * @param maintain This value reflect whether continue from the old place. If set as True, the initial
-     *                 throughput value will be set to previous throughput value, otherwise it will be set to 0
-     * @param timeUnit Time unit for throughput function
+     * @param maintain        This value reflect whether continue from the old place. If set as true, the initial
+     *                        throughput value will be set to previous throughput value, otherwise it will be set to 0
+     * @param timeUnit        Time unit for throughput function
      */
     public void enableThroughput(int throughputLimit, boolean maintain, TimeUnit timeUnit) {
         throughputOn = true;
@@ -177,6 +263,7 @@ public class License {
 
     /**
      * This method is called where license usage is needed.
+     *
      * @return Availability represent whether the license is still available. <code>AVAILABLE</code> represent
      * it is available, <code>CAPACITYEXCEEDED</code> represent capacity reaches limit,
      * <code>THROUGHPUTEXCEEDED</code> represent throughput reaches limit, <code>BOTHEXCEEDED</code> represent
@@ -215,6 +302,7 @@ public class License {
 
     /**
      * Reset the current license value.
+     *
      * @param type Type of this license. If type is <code>LicenseType.BOTH</code>, both capacity value and
      *             throughput value will be set to 0, otherwise the chosen target will be set to 0.
      */
@@ -234,7 +322,8 @@ public class License {
 
     /**
      * This method increase one to capacity value, and return differently for different condition.
-     * @return  Return True if the capacity license is still available, otherwise False.
+     *
+     * @return Return true if the capacity license is still available, otherwise false.
      */
     private boolean increaseCapacity() {
         currentCapacity++;
@@ -243,7 +332,8 @@ public class License {
 
     /**
      * This method increase one to throughput value, and return differently for different condition.
-     * @return  Return True if the throughput license is still available, otherwise False.
+     *
+     * @return Return true if the throughput license is still available, otherwise false.
      */
     private boolean increaseThroughput() {
         long nowTime = 0;
@@ -254,19 +344,23 @@ public class License {
             return true;
         }
         lastTime = nowTime;
-        currentThroughput ++;
+        currentThroughput++;
         return currentThroughput <= throughputLimit;
     }
 
     /**
      * Enum for license functional type.
      */
-    public enum LicenseType {CAPACITY, THROUGHPUT, BOTH}
+    public enum LicenseType {
+        CAPACITY, THROUGHPUT, BOTH
+    }
 
     /**
      * Enum for availability.
      */
-    public enum Availability {AVAILABLE, CAPACITYEXCEEDED, THROUGHPUTEXCEEDED, BOTHEXCEEDED}
+    public enum Availability {
+        AVAILABLE, CAPACITYEXCEEDED, THROUGHPUTEXCEEDED, BOTHEXCEEDED
+    }
 
     /**
      * Enum for time unit, every enum has a value. value of <code>MILLISECONDS</code> set to 1,
