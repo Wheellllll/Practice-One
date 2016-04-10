@@ -23,11 +23,15 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="Client" />
-        <module name="Config" />
         <module name="PracticeOne" />
         <module name="Server" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel target="1.8" />
+    <bytecodeTargetLevel target="1.8">
+      <module name="Client" target="1.8" />
+      <module name="Config" target="1.8" />
+      <module name="PracticeOne" target="1.8" />
+      <module name="Server" target="1.8" />
+    </bytecodeTargetLevel>
   </component>
 </project>
