@@ -13,13 +13,21 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="module" module-name="Event" />
     <orderEntry type="module" module-name="Socket" />
     <orderEntry type="module" module-name="Performance" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/ConfigManager.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/EventManager.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
