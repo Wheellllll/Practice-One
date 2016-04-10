@@ -1,11 +1,13 @@
-package wheellllll.log;
+package wheellllll.performance;
 
-import junit.framework.TestCase;
+
 import org.junit.Test;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * This class is written for testing login wheellllll.utils
@@ -48,8 +50,8 @@ public class LogUtilsTest{
             }
         }
 
-        TestCase.assertEquals(result1,par1);
-        TestCase.assertEquals(result2,par2);
+        assertEquals(result1,par1);
+        assertEquals(result2,par2);
 
     }
 }

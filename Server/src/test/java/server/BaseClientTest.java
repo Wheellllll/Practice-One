@@ -5,6 +5,7 @@ import com.sun.security.ntlm.Client;
 import org.junit.Test;
 
 import java.nio.channels.AsynchronousSocketChannel;
+import java.util.HashMap;
 
 import static org.junit.Assert.*;
 
@@ -20,7 +21,6 @@ public class BaseClientTest {
      */
     @Test
     public void testGetSocketChannel() throws Exception {
-
     }
 
     @Test

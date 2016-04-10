@@ -2,6 +2,8 @@ package client;
 
 import org.junit.Test;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.*;
 
 /**
@@ -32,22 +34,38 @@ public class ClientTest {
 
     @Test
     public void testOnRelogin() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnRelogin(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     @Test
     public void testOnRegister() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnRegister(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     @Test
     public void testOnSend() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnSend(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     @Test
     public void testOnForward() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnForward(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     @Test

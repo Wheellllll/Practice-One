@@ -18,8 +18,16 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="module" module-name="Event" />
     <orderEntry type="library" name="Maven: com.alibaba:fastjson:1.2.5" level="project" />
+    <orderEntry type="module" module-name="Utils" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/EventManager.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>

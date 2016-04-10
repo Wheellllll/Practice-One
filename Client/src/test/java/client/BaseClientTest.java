@@ -3,6 +3,8 @@ package client;
 import org.junit.Test;
 import ui.LoginAndRegisterForm;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.*;
 
 /**
@@ -10,62 +12,6 @@ import static org.junit.Assert.*;
  * All right reserved.
  */
 public class BaseClientTest {
-
-    /**
-     * 获取登录成功次数
-     * @throws Exception
-     */
-    @Test
-    public void testGetLoginSuccessNum() throws Exception {
-
-
-    }
-
-    /**
-     * 获取登录失败次数
-     * @throws Exception
-     */
-    @Test
-    public void testGetLoginFailNum() throws Exception {
-
-    }
-
-    /**
-     * 获取发送信息数目
-     * @throws Exception
-     */
-    @Test
-    public void testGetSendMsgNum() throws Exception {
-
-    }
-
-    /**
-     * 获取接受信息数目
-     * @throws Exception
-     */
-    @Test
-    public void testGetReceiveMsgNum() throws Exception {
-
-    }
-
-    /**
-     * 获取用户姓名
-     * @throws Exception
-     */
-    @Test
-    public void testGetUsername() throws Exception {
-
-    }
-
-    /**
-     * 获取用户密码
-     * @throws Exception
-     */
-    @Test
-    public void testGetPassword() throws Exception {
-
-    }
-
     /**
      * 获取登录成功次数
      * @throws Exception
@@ -155,16 +101,24 @@ public class BaseClientTest {
      */
     @Test
     public void testOnConnect() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnConnect(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     /**
-     * 测试是否注册
+     * 测试是否可以注册
      * @throws Exception
      */
     @Test
     public void testOnRegister() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnRegister(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     /**
@@ -173,7 +127,11 @@ public class BaseClientTest {
      */
     @Test
     public void testOnLogin() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnLogin(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     /**
@@ -182,7 +140,11 @@ public class BaseClientTest {
      */
     @Test
     public void testOnRelogin() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnRelogin(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     /**
@@ -191,7 +153,11 @@ public class BaseClientTest {
      */
     @Test
     public void testOnSend() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnSend(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     /**
@@ -200,7 +166,11 @@ public class BaseClientTest {
      */
     @Test
     public void testOnForward() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnForward(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     /**
@@ -209,7 +179,11 @@ public class BaseClientTest {
      */
     @Test
     public void testOnDisconnect() throws Exception {
-
+        Client client = new Client();
+        HashMap<String,String> msg = new HashMap<>();
+        client.OnDisconnect(msg);
+        boolean tmp = msg.get("result").equals("success");
+        assertEquals(tmp,true);
     }
 
     @Test
