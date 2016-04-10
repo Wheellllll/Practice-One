@@ -23,7 +23,6 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="Client" />
-        <module name="Config" />
         <module name="PracticeOne" />
         <module name="Server" />
       </profile>
