@@ -12,6 +12,8 @@
 - 性能(Performance)管理模块 https://github.com/Wheellllll/PerformanceManager
 - 通行证(License)管理模块 https://github.com/Wheellllll/LicenseManager
 - 事件(Event)模块 https://github.com/Wheellllll/EventManager
+- 数据库(Database)模块 https://github.com/Wheellllll/Database
+- 工具类(Util)模块 https://github.com/Wheellllll/Util
 
 ### 启动方式
 #### Windows
