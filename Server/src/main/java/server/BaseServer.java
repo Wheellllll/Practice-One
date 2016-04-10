@@ -16,9 +16,6 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseServer {
     private ScheduledExecutorService sc = null;
-    public static void main(String[] args) {
-        new Server();
-    }
 
     protected static boolean DEBUG = false;
 
@@ -29,9 +26,9 @@ public abstract class BaseServer {
     public BaseServer() {
         try {
             Config.setConfigName("server");
-            String host = Config.getConfig().getProperty("host");
-            String port = Config.getConfig().getProperty("port");
-            InetSocketAddress socketAddress = new InetSocketAddress(host, Integer.parseInt(port));
+            String host = Config.getConfig().getString("host", "localhost");
+            int port = Config.getConfig().getInt("port", 9001);
+            InetSocketAddress socketAddress = new InetSocketAddress(host, port);
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
                     .open()
                     .bind(socketAddress);

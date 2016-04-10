@@ -1,7 +1,9 @@
 package server;
 
+import wheellllll.config.Config;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;
+import wheellllll.license.License;
 import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
@@ -34,9 +36,6 @@ public abstract class BaseClient {
     private String mUsername = null;
     private String mPassword = null;
     private Status mStatus = Status.LOGOUT;
-    private int mMsgPerSecond = 0;
-    private int mMsgSinceLogin = 0;
-    private long mLastSendTime = 0;
     private int mReloginNum = 0;
 
     private int localValidLogin = 0;
@@ -44,6 +43,9 @@ public abstract class BaseClient {
     private int localReceiveMsgNum = 0;
     private int localIgnoreMsgNum = 0;
     private int localForwardMsgNum = 0;
+
+
+    private License license;
 
     public AsynchronousSocketChannel getSocketChannel() {
         return mSocketChannel;
@@ -59,18 +61,6 @@ public abstract class BaseClient {
 
     public Status getStatus() {
         return mStatus;
-    }
-
-    public int getMsgPerSecond() {
-        return mMsgPerSecond;
-    }
-
-    public int getMsgSinceLogin() {
-        return mMsgSinceLogin;
-    }
-
-    public long getLastSendTime() {
-        return mLastSendTime;
     }
 
     public int getLocalValidLogin() {
@@ -91,6 +81,10 @@ public abstract class BaseClient {
 
     public int getLocalForwardMsgNum() {
         return localForwardMsgNum;
+    }
+
+    public License getLicense() {
+        return license;
     }
 
     public static ArrayList<BaseClient> getClients() {
@@ -117,14 +111,6 @@ public abstract class BaseClient {
         localForwardMsgNum++;
     }
 
-    public void incMsgPerSecond() {
-        mMsgPerSecond++;
-    }
-
-    public void incMsgSinceLogin() {
-        mMsgSinceLogin++;
-    }
-
     public void setUsername(String mUsername) {
         this.mUsername = mUsername;
     }
@@ -137,16 +123,8 @@ public abstract class BaseClient {
         this.mStatus = mStatus;
     }
 
-    public void setMsgPerSecond(int mMsgPerSecond) {
-        this.mMsgPerSecond = mMsgPerSecond;
-    }
-
-    public void setMsgSinceLogin(int mMsgSinceLogin) {
-        this.mMsgSinceLogin = mMsgSinceLogin;
-    }
-
-    public void setLastSendTime(long mLastSendTime) {
-        this.mLastSendTime = mLastSendTime;
+    public void setLicense(License license) {
+        this.license = license;
     }
 
     public void sendMessage(String message) {
@@ -158,6 +136,7 @@ public abstract class BaseClient {
         initialEvent();
         this.mSocketChannel = socketChannel;
         this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
+        this.license = new License(License.LicenseType.BOTH, Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100), Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5));
         /*
          * 触发OnConnect事件
          */
