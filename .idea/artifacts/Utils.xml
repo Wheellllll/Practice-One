@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Utils">
+    <output-path>$PROJECT_DIR$/out/artifacts/Utils</output-path>
+    <root id="archive" name="Utils.jar">
+      <element id="module-output" name="Utils" />
+      <element id="library" level="project" name="Maven: com.alibaba:fastjson:1.2.5" />
+    </root>
+  </artifact>
+</component>
