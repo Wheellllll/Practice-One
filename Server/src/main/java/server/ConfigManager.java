@@ -49,7 +49,7 @@ public class ConfigManager {
             }
         }
         if (in == null) {
-            in = new FileInputStream("config.json");
+            in = new FileInputStream("config/config.json");
         }
         return adapter.loadToBean(in, clazz);
     }
