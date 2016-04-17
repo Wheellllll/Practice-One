@@ -1,14 +1,9 @@
 package server;
 
 
-import octoteam.tahiti.performance.PerformanceMonitor;
-import octoteam.tahiti.performance.recorder.CountingRecorder;
-import octoteam.tahiti.performance.reporter.LogReporter;
-import octoteam.tahiti.performance.reporter.RollingFileReporter;
 import wheellllll.performance.LogUtils;
 
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 /**
  * The <code>ServerLogger</code> class implement <code>Runnable</code> interface, it is used for
@@ -73,29 +68,11 @@ public class ServerLogger implements Runnable {
             ignoreMsgNum += client.getLocalIgnoreMsgNum();
             forwardMsgNum += client.getLocalForwardMsgNum();
         }
-        LogReporter reporter = new RollingFileReporter("./log/server-%d{yyyy-MM-dd_HH-mm}.log");
-        PerformanceMonitor monitor = new PerformanceMonitor(reporter);
-        CountingRecorder vaildLoginTimes = new CountingRecorder("Vaild login times");
-        CountingRecorder invaildLoginTimes = new CountingRecorder("Invaild login times");
-        CountingRecorder receiveMsgNum = new CountingRecorder("Receive message number");
-        CountingRecorder ignoreMsgNum = new CountingRecorder("Ignore message number");
-        CountingRecorder forwardMsgNum = new CountingRecorder("Forward message number");
-
-        monitor
-                .addRecorder(vaildLoginTimes)
-                .addRecorder(invaildLoginTimes)
-                .addRecorder(receiveMsgNum)
-                .addRecorder(ignoreMsgNum)
-                .addRecorder(forwardMsgNum)
-                .start(1, TimeUnit.MINUTES);
-
-        /*
         LogUtils.log(LogUtils.LogType.SERVER, validLogin, invalidLogin, receiveMsgNum, ignoreMsgNum, forwardMsgNum);
         validLogin = 0;
         invalidLogin = 0;
         receiveMsgNum = 0;
         ignoreMsgNum = 0;
         forwardMsgNum = 0;
-        */
     }
 }
