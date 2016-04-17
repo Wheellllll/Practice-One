@@ -1,9 +1,10 @@
 package server;
 
+import octoteam.tahiti.quota.CapacityLimiter;
+import octoteam.tahiti.quota.ThroughputLimiter;
 import wheellllll.config.Config;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;
-import wheellllll.license.License;
 import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
@@ -45,7 +46,25 @@ public abstract class BaseClient {
     private int localForwardMsgNum = 0;
 
 
-    private License license;
+    // QuotaLimiters
+    private CapacityLimiter capacityLimiter;
+    private ThroughputLimiter throughputLimiter;
+
+    public CapacityLimiter getCapacityLimiter() {
+        return capacityLimiter;
+    }
+
+    public void setCapacityLimiter(CapacityLimiter capacityLimiter) {
+        this.capacityLimiter = capacityLimiter;
+    }
+
+    public ThroughputLimiter getThroughputLimiter() {
+        return throughputLimiter;
+    }
+
+    public void setThroughputLimiter(ThroughputLimiter throughputLimiter) {
+        this.throughputLimiter = throughputLimiter;
+    }
 
     public AsynchronousSocketChannel getSocketChannel() {
         return mSocketChannel;
@@ -81,10 +100,6 @@ public abstract class BaseClient {
 
     public int getLocalForwardMsgNum() {
         return localForwardMsgNum;
-    }
-
-    public License getLicense() {
-        return license;
     }
 
     public static ArrayList<BaseClient> getClients() {
@@ -123,10 +138,6 @@ public abstract class BaseClient {
         this.mStatus = mStatus;
     }
 
-    public void setLicense(License license) {
-        this.license = license;
-    }
-
     public void sendMessage(String message) {
         SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
@@ -136,7 +147,8 @@ public abstract class BaseClient {
         initialEvent();
         this.mSocketChannel = socketChannel;
         this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
-        this.license = new License(License.LicenseType.BOTH, Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100), Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5));
+        this.capacityLimiter = new CapacityLimiter(Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100));
+        this.throughputLimiter = new ThroughputLimiter(Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5));
         /*
          * 触发OnConnect事件
          */

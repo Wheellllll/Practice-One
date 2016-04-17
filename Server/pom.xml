@@ -25,6 +25,16 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>tahiti-nexus-snapshots</id>
+            <name>Tahiti NEXUS</name>
+            <url>http://sse.tongji.edu.cn/tahiti/nexus/content/groups/public</url>
+            <releases><enabled>false</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>io.reactivex</groupId>
@@ -45,6 +55,13 @@
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
             <version>1.2.5</version>
+        </dependency>
+
+        <!--QuotaLimiter of Team 5-->
+        <dependency>
+            <groupId>octoteam.tahiti</groupId>
+            <artifactId>tahiti-quota</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
