@@ -1,6 +1,12 @@
 package client;
 
+import octoteam.tahiti.performance.PerformanceMonitor;
+import octoteam.tahiti.performance.recorder.CountingRecorder;
+import octoteam.tahiti.performance.reporter.LogReporter;
+import octoteam.tahiti.performance.reporter.RollingFileReporter;
 import wheellllll.performance.LogUtils;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * The <code>ClientLogger</code> class implement <code>Runnable</code> interface, it is used for
@@ -34,7 +40,20 @@ public class ClientLogger implements Runnable {
      */
     @Override
     public void run() {
+        LogReporter reporter = new RollingFileReporter("./log/client-%d{yyyy-MM-dd_HH-mm}.log");
+        PerformanceMonitor monitor = new PerformanceMonitor(reporter);
+        CountingRecorder loginSuccessNum = new CountingRecorder("Login success number");
+        CountingRecorder sendMsgNum = new CountingRecorder("Send message number");
+        CountingRecorder receiveMsgNum = new CountingRecorder("Receive message number");
+
+        monitor
+                .addRecorder(loginSuccessNum)
+                .addRecorder(sendMsgNum)
+                .addRecorder(receiveMsgNum)
+                .start(1, TimeUnit.MINUTES);
+
+        /*
         LogUtils.log(LogUtils.LogType.CLIENT, client.getLoginSuccessNum(),
-                client.getLoginFailNum(), client.getSendMsgNum(), client.getReceiveMsgNum());
+                client.getLoginFailNum(), client.getSendMsgNum(), client.getReceiveMsgNum());*/
     }
 }
