@@ -2,6 +2,7 @@ package server;
 
 import server.config.ConfigBean;
 import server.config.JsonAdapter;
+import server.config.YamlAdapter;
 import wheellllll.config.Config;
 
 import java.io.IOException;
@@ -28,10 +29,14 @@ public abstract class BaseServer {
     public BaseServer() {
         try {
             Config.setConfigName("server");
-            //此处使用复用配置管理
-            ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./config.json");
+            //此处json复用配置管理
+            //ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./config.json");
+            //ConfigBean config = configManager.loadToBean(ConfigBean.class);
+
+            //此处yaml复用配置管理
+            ConfigManager configManager = new ConfigManager(new server.config.YamlAdapter(), "./config.yaml");
             ConfigBean config = configManager.loadToBean(ConfigBean.class);
-            // 接下来使用面向对象的方式直接访问配置
+
             InetSocketAddress socketAddress = new InetSocketAddress(config.getHost(), config.getPort());
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
                     .open()
