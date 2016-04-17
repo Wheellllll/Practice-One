@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: octoteam.tahiti:tahiti-config:1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/octoteam/tahiti/tahiti-config/1.0-SNAPSHOT/tahiti-config-1.0-20160413.122350-3.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/octoteam/tahiti/tahiti-config/1.0-SNAPSHOT/tahiti-config-1.0-20160413.122350-3-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/octoteam/tahiti/tahiti-config/1.0-SNAPSHOT/tahiti-config-1.0-20160413.122350-3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
