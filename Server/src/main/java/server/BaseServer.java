@@ -1,6 +1,8 @@
 package server;
 
-import wheellllll.config.Config;
+
+import octoteam.tahiti.config.ConfigManager;
+import octoteam.tahiti.config.loader.JsonAdapter;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,10 +27,15 @@ public abstract class BaseServer {
 
     public BaseServer() {
         try {
-            Config.setConfigName("server");
-            String host = Config.getConfig().getString("host", "localhost");
-            int port = Config.getConfig().getInt("port", 9001);
-            InetSocketAddress socketAddress = new InetSocketAddress(host, port);
+            //此处json复用配置管理
+            ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ServerConfig.json");
+            ConfigBean config = configManager.loadToBean(ConfigBean.class);
+
+            //此处yaml复用配置管理
+            //ConfigManager configManager = new ConfigManager(new server.config.YamlAdapter(), "./config.yaml");
+            //ConfigBean config = configManager.loadToBean(ConfigBean.class);
+
+            InetSocketAddress socketAddress = new InetSocketAddress(config.getHost(), config.getPort());
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
                     .open()
                     .bind(socketAddress);
