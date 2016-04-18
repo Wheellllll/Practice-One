@@ -83,6 +83,7 @@
             <artifactId>tahiti-quota</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <!--Config manager of Team 5-->
         <dependency>
             <groupId>octoteam.tahiti</groupId>
             <artifactId>tahiti-config</artifactId>

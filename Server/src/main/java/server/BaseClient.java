@@ -41,12 +41,6 @@ public abstract class BaseClient {
     private String mPassword = null;
     private Status mStatus = Status.LOGOUT;
 
-    private int localValidLogin = 0;
-    private int localInvalidLogin = 0;
-    private int localReceiveMsgNum = 0;
-    private int localIgnoreMsgNum = 0;
-    private int localForwardMsgNum = 0;
-
     private BaseServer mServer = null;
 
     protected BaseServer getServer() {
