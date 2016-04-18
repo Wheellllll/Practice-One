@@ -14,7 +14,6 @@ import java.util.ArrayList;
  * number, invalid login number, received message number, ignored message number, forwarded
  * message number.
  *
- * @author LiaoShanhe
  */
 public class ServerLogger implements Runnable {
 

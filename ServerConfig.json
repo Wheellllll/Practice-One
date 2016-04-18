@@ -1,0 +1,6 @@
+{
+  "host": "localhost",
+  "port": 9001,
+  "MAX_NUMBER_PER_SESSION": 100,
+  "MAX_NUMBER_PER_SECOND": 5
+}

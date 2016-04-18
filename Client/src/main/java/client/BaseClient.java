@@ -1,20 +1,17 @@
 package client;
 
-import octoteam.tahiti.performance.PerformanceMonitor;
-import octoteam.tahiti.performance.recorder.CountingRecorder;
-import octoteam.tahiti.performance.reporter.LogReporter;
-import octoteam.tahiti.performance.reporter.RollingFileReporter;
+import octoteam.tahiti.config.ConfigManager;
+import octoteam.tahiti.config.loader.JsonAdapter;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
+import wheellllll.event.EventListener;
+import wheellllll.event.EventManager;
 import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
 import wheellllll.utils.MessageBuilder;
-import wheellllll.config.Config;
-import wheellllll.event.EventListener;
-import wheellllll.event.EventManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -48,10 +45,7 @@ public abstract class BaseClient {
     private int receiveMsgNum = 0;
     private String username = null;
     private String password = null;
-    private CountingRecorder loginSuccessRecorder;
-    private CountingRecorder loginFailRecorder;
-    private CountingRecorder sendMsgNumRecorder;
-    private CountingRecorder receiveMsgRecorder;
+
     protected static boolean DEBUG = false;
 
     public static void DEBUG_MODE(boolean flag) {
@@ -120,7 +114,7 @@ public abstract class BaseClient {
 
     public BaseClient() {
         try {
-            Config.setConfigName("client");
+//            Config.setConfigName("client");
             initEvent();
             if (!DEBUG) initWelcomeUI();
             tryConnect();
@@ -135,21 +129,6 @@ public abstract class BaseClient {
 
     protected void initWelcomeUI() {
         //开启登陆界面
-        loginSuccessRecorder = new CountingRecorder("Login success times");
-        loginFailRecorder = new CountingRecorder("Login fail times");
-        sendMsgNumRecorder = new CountingRecorder("Send message number");
-        receiveMsgRecorder = new CountingRecorder("Receive message times");
-
-        LogReporter reporter = new RollingFileReporter("./log/client-%d{yyyy-MM-dd_HH-mm}.log");
-        PerformanceMonitor monitor = new PerformanceMonitor(reporter);
-        monitor
-                .addRecorder(loginSuccessRecorder)
-                .addRecorder(loginFailRecorder)
-                .addRecorder(sendMsgNumRecorder)
-                .addRecorder(receiveMsgRecorder)
-                .start(1,TimeUnit.MINUTES);
-
-
         mLoginAndRegisterForm = new LoginAndRegisterForm();
         mLoginAndRegisterForm.setOnLoginListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
@@ -223,22 +202,22 @@ public abstract class BaseClient {
         }).addEventListener("login", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
-                OnLogin(args,loginSuccessRecorder,loginFailRecorder);
+                OnLogin(args);
             }
         }).addEventListener("relogin", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
-                OnRelogin(args,loginSuccessRecorder,loginFailRecorder);
+                OnRelogin(args);
             }
         }).addEventListener("send", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
-                OnSend(args,sendMsgNumRecorder);
+                OnSend(args);
             }
         }).addEventListener("forward", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
-                OnForward(args,receiveMsgRecorder);
+                OnForward(args);
             }
         }).addEventListener("disconnect", new EventListener() {
             @Override
@@ -255,8 +234,10 @@ public abstract class BaseClient {
 
     private void tryConnect() {
         try {
-            String host = Config.getConfig().getString("host", "localhost");
-            int port = Config.getConfig().getInt("port", 9001);
+            ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ClientConfig.json");
+            ConfigBean configBean = configManager.loadToBean(ConfigBean.class);
+            String host = configBean.getHost();
+            int port = configBean.getPort();
             SocketAddress serverAddress = new InetSocketAddress(host, port);
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
@@ -289,10 +270,10 @@ public abstract class BaseClient {
 
     public abstract void OnConnect(HashMap<String, String> args);
     public abstract void OnRegister(HashMap<String, String> args);
-    public abstract void OnLogin(HashMap<String, String> args,CountingRecorder successRecorder,CountingRecorder failRecorder);
-    public abstract void OnRelogin(HashMap<String, String> args,CountingRecorder successRecorder,CountingRecorder failRecorder);
-    public abstract void OnSend(HashMap<String, String> args,CountingRecorder sendRecorder);
-    public abstract void OnForward(HashMap<String, String> args,CountingRecorder receiveRecorder);
+    public abstract void OnLogin(HashMap<String, String> args);
+    public abstract void OnRelogin(HashMap<String, String> args);
+    public abstract void OnSend(HashMap<String, String> args);
+    public abstract void OnForward(HashMap<String, String> args);
     public abstract void OnDisconnect(HashMap<String, String> args);
     public abstract void OnError(HashMap<String, String> args);
 

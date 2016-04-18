@@ -1,9 +1,8 @@
 package server;
 
 import wheellllll.database.DatabaseUtils;
-import wheellllll.license.License;
-import wheellllll.utils.*;
-import wheellllll.config.Config;
+import wheellllll.utils.MessageBuilder;
+import wheellllll.utils.StringUtils;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
@@ -80,7 +79,8 @@ public class NIOClient extends BaseClient {
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
-                getLicense().reset(License.LicenseType.BOTH);
+                getCapacityLimiter().reset();
+                getThroughputLimiter().reset();
                 setUsername(username);
                 setPassword(encryptedPass);
             }
@@ -146,7 +146,8 @@ public class NIOClient extends BaseClient {
                 setUsername(username);
                 setPassword(encryptedPass);
                 setStatus(Status.LOGIN);
-                getLicense().reset(License.LicenseType.BOTH);
+                getCapacityLimiter().reset();
+                getThroughputLimiter().reset();
                 String msgToSend = new MessageBuilder()
                         .add("result","success")
                         .add("event","reg")
@@ -189,16 +190,15 @@ public class NIOClient extends BaseClient {
 
         incLocalReceiveMsgNum();
 
-        License.Availability availability = getLicense().use();
-        if (availability == License.Availability.AVAILABLE)
-            setStatus(Status.LOGIN);
-        else if (availability == License.Availability.THROUGHPUTEXCEEDED)
-            setStatus(Status.IGNORE);
-        else
-            setStatus(Status.RELOGIN);
-
-        /*if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5)) setStatus(Status.IGNORE);
-        if (getStatus() == Status.LOGIN && 0 == Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)) setStatus(Status.RELOGIN);*/
+        if (getStatus() == Status.LOGIN || getStatus() == Status.IGNORE) {
+            if (! getThroughputLimiter().tryAcquire())
+                setStatus(Status.IGNORE);
+            else {
+                setStatus(Status.LOGIN);
+                if (! getCapacityLimiter().tryAcquire())
+                    setStatus(Status.RELOGIN);
+            }
+        }
 
         switch (getStatus()) {
             case LOGOUT:

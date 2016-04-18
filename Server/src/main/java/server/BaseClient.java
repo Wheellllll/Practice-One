@@ -1,14 +1,17 @@
 package server;
 
-import wheellllll.config.Config;
+import octoteam.tahiti.config.ConfigManager;
+import octoteam.tahiti.config.loader.JsonAdapter;
+import octoteam.tahiti.quota.CapacityLimiter;
+import octoteam.tahiti.quota.ThroughputLimiter;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;
-import wheellllll.license.License;
 import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
 
+import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +48,25 @@ public abstract class BaseClient {
     private int localForwardMsgNum = 0;
 
 
-    private License license;
+    // QuotaLimiters
+    private CapacityLimiter capacityLimiter;
+    private ThroughputLimiter throughputLimiter;
+
+    public CapacityLimiter getCapacityLimiter() {
+        return capacityLimiter;
+    }
+
+    public void setCapacityLimiter(CapacityLimiter capacityLimiter) {
+        this.capacityLimiter = capacityLimiter;
+    }
+
+    public ThroughputLimiter getThroughputLimiter() {
+        return throughputLimiter;
+    }
+
+    public void setThroughputLimiter(ThroughputLimiter throughputLimiter) {
+        this.throughputLimiter = throughputLimiter;
+    }
 
     public AsynchronousSocketChannel getSocketChannel() {
         return mSocketChannel;
@@ -81,10 +102,6 @@ public abstract class BaseClient {
 
     public int getLocalForwardMsgNum() {
         return localForwardMsgNum;
-    }
-
-    public License getLicense() {
-        return license;
     }
 
     public static ArrayList<BaseClient> getClients() {
@@ -123,10 +140,6 @@ public abstract class BaseClient {
         this.mStatus = mStatus;
     }
 
-    public void setLicense(License license) {
-        this.license = license;
-    }
-
     public void sendMessage(String message) {
         SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
@@ -136,7 +149,15 @@ public abstract class BaseClient {
         initialEvent();
         this.mSocketChannel = socketChannel;
         this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
-        this.license = new License(License.LicenseType.BOTH, Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100), Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5));
+        ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ServerConfig.json");
+        ConfigBean config = null;
+        try {
+            config = configManager.loadToBean(ConfigBean.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.capacityLimiter = new CapacityLimiter(config.getMAX_NUMBER_PER_SESSION());
+        this.throughputLimiter = new ThroughputLimiter(config.getMAX_NUMBER_PER_SECOND());
         /*
          * 触发OnConnect事件
          */

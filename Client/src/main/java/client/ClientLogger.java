@@ -10,7 +10,6 @@ import wheellllll.performance.LogUtils;
  * to utils the numbers counted during a client running time every minute, including login successfully
  * number, login fail number, send message number, receive message number.
  *
- * @author LiaoShanhe
  */
 public class ClientLogger implements Runnable {
 
