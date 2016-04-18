@@ -2,6 +2,7 @@ package server;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
+import octoteam.tahiti.performance.recorder.CountingRecorder;
 import octoteam.tahiti.quota.CapacityLimiter;
 import octoteam.tahiti.quota.ThroughputLimiter;
 import wheellllll.event.EventListener;
@@ -39,14 +40,12 @@ public abstract class BaseClient {
     private String mUsername = null;
     private String mPassword = null;
     private Status mStatus = Status.LOGOUT;
-    private int mReloginNum = 0;
 
-    private int localValidLogin = 0;
-    private int localInvalidLogin = 0;
-    private int localReceiveMsgNum = 0;
-    private int localIgnoreMsgNum = 0;
-    private int localForwardMsgNum = 0;
+    private BaseServer mServer = null;
 
+    protected BaseServer getServer() {
+        return mServer;
+    }
 
     // QuotaLimiters
     private CapacityLimiter capacityLimiter;
@@ -84,48 +83,8 @@ public abstract class BaseClient {
         return mStatus;
     }
 
-    public int getLocalValidLogin() {
-        return localValidLogin;
-    }
-
-    public int getLocalInvalidLogin() {
-        return localInvalidLogin;
-    }
-
-    public int getLocalReceiveMsgNum() {
-        return localReceiveMsgNum;
-    }
-
-    public int getLocalIgnoreMsgNum() {
-        return localIgnoreMsgNum;
-    }
-
-    public int getLocalForwardMsgNum() {
-        return localForwardMsgNum;
-    }
-
     public static ArrayList<BaseClient> getClients() {
         return clients;
-    }
-
-    public void incLocalValidLogin() {
-        localValidLogin++;
-    }
-
-    public void incLocalInvalidLogin() {
-        localInvalidLogin++;
-    }
-
-    public void incLocalReceiveMsgNum() {
-        localReceiveMsgNum++;
-    }
-
-    public void incLocalIgnoreMsgNum() {
-        localIgnoreMsgNum++;
-    }
-
-    public void incLocalForwardMsgNum() {
-        localForwardMsgNum++;
     }
 
     public void setUsername(String mUsername) {
@@ -169,6 +128,10 @@ public abstract class BaseClient {
         SocketUtils.readMessage(mSocketChannel, new ReadHandler(mPackageHandler, mEventManager));
     }
 
+    public BaseClient(AsynchronousSocketChannel socketChannel, BaseServer server) {
+        this(socketChannel);
+        this.mServer = server;
+    }
 
     private void initialEvent() {
         mEventManager.addEventListener("connect", new EventListener() {

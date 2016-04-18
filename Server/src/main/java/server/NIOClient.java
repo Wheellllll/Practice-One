@@ -17,6 +17,10 @@ public class NIOClient extends BaseClient {
         super(socketChannel);
     }
 
+    public NIOClient(AsynchronousSocketChannel socketChannel, BaseServer server) {
+        super(socketChannel, server);
+    }
+
 
     /**
      * Triggered when connect to the client
@@ -46,7 +50,7 @@ public class NIOClient extends BaseClient {
             for (BaseClient client : getClients()) {
                 if (client != this && client.getUsername() != null &&
                         client.getUsername().equals(username) && client.getStatus() != Status.LOGOUT) {
-                    incLocalInvalidLogin();
+                    getServer().invalidLoginRecorder.record();
                     MessageBuilder megBuilder = new MessageBuilder()
                             .add("event","login")
                             .add("result","fail")
@@ -57,7 +61,7 @@ public class NIOClient extends BaseClient {
                 }
             }
             if (getStatus() == Status.LOGIN) {
-                incLocalInvalidLogin();
+                getServer().invalidLoginRecorder.record();
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
                         .add("result","fail")
@@ -75,7 +79,7 @@ public class NIOClient extends BaseClient {
                             .add("event","relogin")
                             .add("result","success");
                 }
-                incLocalValidLogin();
+                getServer().validLoginRecorder.record();
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
@@ -85,7 +89,7 @@ public class NIOClient extends BaseClient {
                 setPassword(encryptedPass);
             }
         } else {
-            incLocalInvalidLogin();
+            getServer().invalidLoginRecorder.record();
             MessageBuilder megBuilder = new MessageBuilder()
                     .add("event","login")
                     .add("result","fail")
@@ -188,7 +192,7 @@ public class NIOClient extends BaseClient {
         String message;
         String msgToSend;
 
-        incLocalReceiveMsgNum();
+        getServer().receiveMsgRecorder.record();
 
         if (getStatus() == Status.LOGIN || getStatus() == Status.IGNORE) {
             if (! getThroughputLimiter().tryAcquire())
@@ -202,7 +206,7 @@ public class NIOClient extends BaseClient {
 
         switch (getStatus()) {
             case LOGOUT:
-                incLocalIgnoreMsgNum();
+                getServer().ignoreMsgRecorder.record();
                 break;
             case LOGIN:
                 message = args.get("message");
@@ -215,7 +219,7 @@ public class NIOClient extends BaseClient {
                                     .add("message",message)
                                     .build();
                             client.sendMessage(msgToSend);
-                            incLocalForwardMsgNum();
+                            getServer().forwardMsgRecorder.record();
                         }
                     } else {
                         //发给自己的
@@ -250,7 +254,7 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
-                incLocalIgnoreMsgNum();
+                getServer().ignoreMsgRecorder.record();
                 break;
             case RELOGIN:
                 msgToSend = new MessageBuilder()
@@ -267,7 +271,7 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
-                incLocalIgnoreMsgNum();
+                getServer().ignoreMsgRecorder.record();
                 break;
         }
 

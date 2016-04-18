@@ -2,6 +2,10 @@ package client;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
+import octoteam.tahiti.performance.PerformanceMonitor;
+import octoteam.tahiti.performance.recorder.CountingRecorder;
+import octoteam.tahiti.performance.reporter.LogReporter;
+import octoteam.tahiti.performance.reporter.RollingFileReporter;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
@@ -38,11 +42,11 @@ public abstract class BaseClient {
     private PackageHandler mPackageHandler = new PackageHandler();
     private EventManager mEventManager = new EventManager();
 
-    private ScheduledExecutorService sc = null;
-    private int loginSuccessNum = 0;
-    private int loginFailNum = 0;
-    private int sendMsgNum = 0;
-    private int receiveMsgNum = 0;
+    protected CountingRecorder loginSuccessRecorder = new CountingRecorder("Login successfully number");
+    protected CountingRecorder loginFailRecorder = new CountingRecorder("Login failed number");
+    protected CountingRecorder sendMsgRecorder = new CountingRecorder("Send message number");
+    protected CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message number");
+
     private String username = null;
     private String password = null;
 
@@ -50,22 +54,6 @@ public abstract class BaseClient {
 
     public static void DEBUG_MODE(boolean flag) {
         DEBUG = flag;
-    }
-
-    public int getLoginSuccessNum() {
-        return loginSuccessNum;
-    }
-
-    public int getLoginFailNum() {
-        return loginFailNum;
-    }
-
-    public int getSendMsgNum() {
-        return sendMsgNum;
-    }
-
-    public int getReceiveMsgNum() {
-        return receiveMsgNum;
     }
 
     public String getUsername() {
@@ -84,22 +72,6 @@ public abstract class BaseClient {
         this.password = password;
     }
 
-    public void incLoginSuccessNum() {
-        loginSuccessNum++;
-    }
-
-    public void incLoginFailNum() {
-        loginFailNum++;
-    }
-
-    public void incSendMsgNum() {
-        sendMsgNum++;
-    }
-
-    public void incReceiveMsgNum() {
-        receiveMsgNum++;
-    }
-
     public LoginAndRegisterForm getLoginAndRegisterForm() {
         return mLoginAndRegisterForm;
     }
@@ -112,15 +84,31 @@ public abstract class BaseClient {
         SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
+    protected void initPerformance() {
+        // 首先需要一个报告生成器, 此处我们建立 RollingFileReporter, 即
+        // 生成报告到一组文件中. 由于时间输出格式是 yyyy-MM-dd_HH-mm, 因
+        // 此将每分钟生成一个新文件.
+        LogReporter reporter = new RollingFileReporter("serverRecord-%d{yyyy-MM-dd_HH-mm}.log");
+
+        // 接下来创建性能监控实例
+        PerformanceMonitor monitor = new PerformanceMonitor(reporter);
+
+        // 将指标加入监控器, 并开始定时报告, 此处是每 1 分钟统计一次.
+        monitor
+                .addRecorder(loginSuccessRecorder)
+                .addRecorder(loginFailRecorder)
+                .addRecorder(receiveMsgRecorder)
+                .addRecorder(sendMsgRecorder)
+                .start(1, TimeUnit.MINUTES);
+    }
+
     public BaseClient() {
         try {
-//            Config.setConfigName("client");
             initEvent();
+            initPerformance();
             if (!DEBUG) initWelcomeUI();
             tryConnect();
 
-            sc = Executors.newScheduledThreadPool(1);
-            sc.scheduleAtFixedRate(new ClientLogger(this), 0, 1, TimeUnit.MINUTES);
             if (!DEBUG) Thread.currentThread().join();
         } catch (InterruptedException e) {
             System.out.format("Stop to connect to server");
