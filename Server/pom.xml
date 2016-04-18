@@ -56,6 +56,13 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.5</version>
         </dependency>
+
+        <!--QuotaLimiter of Team 5-->
+        <dependency>
+            <groupId>octoteam.tahiti</groupId>
+            <artifactId>tahiti-quota</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>octoteam.tahiti</groupId>
             <artifactId>tahiti-config</artifactId>

@@ -1,12 +1,15 @@
 package ui;
 
-import wheellllll.config.Config;
+import client.ConfigBean;
+import octoteam.tahiti.config.ConfigManager;
+import octoteam.tahiti.config.loader.JsonAdapter;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 
 /**
  * Provide a GUI of the dialog for the client. Users can config host and port in this dialog
@@ -25,11 +28,15 @@ public class ConfigDialog {
         dialog.setSize(300, 150);
         c = dialog.getContentPane();
         c.setLayout(new BorderLayout());
-        initDialog();
+        try {
+            initDialog();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         dialog.setVisible(true);
     }
 
-    private void initDialog() {
+    private void initDialog() throws IOException {
         //中部表单
         JPanel fieldPanel = new JPanel();
         fieldPanel.setLayout(null);
@@ -39,10 +46,12 @@ public class ConfigDialog {
         l2.setBounds(50, 60, 50, 20);
         fieldPanel.add(l1);
         fieldPanel.add(l2);
+        ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ClientConfig.json");
+        ConfigBean configBean = configManager.loadToBean(ConfigBean.class);
         hostField.setBounds(110, 20, 120, 20);
-        hostField.setText(Config.getConfig().getString("host", "localhost"));
+        hostField.setText(configBean.getHost());
         portField.setBounds(110, 60, 120, 20);
-        portField.setText(Config.getConfig().getString("port", "9001"));
+        portField.setText(String.valueOf(configBean.getPort()));
         fieldPanel.add(hostField);
         fieldPanel.add(portField);
         c.add(fieldPanel, "Center");
@@ -59,8 +68,13 @@ public class ConfigDialog {
             public void actionPerformed(ActionEvent actionEvent) {
                 String host = hostField.getText();
                 String port = portField.getText();
-                Config.getConfig().setProperty("host", host);
-                Config.getConfig().setProperty("port", port);
+                configBean.setHost(host);
+                configBean.setPort(Integer.parseInt(port));
+                try {
+                    configManager.writeToFirstCandidate(configBean);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 dialog.dispatchEvent(new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
             }
         });

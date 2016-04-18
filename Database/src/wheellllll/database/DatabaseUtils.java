@@ -5,7 +5,6 @@ import java.sql.*;
 /**
  * This class provide methods for SQLite database.
  *
- * @author LiaoShanhe
  */
 public class DatabaseUtils {
 

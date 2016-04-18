@@ -1,16 +1,17 @@
 package client;
 
+import octoteam.tahiti.config.ConfigManager;
+import octoteam.tahiti.config.loader.JsonAdapter;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
+import wheellllll.event.EventListener;
+import wheellllll.event.EventManager;
 import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
 import wheellllll.utils.MessageBuilder;
-import wheellllll.config.Config;
-import wheellllll.event.EventListener;
-import wheellllll.event.EventManager;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -113,7 +114,7 @@ public abstract class BaseClient {
 
     public BaseClient() {
         try {
-            Config.setConfigName("client");
+//            Config.setConfigName("client");
             initEvent();
             if (!DEBUG) initWelcomeUI();
             tryConnect();
@@ -233,8 +234,10 @@ public abstract class BaseClient {
 
     private void tryConnect() {
         try {
-            String host = Config.getConfig().getString("host", "localhost");
-            int port = Config.getConfig().getInt("port", 9001);
+            ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ClientConfig.json");
+            ConfigBean configBean = configManager.loadToBean(ConfigBean.class);
+            String host = configBean.getHost();
+            int port = configBean.getPort();
             SocketAddress serverAddress = new InetSocketAddress(host, port);
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
