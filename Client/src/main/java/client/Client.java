@@ -30,7 +30,7 @@ public class Client extends BaseClient {
     public void OnLogin(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
-            incLoginSuccessNum();
+            loginSuccessRecorder.record();
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
         } else {
@@ -38,7 +38,7 @@ public class Client extends BaseClient {
              * 登陆失败，更新UI
              */
             if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
-            incLoginFailNum();
+            loginFailRecorder.record();
         }
     }
 
@@ -50,13 +50,13 @@ public class Client extends BaseClient {
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
-            incLoginSuccessNum();
+            loginSuccessRecorder.record();
         } else {
             /*
              * 重新登陆失败，再来一次
              */
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
-            incLoginFailNum();
+            loginFailRecorder.record();
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
                     .add("username", getUsername())
@@ -94,7 +94,7 @@ public class Client extends BaseClient {
             /*
              * 发送成功，记录一下
              */
-            incSendMsgNum();
+            sendMsgRecorder.record();
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -118,7 +118,7 @@ public class Client extends BaseClient {
         String from = msg.get("from");
         String message = msg.get("message");
 
-        incReceiveMsgNum();
+        receiveMsgRecorder.record();
         if (!DEBUG) getChatRoomForm().addMessage(from, message);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
