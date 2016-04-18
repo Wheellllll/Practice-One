@@ -1,7 +1,5 @@
 package server;
 
-import octoteam.tahiti.quota.CapacityLimiter;
-import wheellllll.config.Config;
 import wheellllll.database.DatabaseUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
@@ -81,7 +79,8 @@ public class NIOClient extends BaseClient {
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
-                setCapacityLimiter(new CapacityLimiter(Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)));
+                getCapacityLimiter().reset();
+                getThroughputLimiter().reset();
                 setUsername(username);
                 setPassword(encryptedPass);
             }
@@ -147,7 +146,8 @@ public class NIOClient extends BaseClient {
                 setUsername(username);
                 setPassword(encryptedPass);
                 setStatus(Status.LOGIN);
-                setCapacityLimiter(new CapacityLimiter(Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100)));
+                getCapacityLimiter().reset();
+                getThroughputLimiter().reset();
                 String msgToSend = new MessageBuilder()
                         .add("result","success")
                         .add("event","reg")

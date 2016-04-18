@@ -1,8 +1,9 @@
 package server;
 
+import octoteam.tahiti.config.ConfigManager;
+import octoteam.tahiti.config.loader.JsonAdapter;
 import octoteam.tahiti.quota.CapacityLimiter;
 import octoteam.tahiti.quota.ThroughputLimiter;
-import wheellllll.config.Config;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;
 import wheellllll.socket.SocketUtils;
@@ -10,6 +11,7 @@ import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
 
+import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -147,8 +149,15 @@ public abstract class BaseClient {
         initialEvent();
         this.mSocketChannel = socketChannel;
         this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
-        this.capacityLimiter = new CapacityLimiter(Config.getConfig().getInt("MAX_NUMBER_PER_SESSION", 100));
-        this.throughputLimiter = new ThroughputLimiter(Config.getConfig().getInt("MAX_NUMBER_PER_SECOND", 5));
+        ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ServerConfig.json");
+        ConfigBean config = null;
+        try {
+            config = configManager.loadToBean(ConfigBean.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.capacityLimiter = new CapacityLimiter(config.getMAX_NUMBER_PER_SESSION());
+        this.throughputLimiter = new ThroughputLimiter(config.getMAX_NUMBER_PER_SECOND());
         /*
          * 触发OnConnect事件
          */
