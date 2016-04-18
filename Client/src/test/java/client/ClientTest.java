@@ -1,5 +1,6 @@
 package client;
 
+import octoteam.tahiti.performance.recorder.CountingRecorder;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -16,6 +17,11 @@ public class ClientTest {
      * 测试主页面
      * @throws Exception
      */
+
+    private CountingRecorder loginSuccessRecorder = new CountingRecorder("Login success number");
+    private CountingRecorder loginFailRecorde = new CountingRecorder("Login fail number");
+    private CountingRecorder sendMsgRecorder = new CountingRecorder("Send message numeber");
+    private CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message recorder");
     @Test
     public void testMain() throws Exception {
         Client testClient = new Client();
@@ -36,7 +42,7 @@ public class ClientTest {
     public void testOnRelogin() throws Exception {
         Client client = new Client();
         HashMap<String,String> msg = new HashMap<>();
-        client.OnRelogin(msg);
+        client.OnRelogin(msg,loginSuccessRecorder,loginFailRecorde);
         boolean tmp = msg.get("result").equals("success");
         assertEquals(tmp,true);
     }
@@ -54,7 +60,7 @@ public class ClientTest {
     public void testOnSend() throws Exception {
         Client client = new Client();
         HashMap<String,String> msg = new HashMap<>();
-        client.OnSend(msg);
+        client.OnSend(msg,sendMsgRecorder);
         boolean tmp = msg.get("result").equals("success");
         assertEquals(tmp,true);
     }
@@ -63,7 +69,7 @@ public class ClientTest {
     public void testOnForward() throws Exception {
         Client client = new Client();
         HashMap<String,String> msg = new HashMap<>();
-        client.OnForward(msg);
+        client.OnForward(msg,receiveMsgRecorder);
         boolean tmp = msg.get("result").equals("success");
         assertEquals(tmp,true);
     }

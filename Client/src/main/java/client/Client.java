@@ -1,5 +1,6 @@
 package client;
 
+import octoteam.tahiti.performance.recorder.CountingRecorder;
 import wheellllll.utils.MessageBuilder;
 
 import java.util.HashMap;
@@ -27,10 +28,10 @@ public class Client extends BaseClient {
      * @param msg Json params passed to this method
      */
     @Override
-    public void OnLogin(HashMap<String,String> msg) {
+    public void OnLogin(HashMap<String,String> msg, CountingRecorder successRecorder,CountingRecorder failRecorder) {
 
         if (msg.get("result").equals("success")) {
-            incLoginSuccessNum();
+            successRecorder.record();
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
         } else {
@@ -38,7 +39,7 @@ public class Client extends BaseClient {
              * 登陆失败，更新UI
              */
             if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
-            incLoginFailNum();
+            failRecorder.record();
         }
     }
 
@@ -47,16 +48,16 @@ public class Client extends BaseClient {
      * @param msg Json params passed to this method
      */
     @Override
-    public void OnRelogin(HashMap<String, String> msg) {
+    public void OnRelogin(HashMap<String, String> msg,CountingRecorder successRecorder, CountingRecorder failRecorder) {
         if (msg.get("result").equals("success")) {
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
-            incLoginSuccessNum();
+            successRecorder.record();
         } else {
             /*
              * 重新登陆失败，再来一次
              */
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
-            incLoginFailNum();
+            failRecorder.record();
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
                     .add("username", getUsername())
@@ -89,12 +90,12 @@ public class Client extends BaseClient {
      * @param msg Json params passed to this method
      */
     @Override
-    public void OnSend(HashMap<String, String> msg) {
+    public void OnSend(HashMap<String, String> msg,CountingRecorder sendRecorder) {
         if (msg.get("result").equals("success")) {
             /*
              * 发送成功，记录一下
              */
-            incSendMsgNum();
+            sendRecorder.record();
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -114,11 +115,11 @@ public class Client extends BaseClient {
      * @param msg Json params passed to this method
      */
     @Override
-    public void OnForward(HashMap<String,String> msg) {
+    public void OnForward(HashMap<String,String> msg,CountingRecorder receiveRecorder) {
         String from = msg.get("from");
         String message = msg.get("message");
 
-        incReceiveMsgNum();
+        receiveRecorder.record();
         if (!DEBUG) getChatRoomForm().addMessage(from, message);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
