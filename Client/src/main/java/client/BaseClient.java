@@ -34,6 +34,12 @@ import java.util.concurrent.TimeUnit;
  * Base class for client
  */
 public abstract class BaseClient {
+
+    protected CountingRecorder loginSuccessRecorder = new CountingRecorder("Login successfully number");
+    protected CountingRecorder loginFailRecorder = new CountingRecorder("Login failed number");
+    protected CountingRecorder sendMsgRecorder = new CountingRecorder("Send message number");
+    protected CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message number");
+
     private LoginAndRegisterForm mLoginAndRegisterForm = null;
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
@@ -42,10 +48,7 @@ public abstract class BaseClient {
     private PackageHandler mPackageHandler = new PackageHandler();
     private EventManager mEventManager = new EventManager();
 
-    protected CountingRecorder loginSuccessRecorder = new CountingRecorder("Login successfully number");
-    protected CountingRecorder loginFailRecorder = new CountingRecorder("Login failed number");
-    protected CountingRecorder sendMsgRecorder = new CountingRecorder("Send message number");
-    protected CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message number");
+
 
     private String username = null;
     private String password = null;
