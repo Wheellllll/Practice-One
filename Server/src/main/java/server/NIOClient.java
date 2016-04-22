@@ -6,6 +6,8 @@ import wheellllll.utils.StringUtils;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -51,6 +53,7 @@ public class NIOClient extends BaseClient {
                 if (client != this && client.getUsername() != null &&
                         client.getUsername().equals(username) && client.getStatus() != Status.LOGOUT) {
                     getServer().invalidLoginRecorder.record();
+                    getServer().invalidLoginRecorder2.record();
                     MessageBuilder megBuilder = new MessageBuilder()
                             .add("event","login")
                             .add("result","fail")
@@ -62,6 +65,7 @@ public class NIOClient extends BaseClient {
             }
             if (getStatus() == Status.LOGIN) {
                 getServer().invalidLoginRecorder.record();
+                getServer().invalidLoginRecorder2.record();
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
                         .add("result","fail")
@@ -80,6 +84,7 @@ public class NIOClient extends BaseClient {
                             .add("result","success");
                 }
                 getServer().validLoginRecorder.record();
+                getServer().validLoginRecorder2.record();
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
@@ -90,6 +95,7 @@ public class NIOClient extends BaseClient {
             }
         } else {
             getServer().invalidLoginRecorder.record();
+            getServer().invalidLoginRecorder2.record();
             MessageBuilder megBuilder = new MessageBuilder()
                     .add("event","login")
                     .add("result","fail")
@@ -193,6 +199,7 @@ public class NIOClient extends BaseClient {
         String msgToSend;
 
         getServer().receiveMsgRecorder.record();
+        getServer().receiveMsgRecorder2.record();
 
         if (getStatus() == Status.LOGIN || getStatus() == Status.IGNORE) {
             if (! getThroughputLimiter().tryAcquire())
@@ -207,6 +214,7 @@ public class NIOClient extends BaseClient {
         switch (getStatus()) {
             case LOGOUT:
                 getServer().ignoreMsgRecorder.record();
+                getServer().ignoreMsgRecorder2.record();
                 break;
             case LOGIN:
                 message = args.get("message");
@@ -220,6 +228,7 @@ public class NIOClient extends BaseClient {
                                     .build();
                             client.sendMessage(msgToSend);
                             getServer().forwardMsgRecorder.record();
+                            getServer().forwardMsgRecorder2.record();
                         }
                     } else {
                         //发给自己的
@@ -238,6 +247,11 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
+                getServer().realtimeMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s",
+                        getUsername(), new SimpleDateFormat("yyyy-MM-dd HH::mm::ss").format(new Date()), message));
+                getServer().dailyMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s",
+                        getUsername(), new SimpleDateFormat("yyyy-MM-dd HH::mm::ss").format(new Date()), message));
+
                 break;
             case IGNORE:
                 msgToSend = new MessageBuilder()
@@ -255,6 +269,7 @@ public class NIOClient extends BaseClient {
                 sendMessage(msgToSend);
 
                 getServer().ignoreMsgRecorder.record();
+                getServer().ignoreMsgRecorder2.record();
                 break;
             case RELOGIN:
                 msgToSend = new MessageBuilder()
@@ -272,6 +287,7 @@ public class NIOClient extends BaseClient {
                 sendMessage(msgToSend);
 
                 getServer().ignoreMsgRecorder.record();
+                getServer().ignoreMsgRecorder2.record();
                 break;
         }
 

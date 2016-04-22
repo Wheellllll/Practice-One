@@ -5,6 +5,7 @@ import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
 import octoteam.tahiti.performance.PerformanceMonitor;
 import octoteam.tahiti.performance.recorder.CountingRecorder;
+import octoteam.tahiti.performance.reporter.AppendFileReporter;
 import octoteam.tahiti.performance.reporter.LogReporter;
 import octoteam.tahiti.performance.reporter.RollingFileReporter;
 
@@ -24,6 +25,15 @@ public abstract class BaseServer {
     public CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive Message Number");
     public CountingRecorder ignoreMsgRecorder = new CountingRecorder("Ignore Message Number");
     public CountingRecorder forwardMsgRecorder = new CountingRecorder("Forward Message Number");
+
+    public MessageRecorder realtimeMessageRecorder = new MessageRecorder();
+
+    public MessageRecorder dailyMessageRecorder = new MessageRecorder();
+    public CountingRecorder validLoginRecorder2 = new CountingRecorder("Valid Login Number");
+    public CountingRecorder invalidLoginRecorder2 = new CountingRecorder("Invalid Login Number");
+    public CountingRecorder receiveMsgRecorder2 = new CountingRecorder("Receive Message Number");
+    public CountingRecorder ignoreMsgRecorder2 = new CountingRecorder("Ignore Message Number");
+    public CountingRecorder forwardMsgRecorder2 = new CountingRecorder("Forward Message Number");
 
     protected static boolean DEBUG = false;
 
@@ -48,6 +58,27 @@ public abstract class BaseServer {
                 .addRecorder(ignoreMsgRecorder)
                 .addRecorder(forwardMsgRecorder)
                 .start(1, TimeUnit.MINUTES);
+
+        //保存消息
+        LogReporter historyReporter = new AppendFileReporter("server/chattingData/chatHistory.log");
+        PerformanceMonitor pmForHistory = new PerformanceMonitor(historyReporter);
+        pmForHistory
+                .addRecorder(realtimeMessageRecorder)
+                .start(10, TimeUnit.SECONDS);
+        //压缩
+        LogReporter archiveReporter = new RollingFileReporter("server/archive/log-%d{yyyy-MM-dd}.zip");
+        PerformanceMonitor archiveMonitor = new PerformanceMonitor(archiveReporter);
+        archiveMonitor
+                .addRecorder(dailyMessageRecorder)
+                .addRecorder(validLoginRecorder2)
+                .addRecorder(invalidLoginRecorder2)
+                .addRecorder(receiveMsgRecorder2)
+                .addRecorder(ignoreMsgRecorder2)
+                .addRecorder(forwardMsgRecorder2)
+                .start(1, TimeUnit.DAYS);
+
+
+
     }
 
     public BaseServer() {

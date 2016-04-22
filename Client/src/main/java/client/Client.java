@@ -2,6 +2,8 @@ package client;
 
 import wheellllll.utils.MessageBuilder;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -31,6 +33,7 @@ public class Client extends BaseClient {
 
         if (msg.get("result").equals("success")) {
             loginSuccessRecorder.record();
+            loginSuccessRecorder2.record();
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
         } else {
@@ -39,6 +42,7 @@ public class Client extends BaseClient {
              */
             if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
             loginFailRecorder.record();
+            loginFailRecorder2.record();
         }
     }
 
@@ -51,12 +55,14 @@ public class Client extends BaseClient {
         if (msg.get("result").equals("success")) {
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
             loginSuccessRecorder.record();
+            loginSuccessRecorder2.record();
         } else {
             /*
              * 重新登陆失败，再来一次
              */
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
             loginFailRecorder.record();
+            loginFailRecorder2.record();
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
                     .add("username", getUsername())
@@ -95,6 +101,7 @@ public class Client extends BaseClient {
              * 发送成功，记录一下
              */
             sendMsgRecorder.record();
+            sendMsgRecorder2.record();
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -118,7 +125,15 @@ public class Client extends BaseClient {
         String from = msg.get("from");
         String message = msg.get("message");
 
+        if (from.equals("你")) {
+            realtimeMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s",
+                    getUsername(), new SimpleDateFormat("yyyy-MM-dd HH::mm::ss").format(new Date()), message));
+            dailyMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s",
+                    getUsername(), new SimpleDateFormat("yyyy-MM-dd HH::mm::ss").format(new Date()), message));
+        }
+
         receiveMsgRecorder.record();
+        receiveMsgRecorder2.record();
         if (!DEBUG) getChatRoomForm().addMessage(from, message);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")

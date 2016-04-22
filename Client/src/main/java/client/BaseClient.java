@@ -4,6 +4,7 @@ import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
 import octoteam.tahiti.performance.PerformanceMonitor;
 import octoteam.tahiti.performance.recorder.CountingRecorder;
+import octoteam.tahiti.performance.reporter.AppendFileReporter;
 import octoteam.tahiti.performance.reporter.LogReporter;
 import octoteam.tahiti.performance.reporter.RollingFileReporter;
 import ui.ChatRoomForm;
@@ -26,8 +27,6 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -46,6 +45,14 @@ public abstract class BaseClient {
     protected CountingRecorder loginFailRecorder = new CountingRecorder("Login failed number");
     protected CountingRecorder sendMsgRecorder = new CountingRecorder("Send message number");
     protected CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message number");
+
+    protected MessageRecorder realtimeMessageRecorder = new MessageRecorder();
+
+    protected MessageRecorder dailyMessageRecorder = new MessageRecorder();
+    protected CountingRecorder loginSuccessRecorder2 = new CountingRecorder("Login successfully number");
+    protected CountingRecorder loginFailRecorder2 = new CountingRecorder("Login failed number");
+    protected CountingRecorder sendMsgRecorder2 = new CountingRecorder("Send message number");
+    protected CountingRecorder receiveMsgRecorder2 = new CountingRecorder("Receive message number");
 
     private String username = null;
     private String password = null;
@@ -88,7 +95,7 @@ public abstract class BaseClient {
         // 首先需要一个报告生成器, 此处我们建立 RollingFileReporter, 即
         // 生成报告到一组文件中. 由于时间输出格式是 yyyy-MM-dd_HH-mm, 因
         // 此将每分钟生成一个新文件.
-        LogReporter reporter = new RollingFileReporter("serverRecord-%d{yyyy-MM-dd_HH-mm}.log");
+        LogReporter reporter = new RollingFileReporter("clientRecord-%d{yyyy-MM-dd_HH-mm}.log");
 
         // 接下来创建性能监控实例
         PerformanceMonitor monitor = new PerformanceMonitor(reporter);
@@ -100,6 +107,23 @@ public abstract class BaseClient {
                 .addRecorder(receiveMsgRecorder)
                 .addRecorder(sendMsgRecorder)
                 .start(1, TimeUnit.MINUTES);
+
+        //保存消息
+        LogReporter historyReporter = new AppendFileReporter("client/chattingData/chatHistory.log");
+        PerformanceMonitor pmForHistory = new PerformanceMonitor(historyReporter);
+        pmForHistory
+                .addRecorder(realtimeMessageRecorder)
+                .start(30, TimeUnit.SECONDS);
+        //压缩
+        LogReporter archiveReporter = new RollingFileReporter("client/archive/log-%d{yyyy-MM-dd}.zip");
+        PerformanceMonitor archiveMonitor = new PerformanceMonitor(archiveReporter);
+        archiveMonitor
+                .addRecorder(dailyMessageRecorder)
+                .addRecorder(loginSuccessRecorder2)
+                .addRecorder(loginFailRecorder2)
+                .addRecorder(receiveMsgRecorder2)
+                .addRecorder(sendMsgRecorder2)
+                .start(1, TimeUnit.DAYS);
     }
 
     public BaseClient() {

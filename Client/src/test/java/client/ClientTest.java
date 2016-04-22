@@ -42,7 +42,8 @@ public class ClientTest {
     public void testOnRelogin() throws Exception {
         Client client = new Client();
         HashMap<String,String> msg = new HashMap<>();
-        client.OnRelogin(msg,loginSuccessRecorder,loginFailRecorde);
+//        client.OnRelogin(msg,loginSuccessRecorder,loginFailRecorde);
+        client.OnRelogin(msg);
         boolean tmp = msg.get("result").equals("success");
         assertEquals(tmp,true);
     }
@@ -60,7 +61,8 @@ public class ClientTest {
     public void testOnSend() throws Exception {
         Client client = new Client();
         HashMap<String,String> msg = new HashMap<>();
-        client.OnSend(msg,sendMsgRecorder);
+//        client.OnSend(msg,sendMsgRecorder);
+        client.OnSend(msg);
         boolean tmp = msg.get("result").equals("success");
         assertEquals(tmp,true);
     }
@@ -69,7 +71,8 @@ public class ClientTest {
     public void testOnForward() throws Exception {
         Client client = new Client();
         HashMap<String,String> msg = new HashMap<>();
-        client.OnForward(msg,receiveMsgRecorder);
+//        client.OnForward(msg,receiveMsgRecorder);
+        client.OnForward(msg);
         boolean tmp = msg.get("result").equals("success");
         assertEquals(tmp,true);
     }
