@@ -125,12 +125,12 @@ public class Client extends BaseClient {
         String from = msg.get("from");
         String message = msg.get("message");
 
-        if (from.equals("你")) {
-            realtimeMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s",
-                    getUsername(), new SimpleDateFormat("yyyy-MM-dd HH::mm::ss").format(new Date()), message));
-            dailyMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s",
-                    getUsername(), new SimpleDateFormat("yyyy-MM-dd HH::mm::ss").format(new Date()), message));
-        }
+//        if (from.equals("你")) {
+//            realtimeMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s\n",
+//                    getUsername(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), message));
+//            dailyMessageRecorder.record(String.format("UserName : %s\ntime : %s\nmessage : %s\n",
+//                    getUsername(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()), message));
+//        }
 
         receiveMsgRecorder.record();
         receiveMsgRecorder2.record();

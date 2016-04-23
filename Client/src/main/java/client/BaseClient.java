@@ -46,9 +46,9 @@ public abstract class BaseClient {
     protected CountingRecorder sendMsgRecorder = new CountingRecorder("Send message number");
     protected CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message number");
 
-    protected MessageRecorder realtimeMessageRecorder = new MessageRecorder();
+//    protected MessageRecorder realtimeMessageRecorder = new MessageRecorder();
 
-    protected MessageRecorder dailyMessageRecorder = new MessageRecorder();
+//    protected MessageRecorder dailyMessageRecorder = new MessageRecorder();
     protected CountingRecorder loginSuccessRecorder2 = new CountingRecorder("Login successfully number");
     protected CountingRecorder loginFailRecorder2 = new CountingRecorder("Login failed number");
     protected CountingRecorder sendMsgRecorder2 = new CountingRecorder("Send message number");
@@ -109,21 +109,17 @@ public abstract class BaseClient {
                 .start(1, TimeUnit.MINUTES);
 
         //保存消息
-        LogReporter historyReporter = new AppendFileReporter("client/chattingData/chatHistory.log");
-        PerformanceMonitor pmForHistory = new PerformanceMonitor(historyReporter);
-        pmForHistory
-                .addRecorder(realtimeMessageRecorder)
-                .start(30, TimeUnit.SECONDS);
+//        LogReporter historyReporter = new AppendFileReporter("client/chattingData/chatHistory.log", "%msg%n");
+//        PerformanceMonitor pmForHistory = new PerformanceMonitor(historyReporter);
+//        pmForHistory
+//                .addRecorder(realtimeMessageRecorder)
+//                .start(30, TimeUnit.SECONDS);
         //压缩
-        LogReporter archiveReporter = new RollingFileReporter("client/archive/log-%d{yyyy-MM-dd}.zip");
-        PerformanceMonitor archiveMonitor = new PerformanceMonitor(archiveReporter);
-        archiveMonitor
-                .addRecorder(dailyMessageRecorder)
-                .addRecorder(loginSuccessRecorder2)
-                .addRecorder(loginFailRecorder2)
-                .addRecorder(receiveMsgRecorder2)
-                .addRecorder(sendMsgRecorder2)
-                .start(1, TimeUnit.DAYS);
+//        LogReporter archiveReporter = new RollingFileReporter("client/archive/log-%d{yyyy-MM-dd_HH-mm}.zip");
+//        PerformanceMonitor archiveMonitor = new PerformanceMonitor(archiveReporter);
+//        archiveMonitor
+//                .addRecorder(dailyMessageRecorder)
+//                .start(1, TimeUnit.MINUTES);
     }
 
     public BaseClient() {
