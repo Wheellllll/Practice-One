@@ -3,10 +3,9 @@ package server;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
-import octoteam.tahiti.performance.PerformanceMonitor;
-import octoteam.tahiti.performance.recorder.CountingRecorder;
-import octoteam.tahiti.performance.reporter.LogReporter;
-import octoteam.tahiti.performance.reporter.RollingFileReporter;
+import wheellllll.performance.ArchiveManager;
+import wheellllll.performance.IntervalLogger;
+import wheellllll.performance.RealtimeLogger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -19,13 +18,9 @@ import java.util.concurrent.TimeUnit;
  * Base server which implement the dirty works
  */
 public abstract class BaseServer {
-    public CountingRecorder validLoginRecorder = new CountingRecorder("Valid Login Number");
-    public CountingRecorder invalidLoginRecorder = new CountingRecorder("Invalid Login Number");
-    public CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive Message Number");
-    public CountingRecorder ignoreMsgRecorder = new CountingRecorder("Ignore Message Number");
-    public CountingRecorder forwardMsgRecorder = new CountingRecorder("Forward Message Number");
-
-//    public MessageLogger messageLogger = new MessageLogger("server/chattingData/chatHistory.log");
+    IntervalLogger intervalLogger = new IntervalLogger();
+    RealtimeLogger realtimeLogger = new RealtimeLogger();
+    ArchiveManager archiveManager = new ArchiveManager();
 
     protected static boolean DEBUG = false;
 
@@ -34,38 +29,44 @@ public abstract class BaseServer {
     }
 
     protected void initPerformance() {
-        // 首先需要一个报告生成器, 此处我们建立 RollingFileReporter, 即
-        // 生成报告到一组文件中. 由于时间输出格式是 yyyy-MM-dd_HH-mm, 因
-        // 此将每分钟生成一个新文件.
-        LogReporter reporter = new RollingFileReporter("serverRecord-%d{yyyy-MM-dd_HH-mm}.log");
+        //初始化intervalLogger
+        intervalLogger.setLogDir("./serverlog");
+        intervalLogger.setLogPrefix("server");
+        intervalLogger.setLogSuffix("log");
+        intervalLogger.setDateFormat("yyyy-MM-dd HH_mm");
+        intervalLogger.setInitialDelay(1);
+        intervalLogger.setInterval(1, TimeUnit.MINUTES);
 
-        // 接下来创建性能监控实例
-        PerformanceMonitor monitor = new PerformanceMonitor(reporter);
+        intervalLogger.addIndex("Valid Login Number");
+        intervalLogger.addIndex("Invalid Login Number");
+        intervalLogger.addIndex("Receive Message Number");
+        intervalLogger.addIndex("Ignore Message Number");
+        intervalLogger.addIndex("Forward Message Number");
+        intervalLogger.setFormatPattern(
+                "Valid Login Number : ${Valid Login Number}\n" +
+                "Invalid Login Number : ${Invalid Login Number}\n" +
+                "Receive Message Number : ${Receive Message Number}\n" +
+                "Ignore Message Number : ${Ignore Message Number}\n" +
+                "Forward Message Number : ${Forward Message Number}\n\n");
+        intervalLogger.start();
 
-        // 将指标加入监控器, 并开始定时报告, 此处是每 1 分钟统计一次.
-        monitor
-                .addRecorder(validLoginRecorder)
-                .addRecorder(invalidLoginRecorder)
-                .addRecorder(receiveMsgRecorder)
-                .addRecorder(ignoreMsgRecorder)
-                .addRecorder(forwardMsgRecorder)
-                .start(1, TimeUnit.MINUTES);
+        //初始化realtimeLogger
+        realtimeLogger.setLogDir("./serverlog");
+        realtimeLogger.setLogPrefix("server");
+        realtimeLogger.setLogSuffix("mlog");
+        realtimeLogger.setFormatPattern(
+                "Username : ${username}\n" +
+                "Time : ${time}\n" +
+                "Message : ${message}\n\n");
 
-        //保存消息
-//        LogReporter historyReporter = new AppendFileReporter("server/chattingData/chatHistory.log", "%msg%n");
-//        PerformanceMonitor pmForHistory = new PerformanceMonitor(historyReporter);
-//        pmForHistory
-//                .addRecorder(realtimeMessageRecorder)
-//                .start(10, TimeUnit.SECONDS);
-        //压缩
-//        LogReporter archiveReporter = new RollingFileReporter("server/archive/log-%d{yyyy-MM-dd}.zip");
-//        PerformanceMonitor archiveMonitor = new PerformanceMonitor(archiveReporter);
-//        archiveMonitor
-//                .addRecorder(dailyMessageRecorder)
-//                .start(5, TimeUnit.SECONDS);
-
-
-
+        //初始化archiveManager
+        archiveManager.setArchiveDir("./serverarchive");
+        archiveManager.setDatePattern("yyyy-MM-dd");
+        archiveManager.addLogger(intervalLogger);
+        archiveManager.addLogger(realtimeLogger);
+        archiveManager.setInitialDelay(1);
+        archiveManager.setInterval(1, TimeUnit.DAYS);
+        archiveManager.start();
     }
 
     public BaseServer() {
