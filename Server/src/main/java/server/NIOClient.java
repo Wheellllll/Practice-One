@@ -6,6 +6,8 @@ import wheellllll.utils.StringUtils;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -50,7 +52,7 @@ public class NIOClient extends BaseClient {
             for (BaseClient client : getClients()) {
                 if (client != this && client.getUsername() != null &&
                         client.getUsername().equals(username) && client.getStatus() != Status.LOGOUT) {
-                    getServer().invalidLoginRecorder.record();
+                    getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
                     MessageBuilder megBuilder = new MessageBuilder()
                             .add("event","login")
                             .add("result","fail")
@@ -61,7 +63,7 @@ public class NIOClient extends BaseClient {
                 }
             }
             if (getStatus() == Status.LOGIN) {
-                getServer().invalidLoginRecorder.record();
+                getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
                 MessageBuilder megBuilder = new MessageBuilder()
                         .add("event","login")
                         .add("result","fail")
@@ -79,7 +81,7 @@ public class NIOClient extends BaseClient {
                             .add("event","relogin")
                             .add("result","success");
                 }
-                getServer().validLoginRecorder.record();
+                getServer().intervalLogger.updateIndex("Valid Login Number", 1);
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
@@ -89,7 +91,7 @@ public class NIOClient extends BaseClient {
                 setPassword(encryptedPass);
             }
         } else {
-            getServer().invalidLoginRecorder.record();
+            getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
             MessageBuilder megBuilder = new MessageBuilder()
                     .add("event","login")
                     .add("result","fail")
@@ -192,7 +194,7 @@ public class NIOClient extends BaseClient {
         String message;
         String msgToSend;
 
-        getServer().receiveMsgRecorder.record();
+        getServer().intervalLogger.updateIndex("Receive Message Number", 1);
 
         if (getStatus() == Status.LOGIN || getStatus() == Status.IGNORE) {
             if (! getThroughputLimiter().tryAcquire())
@@ -206,7 +208,7 @@ public class NIOClient extends BaseClient {
 
         switch (getStatus()) {
             case LOGOUT:
-                getServer().ignoreMsgRecorder.record();
+                getServer().intervalLogger.updateIndex("Ignore Message Number", 1);
                 break;
             case LOGIN:
                 message = args.get("message");
@@ -219,7 +221,7 @@ public class NIOClient extends BaseClient {
                                     .add("message",message)
                                     .build();
                             client.sendMessage(msgToSend);
-                            getServer().forwardMsgRecorder.record();
+                            getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else {
                         //发给自己的
@@ -238,6 +240,12 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
+                HashMap<String, String> map = new HashMap<>();
+                map.put("username", this.getUsername());
+                map.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+                map.put("message", message);
+                getServer().realtimeLogger.log(map);
+
                 break;
             case IGNORE:
                 msgToSend = new MessageBuilder()
@@ -254,7 +262,7 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
-                getServer().ignoreMsgRecorder.record();
+                getServer().intervalLogger.updateIndex("Ignore Message Number", 1);
                 break;
             case RELOGIN:
                 msgToSend = new MessageBuilder()
@@ -271,7 +279,7 @@ public class NIOClient extends BaseClient {
                         .build();
                 sendMessage(msgToSend);
 
-                getServer().ignoreMsgRecorder.record();
+                getServer().intervalLogger.updateIndex("Ignore Message Number", 1);
                 break;
         }
 
