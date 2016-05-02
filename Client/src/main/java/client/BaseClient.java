@@ -45,6 +45,7 @@ public abstract class BaseClient {
 
     private String username = null;
     private String password = null;
+    private int groupId = 0;
 
     protected static boolean DEBUG = false;
 
@@ -60,12 +61,20 @@ public abstract class BaseClient {
         return password;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public LoginAndRegisterForm getLoginAndRegisterForm() {
