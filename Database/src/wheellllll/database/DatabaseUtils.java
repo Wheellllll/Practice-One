@@ -18,7 +18,7 @@ public class DatabaseUtils {
      * This method create a connection to database use the <code>JDBC_DRIVER</code>
      * and <code>DB_URL</code>. The table will be created if it is not existing.
      *
-     * @return Connection A connection to the database
+     * @return Connection to the database
      */
     private static Connection getConnection() {
         Connection connection = null;
@@ -27,7 +27,8 @@ public class DatabaseUtils {
             Class.forName(JDBC_DRIVER);
             connection = DriverManager.getConnection(DB_URL);
             statement = connection.createStatement();
-            String create_sql = "CREATE TABLE IF NOT EXISTS account (username VARCHAR , password VARCHAR )";
+            String create_sql = "CREATE TABLE IF NOT EXISTS account " +
+                    "(username VARCHAR , password VARCHAR , groupid INT DEFAULT 1)";
             statement.executeUpdate(create_sql);
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,9 +88,9 @@ public class DatabaseUtils {
      *
      * @param username Username of client
      * @param password Password of client, the password is encrypted with md5
-     * @return boolean Return true if the username and password combination exists in database, otherwise false
+     * @return Return the group id of the account if the username and password combination exists in database, otherwise -1
      */
-    public static boolean isValid(String username, String password) {
+    public static int isValid(String username, String password) {
         String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
         PreparedStatement pstmt = null;
         Connection conn = getConnection();
@@ -99,8 +100,9 @@ public class DatabaseUtils {
             pstmt.setString(2, password);
             ResultSet resultSet = pstmt.executeQuery();
             if (resultSet.next()) {
+                int groupId = resultSet.getInt("groupid");
                 resultSet.close();
-                return true;
+                return groupId;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -120,7 +122,7 @@ public class DatabaseUtils {
                 }
             }
         }
-        return false;
+        return -1;
     }
 
     /**
@@ -130,14 +132,47 @@ public class DatabaseUtils {
      * @param password Password of client
      * @return boolean Return true if creating account successfully, otherwise false
      */
-    public static boolean createAccount(String username, String password) {
-        String sql = "INSERT INTO account VALUES (?, ?)";
+    public static boolean createAccount(String username, String password, int groupid) {
+        String sql = "INSERT INTO account VALUES (?, ?, ?)";
         PreparedStatement pstmt = null;
         Connection conn = getConnection();
         try {
             pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, username);
             pstmt.setString(2, password);
+            pstmt.setInt(3, groupid);
+            pstmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean changeGroupId(String username, String password, int newGroupId) {
+        String sql = "UPDATE account SET groupId = ? WHERE username = ? AND password = ?";
+        PreparedStatement pstmt = null;
+        Connection conn = getConnection();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, newGroupId);
+            pstmt.setString(2, username);
+            pstmt.setString(3, password);
             pstmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();

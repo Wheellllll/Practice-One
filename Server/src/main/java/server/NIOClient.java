@@ -48,17 +48,19 @@ public class NIOClient extends BaseClient {
 
         String username = args.get("username");
         String encryptedPass = StringUtils.md5Hash(args.get("password"));
-        if (DatabaseUtils.isValid(username, encryptedPass)) {
+        int groupId = DatabaseUtils.isValid(username, encryptedPass);
+        if (groupId != -1) {
+            setGroupId(groupId);
             for (BaseClient client : getClients()) {
                 if (client != this && client.getUsername() != null &&
                         client.getUsername().equals(username) && client.getStatus() != Status.LOGOUT) {
                     getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
-                    MessageBuilder megBuilder = new MessageBuilder()
+                    MessageBuilder msgBuilder = new MessageBuilder()
                             .add("event","login")
                             .add("result","fail")
                             .add("reason","该用户已在其他终端登陆");
-                    String megToSend = megBuilder.build();
-                    sendMessage(megToSend);
+                    String msgToSend = msgBuilder.build();
+                    sendMessage(msgToSend);
                     return;
                 }
             }
@@ -75,7 +77,8 @@ public class NIOClient extends BaseClient {
                 if (getStatus() == Status.LOGOUT) {
                     megBuilder = new MessageBuilder()
                             .add("event","login")
-                            .add("result","success");
+                            .add("result","success")
+                            .add("groupid", String.valueOf(getGroupId()));
                 } else {
                     megBuilder = new MessageBuilder()
                             .add("event","relogin")
@@ -89,6 +92,7 @@ public class NIOClient extends BaseClient {
                 getThroughputLimiter().reset();
                 setUsername(username);
                 setPassword(encryptedPass);
+                setGroupId(groupId);
             }
         } else {
             getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
@@ -147,16 +151,18 @@ public class NIOClient extends BaseClient {
             sendMessage(msgToSend);
         } else {
             String encryptedPass = StringUtils.md5Hash(password);
-            boolean b = DatabaseUtils.createAccount(username, encryptedPass);
+            boolean b = DatabaseUtils.createAccount(username, encryptedPass, 1);
             if (b) {
                 setUsername(username);
                 setPassword(encryptedPass);
+                setGroupId(1);
                 setStatus(Status.LOGIN);
                 getCapacityLimiter().reset();
                 getThroughputLimiter().reset();
                 String msgToSend = new MessageBuilder()
                         .add("result","success")
                         .add("event","reg")
+                        .add("groupid", String.valueOf(getGroupId()))
                         .build();
                 sendMessage(msgToSend);
             } else {
@@ -212,8 +218,43 @@ public class NIOClient extends BaseClient {
                 break;
             case LOGIN:
                 message = args.get("message");
+                if (message.startsWith("/group")) {
+
+                    int newGId = 0;
+                    try {
+                        newGId = Integer.parseInt(message.split(" ")[1]);
+                    } catch (Exception e) {
+                        //输入不合法则不改变 group id
+                        msgToSend = new MessageBuilder()
+                                .add("event", "forward")
+                                .add("from", "管理员")
+                                .add("message", "请输入合法的整数以切换到其他组")
+                                .build();
+                        sendMessage(msgToSend);
+                        break;
+                    }
+
+                    DatabaseUtils.changeGroupId(getUsername(), getPassword(), newGId);
+                    setGroupId(newGId);
+
+                    msgToSend = new MessageBuilder()
+                            .add("event", "group")
+                            .add("type", "change")
+                            .add("groupid", String.valueOf(getGroupId()))
+                            .build();
+                    sendMessage(msgToSend);
+
+                    msgToSend = new MessageBuilder()
+                            .add("event", "forward")
+                            .add("from", "管理员")
+                            .add("message", String.format("切换到第%d组", newGId))
+                            .build();
+                    sendMessage(msgToSend);
+
+                    break;
+                }
                 for (BaseClient client : getClients()) {
-                    if (client != this) {
+                    if (client != this && client.getGroupId() == this.getGroupId()) {
                         if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
                             msgToSend = new MessageBuilder()
                                     .add("event","forward")
@@ -223,7 +264,7 @@ public class NIOClient extends BaseClient {
                             client.sendMessage(msgToSend);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
-                    } else {
+                    } else if (client == this) {
                         //发给自己的
                         msgToSend = new MessageBuilder()
                                 .add("event", "forward")
