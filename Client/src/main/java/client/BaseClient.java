@@ -2,15 +2,14 @@ package client;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
-import octoteam.tahiti.performance.PerformanceMonitor;
-import octoteam.tahiti.performance.recorder.CountingRecorder;
-import octoteam.tahiti.performance.reporter.LogReporter;
-import octoteam.tahiti.performance.reporter.RollingFileReporter;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;
+import wheellllll.performance.ArchiveManager;
+import wheellllll.performance.IntervalLogger;
+import wheellllll.performance.RealtimeLogger;
 import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
@@ -26,20 +25,12 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.HashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Base class for client
  */
 public abstract class BaseClient {
-
-    protected CountingRecorder loginSuccessRecorder = new CountingRecorder("Login successfully number");
-    protected CountingRecorder loginFailRecorder = new CountingRecorder("Login failed number");
-    protected CountingRecorder sendMsgRecorder = new CountingRecorder("Send message number");
-    protected CountingRecorder receiveMsgRecorder = new CountingRecorder("Receive message number");
-
     private LoginAndRegisterForm mLoginAndRegisterForm = null;
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
@@ -48,10 +39,13 @@ public abstract class BaseClient {
     private PackageHandler mPackageHandler = new PackageHandler();
     private EventManager mEventManager = new EventManager();
 
-
+    protected IntervalLogger intervalLogger = new IntervalLogger();
+    protected RealtimeLogger realtimeLogger = new RealtimeLogger();
+    protected ArchiveManager archiveManager = new ArchiveManager();
 
     private String username = null;
     private String password = null;
+    private int groupId = 0;
 
     protected static boolean DEBUG = false;
 
@@ -67,12 +61,20 @@ public abstract class BaseClient {
         return password;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public LoginAndRegisterForm getLoginAndRegisterForm() {
@@ -88,21 +90,42 @@ public abstract class BaseClient {
     }
 
     protected void initPerformance() {
-        // 首先需要一个报告生成器, 此处我们建立 RollingFileReporter, 即
-        // 生成报告到一组文件中. 由于时间输出格式是 yyyy-MM-dd_HH-mm, 因
-        // 此将每分钟生成一个新文件.
-        LogReporter reporter = new RollingFileReporter("serverRecord-%d{yyyy-MM-dd_HH-mm}.log");
+        //初始化intervalLogger
+        intervalLogger.setLogDir("./clientlog");
+        intervalLogger.setLogPrefix("client");
+        intervalLogger.setLogSuffix("log");
+        intervalLogger.setDateFormat("yyyy-MM-dd HH_mm");
+        intervalLogger.setInitialDelay(1);
+        intervalLogger.setInterval(1, TimeUnit.MINUTES);
 
-        // 接下来创建性能监控实例
-        PerformanceMonitor monitor = new PerformanceMonitor(reporter);
+        intervalLogger.addIndex("Login successfully number");
+        intervalLogger.addIndex("Login failed number");
+        intervalLogger.addIndex("Send message number");
+        intervalLogger.addIndex("Receive message number");
+        intervalLogger.setFormatPattern(
+                "Login successfully number : ${Login successfully number}\n" +
+                        "Login failed number : ${Login failed number}\n" +
+                        "Send message number : ${Send message number}\n" +
+                        "Receive message number : ${Receive message number}\n\n");
+        intervalLogger.start();
 
-        // 将指标加入监控器, 并开始定时报告, 此处是每 1 分钟统计一次.
-        monitor
-                .addRecorder(loginSuccessRecorder)
-                .addRecorder(loginFailRecorder)
-                .addRecorder(receiveMsgRecorder)
-                .addRecorder(sendMsgRecorder)
-                .start(1, TimeUnit.MINUTES);
+        //初始化realtimeLogger
+        realtimeLogger.setLogDir("./clientlog");
+        realtimeLogger.setLogPrefix("client");
+        realtimeLogger.setLogSuffix("mlog");
+        realtimeLogger.setFormatPattern(
+                "Username : ${username}\n" +
+                        "Time : ${time}\n" +
+                        "Message : ${message}\n\n");
+
+        //初始化archiveManager
+        archiveManager.setArchiveDir("./clientarchive");
+        archiveManager.setDatePattern("yyyy-MM-dd");
+        archiveManager.addLogger(intervalLogger);
+        archiveManager.addLogger(realtimeLogger);
+        archiveManager.setInitialDelay(1);
+        archiveManager.setInterval(1, TimeUnit.DAYS);
+        archiveManager.start();
     }
 
     public BaseClient() {
@@ -166,6 +189,7 @@ public abstract class BaseClient {
     protected void initChatRoomUI() {
         //开启聊天室界面
         mChatRoomForm = new ChatRoomForm();
+        mChatRoomForm.updateGroupId(getGroupId());
         mChatRoomForm.setOnSendListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String msgToSend = mChatRoomForm.getSendMessage();
@@ -209,6 +233,11 @@ public abstract class BaseClient {
             @Override
             public void run(HashMap<String, String> args) {
                 OnForward(args);
+            }
+        }).addEventListener("group", new EventListener() {
+            @Override
+            public void run(HashMap<String, String> args) {
+                OnGroupChange(args);
             }
         }).addEventListener("disconnect", new EventListener() {
             @Override
@@ -265,6 +294,7 @@ public abstract class BaseClient {
     public abstract void OnRelogin(HashMap<String, String> args);
     public abstract void OnSend(HashMap<String, String> args);
     public abstract void OnForward(HashMap<String, String> args);
+    public abstract void OnGroupChange(HashMap<String, String> args);
     public abstract void OnDisconnect(HashMap<String, String> args);
     public abstract void OnError(HashMap<String, String> args);
 

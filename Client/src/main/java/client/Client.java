@@ -2,6 +2,8 @@ package client;
 
 import wheellllll.utils.MessageBuilder;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 
@@ -30,7 +32,8 @@ public class Client extends BaseClient {
     public void OnLogin(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
-            loginSuccessRecorder.record();
+            setGroupId(Integer.parseInt(msg.get("groupid")));
+            intervalLogger.updateIndex("Login successfully number", 1);
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
         } else {
@@ -38,7 +41,7 @@ public class Client extends BaseClient {
              * 登陆失败，更新UI
              */
             if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
-            loginFailRecorder.record();
+            intervalLogger.updateIndex("Login failed number", 1);
         }
     }
 
@@ -50,13 +53,13 @@ public class Client extends BaseClient {
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
-            loginSuccessRecorder.record();
+            intervalLogger.updateIndex("Login successfully number", 1);
         } else {
             /*
              * 重新登陆失败，再来一次
              */
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
-            loginFailRecorder.record();
+            intervalLogger.updateIndex("Login failed number", 1);
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
                     .add("username", getUsername())
@@ -74,6 +77,7 @@ public class Client extends BaseClient {
     public void OnRegister(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
+            setGroupId(Integer.parseInt(msg.get("groupid")));
             if (!DEBUG) getLoginAndRegisterForm().close();
             initChatRoomUI();
         } else {
@@ -94,7 +98,7 @@ public class Client extends BaseClient {
             /*
              * 发送成功，记录一下
              */
-            sendMsgRecorder.record();
+            intervalLogger.updateIndex("Send message number", 1);
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -118,7 +122,13 @@ public class Client extends BaseClient {
         String from = msg.get("from");
         String message = msg.get("message");
 
-        receiveMsgRecorder.record();
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", getUsername());
+        map.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        map.put("message", message);
+        realtimeLogger.log(map);
+
+        intervalLogger.updateIndex("Receive message number", 1);
         if (!DEBUG) getChatRoomForm().addMessage(from, message);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
@@ -126,6 +136,12 @@ public class Client extends BaseClient {
                 .add("ack", "success")
                 .build();
         sendMessage(msgToSend);
+    }
+
+    @Override
+    public void OnGroupChange(HashMap<String, String> args) {
+        String newGId = args.get("groupid");
+        getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
     }
 
     /**

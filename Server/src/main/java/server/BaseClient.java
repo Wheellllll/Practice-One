@@ -2,7 +2,9 @@ package server;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
-import octoteam.tahiti.performance.recorder.CountingRecorder;
+import octoteam.tahiti.performance.PerformanceMonitor;
+import octoteam.tahiti.performance.reporter.AppendFileReporter;
+import octoteam.tahiti.performance.reporter.LogReporter;
 import octoteam.tahiti.quota.CapacityLimiter;
 import octoteam.tahiti.quota.ThroughputLimiter;
 import wheellllll.event.EventListener;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Base client which implement the dirty works
@@ -39,70 +42,13 @@ public abstract class BaseClient {
 
     private String mUsername = null;
     private String mPassword = null;
+    private int groupId = 0;
     private Status mStatus = Status.LOGOUT;
 
     private BaseServer mServer = null;
-
-    protected BaseServer getServer() {
-        return mServer;
-    }
-
     // QuotaLimiters
     private CapacityLimiter capacityLimiter;
     private ThroughputLimiter throughputLimiter;
-
-    public CapacityLimiter getCapacityLimiter() {
-        return capacityLimiter;
-    }
-
-    public void setCapacityLimiter(CapacityLimiter capacityLimiter) {
-        this.capacityLimiter = capacityLimiter;
-    }
-
-    public ThroughputLimiter getThroughputLimiter() {
-        return throughputLimiter;
-    }
-
-    public void setThroughputLimiter(ThroughputLimiter throughputLimiter) {
-        this.throughputLimiter = throughputLimiter;
-    }
-
-    public AsynchronousSocketChannel getSocketChannel() {
-        return mSocketChannel;
-    }
-
-    public String getUsername() {
-        return mUsername;
-    }
-
-    public String getPassword() {
-        return mPassword;
-    }
-
-    public Status getStatus() {
-        return mStatus;
-    }
-
-    public static ArrayList<BaseClient> getClients() {
-        return clients;
-    }
-
-    public void setUsername(String mUsername) {
-        this.mUsername = mUsername;
-    }
-
-    public void setPassword(String mPassword) {
-        this.mPassword = mPassword;
-    }
-
-    public void setStatus(Status mStatus) {
-        this.mStatus = mStatus;
-    }
-
-    public void sendMessage(String message) {
-        SocketUtils.sendMessage(mSocketWrapper, message, null);
-    }
-
 
     public BaseClient(AsynchronousSocketChannel socketChannel) {
         initialEvent();
@@ -131,6 +77,70 @@ public abstract class BaseClient {
     public BaseClient(AsynchronousSocketChannel socketChannel, BaseServer server) {
         this(socketChannel);
         this.mServer = server;
+    }
+
+    public static ArrayList<BaseClient> getClients() {
+        return clients;
+    }
+
+    protected BaseServer getServer() {
+        return mServer;
+    }
+
+    public CapacityLimiter getCapacityLimiter() {
+        return capacityLimiter;
+    }
+
+    public void setCapacityLimiter(CapacityLimiter capacityLimiter) {
+        this.capacityLimiter = capacityLimiter;
+    }
+
+    public ThroughputLimiter getThroughputLimiter() {
+        return throughputLimiter;
+    }
+
+    public void setThroughputLimiter(ThroughputLimiter throughputLimiter) {
+        this.throughputLimiter = throughputLimiter;
+    }
+
+    public AsynchronousSocketChannel getSocketChannel() {
+        return mSocketChannel;
+    }
+
+    public String getUsername() {
+        return mUsername;
+    }
+
+    public void setUsername(String mUsername) {
+        this.mUsername = mUsername;
+    }
+
+    public String getPassword() {
+        return mPassword;
+    }
+
+    public void setPassword(String mPassword) {
+        this.mPassword = mPassword;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
+    }
+
+    public Status getStatus() {
+        return mStatus;
+    }
+
+    public void setStatus(Status mStatus) {
+        this.mStatus = mStatus;
+    }
+
+    public void sendMessage(String message) {
+        SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
     private void initialEvent() {
@@ -178,12 +188,19 @@ public abstract class BaseClient {
     }
 
     public abstract void OnConnect(HashMap<String, String> args);
+
     public abstract void OnLogin(HashMap<String, String> args);
+
     public abstract void OnRegister(HashMap<String, String> args);
+
     public abstract void OnRelogin(HashMap<String, String> args);
+
     public abstract void OnSend(HashMap<String, String> args);
+
     public abstract void OnForward(HashMap<String, String> args);
+
     public abstract void OnDisconnect(HashMap<String, String> args);
+
     public abstract void OnError(HashMap<String, String> args);
 
 }
