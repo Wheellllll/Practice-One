@@ -42,6 +42,7 @@ public abstract class BaseClient {
 
     private String mUsername = null;
     private String mPassword = null;
+    private int groupId = 0;
     private Status mStatus = Status.LOGOUT;
 
     private BaseServer mServer = null;
@@ -120,6 +121,14 @@ public abstract class BaseClient {
 
     public void setPassword(String mPassword) {
         this.mPassword = mPassword;
+    }
+
+    public int getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public Status getStatus() {
