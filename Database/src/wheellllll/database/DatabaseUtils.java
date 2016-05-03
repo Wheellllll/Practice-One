@@ -164,6 +164,12 @@ public class DatabaseUtils {
         return true;
     }
 
+    /**
+     * This method change the group id in database of a user.
+     * @param username Username of user
+     * @param password Password of user
+     * @param newGroupId New group id
+     */
     public static boolean changeGroupId(String username, String password, int newGroupId) {
         String sql = "UPDATE account SET groupId = ? WHERE username = ? AND password = ?";
         PreparedStatement pstmt = null;
