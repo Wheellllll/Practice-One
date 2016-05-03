@@ -9,6 +9,7 @@ import java.awt.event.*;
  */
 public class ChatRoomForm {
     private JFrame frame = new JFrame("最简单的聊天室");
+    private JTextField groupIdField = new JTextField("当前组号：*，输入/group [groupId]切换到其他组");
     private JTextArea messageArea = new JTextArea();
     private JTextArea chatArea = new JTextArea(3, 30);
     private JButton sendBtn = new JButton("发送");
@@ -38,7 +39,9 @@ public class ChatRoomForm {
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED
         );
         messageArea.setEditable(false);
+        groupIdField.setEditable(false);
 
+        container.add(groupIdField, BorderLayout.NORTH);
         container.add(messageScrollPane, BorderLayout.CENTER);
         container.add(bottomPanel, BorderLayout.SOUTH);
 
@@ -77,6 +80,14 @@ public class ChatRoomForm {
      */
     public void clearChatArea() {
         chatArea.setText("");
+    }
+
+    /**
+     * Update the group id of the client.
+     * @param id New group id
+     */
+    public void updateGroupId(int id) {
+        groupIdField.setText(String.format("当前组号：%d，输入 /group {groupId} 切换到其他组", id));
     }
 
     /**

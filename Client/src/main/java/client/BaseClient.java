@@ -42,9 +42,11 @@ public abstract class BaseClient {
     protected IntervalLogger intervalLogger = new IntervalLogger();
     protected RealtimeLogger realtimeLogger = new RealtimeLogger();
     protected ArchiveManager archiveManager = new ArchiveManager();
+    protected ArchiveManager aarchiveManager = new ArchiveManager();
 
     private String username = null;
     private String password = null;
+    private int groupId = 0;
 
     protected static boolean DEBUG = false;
 
@@ -60,12 +62,20 @@ public abstract class BaseClient {
         return password;
     }
 
+    public int getGroupId() {
+        return groupId;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setGroupId(int groupId) {
+        this.groupId = groupId;
     }
 
     public LoginAndRegisterForm getLoginAndRegisterForm() {
@@ -117,6 +127,14 @@ public abstract class BaseClient {
         archiveManager.setInitialDelay(1);
         archiveManager.setInterval(1, TimeUnit.DAYS);
         archiveManager.start();
+
+        //初始化archiveManager
+        aarchiveManager.setArchiveDir("./clientaarchive");
+        aarchiveManager.setDatePattern("yyyy-MM-dd");
+        aarchiveManager.addFolder("./clientarchive");
+        aarchiveManager.setInterval(7, TimeUnit.DAYS);
+        aarchiveManager.setInitialDelay(1);
+        aarchiveManager.start();
     }
 
     public BaseClient() {
@@ -180,6 +198,7 @@ public abstract class BaseClient {
     protected void initChatRoomUI() {
         //开启聊天室界面
         mChatRoomForm = new ChatRoomForm();
+        mChatRoomForm.updateGroupId(getGroupId());
         mChatRoomForm.setOnSendListener(new ActionListener() {
             public void actionPerformed(ActionEvent actionEvent) {
                 String msgToSend = mChatRoomForm.getSendMessage();
@@ -223,6 +242,11 @@ public abstract class BaseClient {
             @Override
             public void run(HashMap<String, String> args) {
                 OnForward(args);
+            }
+        }).addEventListener("group", new EventListener() {
+            @Override
+            public void run(HashMap<String, String> args) {
+                OnGroupChange(args);
             }
         }).addEventListener("disconnect", new EventListener() {
             @Override
@@ -279,6 +303,7 @@ public abstract class BaseClient {
     public abstract void OnRelogin(HashMap<String, String> args);
     public abstract void OnSend(HashMap<String, String> args);
     public abstract void OnForward(HashMap<String, String> args);
+    public abstract void OnGroupChange(HashMap<String, String> args);
     public abstract void OnDisconnect(HashMap<String, String> args);
     public abstract void OnError(HashMap<String, String> args);
 
