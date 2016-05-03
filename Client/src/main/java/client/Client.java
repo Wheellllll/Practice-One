@@ -32,6 +32,7 @@ public class Client extends BaseClient {
     public void OnLogin(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
+            setGroupId(Integer.parseInt(msg.get("groupid")));
             intervalLogger.updateIndex("Login successfully number", 1);
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
@@ -76,6 +77,7 @@ public class Client extends BaseClient {
     public void OnRegister(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
+            setGroupId(Integer.parseInt(msg.get("groupid")));
             if (!DEBUG) getLoginAndRegisterForm().close();
             initChatRoomUI();
         } else {
@@ -134,6 +136,12 @@ public class Client extends BaseClient {
                 .add("ack", "success")
                 .build();
         sendMessage(msgToSend);
+    }
+
+    @Override
+    public void OnGroupChange(HashMap<String, String> args) {
+        String newGId = args.get("groupid");
+        getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
     }
 
     /**
