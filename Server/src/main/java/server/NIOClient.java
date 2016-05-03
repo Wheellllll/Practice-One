@@ -219,6 +219,7 @@ public class NIOClient extends BaseClient {
             case LOGIN:
                 message = args.get("message");
                 if (message.startsWith("/group")) {
+
                     int newGId = 0;
                     try {
                         newGId = Integer.parseInt(message.split(" ")[1]);
@@ -232,6 +233,7 @@ public class NIOClient extends BaseClient {
                         sendMessage(msgToSend);
                         break;
                     }
+
                     DatabaseUtils.changeGroupId(getUsername(), getPassword(), newGId);
                     setGroupId(newGId);
 
