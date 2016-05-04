@@ -10,7 +10,6 @@
     <orderEntry type="module" module-name="Client" />
     <orderEntry type="module" module-name="Server" />
     <orderEntry type="module" module-name="Utils" />
-    <orderEntry type="module" module-name="Performance" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
