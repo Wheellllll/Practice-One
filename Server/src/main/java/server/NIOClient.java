@@ -254,6 +254,12 @@ public class NIOClient extends BaseClient {
                     break;
                 }
 
+                /*
+                 * Storage message
+                 */
+                DatabaseUtils.createMessage(message, getUsername());
+
+
                 for (BaseClient client : getClients()) {
                     if (client != this && client.getGroupId() == this.getGroupId()) {
                         if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
