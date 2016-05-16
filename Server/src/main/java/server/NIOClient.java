@@ -103,7 +103,7 @@ public class NIOClient extends BaseClient {
                 List<DBObject> msgs;
                 if (msg != null) {
                     msgs = DatabaseUtils.findMessage(
-                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getInt("utime")))
+                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getLong("utime")))
                                     .append("to", username),
                             new BasicDBObject("utime", 1)
                     );
@@ -121,7 +121,7 @@ public class NIOClient extends BaseClient {
                     HashMap<String, String> tempMap = new HashMap<>();
                     tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
                     tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
-//                    tempMap.put("utime", ((BasicDBObject)tempMsg).getInt("utime"));
+//                    tempMap.put("utime", ((BasicDBObject)tempMsg).getLong("utime"));
                     m.add(tempMap);
                 }
 
