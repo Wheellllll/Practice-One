@@ -50,7 +50,8 @@ public class Client extends BaseClient {
                 JSONObject o = unreadMessageA.getJSONObject(i);
                 String from = o.getString("from");
                 String message = o.getString("message");
-                if (!DEBUG) getChatRoomForm().addMessage(from, message);
+                String date = o.getString("date");
+                if (!DEBUG) getChatRoomForm().addMessage(from, message, date);
             }
 
         } else {
@@ -138,15 +139,16 @@ public class Client extends BaseClient {
     public void OnForward(HashMap<String,String> msg) {
         String from = msg.get("from");
         String message = msg.get("message");
+        String date = msg.get("date");
 
         HashMap<String, String> map = new HashMap<>();
         map.put("username", getUsername());
-        map.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        map.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         map.put("message", message);
         realtimeLogger.log(map);
 
         intervalLogger.updateIndex("Receive message number", 1);
-        if (!DEBUG) getChatRoomForm().addMessage(from, message);
+        if (!DEBUG) getChatRoomForm().addMessage(from, message, date);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
                 .add("username", getUsername())

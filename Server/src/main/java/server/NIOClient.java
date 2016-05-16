@@ -121,7 +121,9 @@ public class NIOClient extends BaseClient {
                     HashMap<String, String> tempMap = new HashMap<>();
                     tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
                     tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
-//                    tempMap.put("utime", ((BasicDBObject)tempMsg).getLong("utime"));
+                    Long utime = ((BasicDBObject)tempMsg).getLong("utime");
+                    String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
+                    tempMap.put("date", date);
                     m.add(tempMap);
                 }
 
@@ -310,7 +312,10 @@ public class NIOClient extends BaseClient {
                 /*
                  * Storage message
                  */
-                ObjectId messageId = DatabaseUtils.createMessage(message, getUsername());
+                BasicDBObject messageObj = DatabaseUtils.createMessage(message, getUsername());
+                ObjectId messageId = messageObj.getObjectId("_id");
+                Long utime = messageObj.getLong("utime");
+                String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date(utime));
 
                 List<DBObject> accounts = DatabaseUtils.findAccount(new BasicDBObject("groupid", getGroupId()));
 
@@ -327,6 +332,7 @@ public class NIOClient extends BaseClient {
                                     .add("event","forward")
                                     .add("from",getUsername())
                                     .add("message",message)
+                                    .add("date", date)
                                     .build();
                             client.sendMessage(msgToSend);
                             /*
@@ -341,6 +347,7 @@ public class NIOClient extends BaseClient {
                                 .add("event", "forward")
                                 .add("from", "你")
                                 .add("message", message)
+                                .add("date", date)
                                 .build();
                         sendMessage(msgToSend);
                     }

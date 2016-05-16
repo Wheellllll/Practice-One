@@ -71,7 +71,15 @@ public class ChatRoomForm {
      * @param message message send by the user
      */
     public void addMessage(String from, String message) {
-        messageArea.append(from + ":" + message + "\n");
+        String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date(System.currentTimeMillis()));
+        messageArea.append(date + "  " + from + ":\n");
+        messageArea.append(message + "\n");
+        messageArea.setCaretPosition(messageArea.getDocument().getLength());
+    }
+
+    public void addMessage(String from, String message, String date) {
+        messageArea.append(date + "  " + from + ":\n");
+        messageArea.append(message + "\n");
         messageArea.setCaretPosition(messageArea.getDocument().getLength());
     }
 

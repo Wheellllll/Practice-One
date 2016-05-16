@@ -158,7 +158,7 @@ public class DatabaseUtils {
      * @param from Username who send the message
      * @return ObjectId Return ObjectId if creating message successfully, otherwise false
      */
-    public static ObjectId createMessage(String message, String from) {
+    public static BasicDBObject createMessage(String message, String from) {
         DBCollection messageColl = getDb().getCollection("message");
 
         BasicDBObject doc = new BasicDBObject("message", message)
@@ -167,7 +167,7 @@ public class DatabaseUtils {
                 .append("utime", System.currentTimeMillis());
         messageColl.insert(doc);
 
-        return (ObjectId)doc.get("_id");
+        return doc;
 
     }
 
