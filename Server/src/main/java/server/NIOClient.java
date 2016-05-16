@@ -115,7 +115,7 @@ public class NIOClient extends BaseClient {
                 }
 
                 /*
-                 * TODO: fill
+                 * TODO: Time
                  */
                 for (DBObject tempMsg : msgs) {
                     HashMap<String, String> tempMap = new HashMap<>();
@@ -123,6 +123,14 @@ public class NIOClient extends BaseClient {
                     tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
 //                    tempMap.put("utime", ((BasicDBObject)tempMsg).getInt("utime"));
                     m.add(tempMap);
+                }
+
+                /*
+                 * Ack last unread message
+                 */
+                if (!msgs.isEmpty()) {
+                    BasicDBObject tempMsg = (BasicDBObject) msgs.get(msgs.size() - 1);
+                    DatabaseUtils.syncAccount(username, tempMsg.getObjectId("_id"));
                 }
 
 
