@@ -1,5 +1,9 @@
 package server;
 
+import com.alibaba.fastjson.JSON;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
 import wheellllll.database.DatabaseUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
@@ -7,8 +11,10 @@ import wheellllll.utils.StringUtils;
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Client inherited from BaseClient. You may need to implement the event wheellllll.handler.
@@ -84,6 +90,53 @@ public class NIOClient extends BaseClient {
                             .add("event","relogin")
                             .add("result","success");
                 }
+
+                /*
+                 * build unread message
+                 */
+                ArrayList<HashMap<String, String>> m = new ArrayList<>();
+
+                BasicDBObject ac = (BasicDBObject) DatabaseUtils.findOneAccount(new BasicDBObject("username", username));
+                ObjectId lastupdate = ac.getObjectId("lastupdate");
+                BasicDBObject msg = (BasicDBObject) DatabaseUtils.findOneMessage(new BasicDBObject("_id", lastupdate));
+
+                List<DBObject> msgs;
+                if (msg != null) {
+                    msgs = DatabaseUtils.findMessage(
+                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getLong("utime")))
+                                    .append("to", username),
+                            new BasicDBObject("utime", 1)
+                    );
+                } else {
+                    msgs = DatabaseUtils.findMessage(
+                            new BasicDBObject("to", username),
+                            new BasicDBObject("utime", 1)
+                    );
+                }
+
+                /*
+                 * TODO: Time
+                 */
+                for (DBObject tempMsg : msgs) {
+                    HashMap<String, String> tempMap = new HashMap<>();
+                    tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
+                    tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
+//                    tempMap.put("utime", ((BasicDBObject)tempMsg).getLong("utime"));
+                    m.add(tempMap);
+                }
+
+                /*
+                 * Ack last unread message
+                 */
+                if (!msgs.isEmpty()) {
+                    BasicDBObject tempMsg = (BasicDBObject) msgs.get(msgs.size() - 1);
+                    DatabaseUtils.syncAccount(username, tempMsg.getObjectId("_id"));
+                }
+
+
+                String unreadMessage = JSON.toJSONString(m);
+                megBuilder.add("unreadmessage", unreadMessage);
+
                 getServer().intervalLogger.updateIndex("Valid Login Number", 1);
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
@@ -254,6 +307,19 @@ public class NIOClient extends BaseClient {
                     break;
                 }
 
+                /*
+                 * Storage message
+                 */
+                ObjectId messageId = DatabaseUtils.createMessage(message, getUsername());
+
+                List<DBObject> accounts = DatabaseUtils.findAccount(new BasicDBObject("groupid", getGroupId()));
+
+                for (DBObject account : accounts) {
+                    BasicDBObject ac = (BasicDBObject) account;
+                    if (!ac.getString("username").equals(getUsername()))DatabaseUtils.addUserToMessage(ac.getString("username"), messageId);
+                }
+
+
                 for (BaseClient client : getClients()) {
                     if (client != this && client.getGroupId() == this.getGroupId()) {
                         if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
@@ -263,6 +329,10 @@ public class NIOClient extends BaseClient {
                                     .add("message",message)
                                     .build();
                             client.sendMessage(msgToSend);
+                            /*
+                             * sync message
+                             */
+                            DatabaseUtils.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else if (client == this) {
