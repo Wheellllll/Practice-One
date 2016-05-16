@@ -118,15 +118,37 @@ public class DatabaseUtils {
 
     public static List<DBObject> findAccount(BasicDBObject query) {
         DBCollection accountColl = getDb().getCollection("account");
-
-
         DBCursor cursor = accountColl.find(query);
-
         List<DBObject> result = cursor.toArray();
-
         cursor.close();
-
         return result;
+    }
+
+    public static List<DBObject> findMessage(BasicDBObject query) {
+        DBCollection messageColl = getDb().getCollection("message");
+        DBCursor cursor = messageColl.find(query);
+        List<DBObject> result = cursor.toArray();
+        cursor.close();
+        return result;
+    }
+
+    public static List<DBObject> findMessage(BasicDBObject query, BasicDBObject sort) {
+        DBCollection messageColl = getDb().getCollection("message");
+        DBCursor cursor = messageColl.find(query).sort(sort);
+        List<DBObject> result = cursor.toArray();
+        cursor.close();
+        return result;
+    }
+
+    public static DBObject findOneAccount(BasicDBObject query) {
+        DBCollection accountColl = getDb().getCollection("account");
+        return accountColl.findOne(query);
+    }
+
+
+    public static DBObject findOneMessage(BasicDBObject query) {
+        DBCollection messageColl = getDb().getCollection("message");
+        return messageColl.findOne(query);
     }
 
     /**

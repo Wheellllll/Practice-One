@@ -1,5 +1,6 @@
 package server;
 
+import com.alibaba.fastjson.JSON;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
@@ -10,6 +11,7 @@ import wheellllll.utils.StringUtils;
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -88,6 +90,45 @@ public class NIOClient extends BaseClient {
                             .add("event","relogin")
                             .add("result","success");
                 }
+
+                /*
+                 * build unread message
+                 */
+                ArrayList<HashMap<String, String>> m = new ArrayList<>();
+
+                BasicDBObject ac = (BasicDBObject) DatabaseUtils.findOneAccount(new BasicDBObject("username", username));
+                ObjectId lastupdate = ac.getObjectId("lastupdate");
+                BasicDBObject msg = (BasicDBObject) DatabaseUtils.findOneMessage(new BasicDBObject("_id", lastupdate));
+
+                List<DBObject> msgs;
+                if (msg != null) {
+                    msgs = DatabaseUtils.findMessage(
+                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getInt("utime")))
+                                    .append("to", username),
+                            new BasicDBObject("utime", 1)
+                    );
+                } else {
+                    msgs = DatabaseUtils.findMessage(
+                            new BasicDBObject("to", username),
+                            new BasicDBObject("utime", 1)
+                    );
+                }
+
+                /*
+                 * TODO: fill
+                 */
+                for (DBObject tempMsg : msgs) {
+                    HashMap<String, String> tempMap = new HashMap<>();
+                    tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
+                    tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
+//                    tempMap.put("utime", ((BasicDBObject)tempMsg).getInt("utime"));
+                    m.add(tempMap);
+                }
+
+
+                String unreadMessage = JSON.toJSONString(m);
+                megBuilder.add("unreadmessage", unreadMessage);
+
                 getServer().intervalLogger.updateIndex("Valid Login Number", 1);
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
@@ -280,6 +321,9 @@ public class NIOClient extends BaseClient {
                                     .add("message",message)
                                     .build();
                             client.sendMessage(msgToSend);
+                            /*
+                             * sync message
+                             */
                             DatabaseUtils.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
