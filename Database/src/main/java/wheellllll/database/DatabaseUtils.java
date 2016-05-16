@@ -4,6 +4,7 @@ import com.mongodb.*;
 import org.bson.types.ObjectId;
 
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -115,14 +116,27 @@ public class DatabaseUtils {
         return true;
     }
 
+    public static List<DBObject> findAccount(BasicDBObject query) {
+        DBCollection accountColl = getDb().getCollection("account");
+
+
+        DBCursor cursor = accountColl.find(query);
+
+        List<DBObject> result = cursor.toArray();
+
+        cursor.close();
+
+        return result;
+    }
+
     /**
      * This method create a new message in database.
      *
      * @param message Message to send
      * @param from Username who send the message
-     * @return boolean Return true if creating message successfully, otherwise false
+     * @return ObjectId Return ObjectId if creating message successfully, otherwise false
      */
-    public static boolean createMessage(String message, String from) {
+    public static ObjectId createMessage(String message, String from) {
         DBCollection messageColl = getDb().getCollection("message");
 
         BasicDBObject doc = new BasicDBObject("message", message)
@@ -131,7 +145,7 @@ public class DatabaseUtils {
                 .append("utime", System.currentTimeMillis());
         messageColl.insert(doc);
 
-        return true;
+        return (ObjectId)doc.get("_id");
 
     }
 
@@ -142,15 +156,26 @@ public class DatabaseUtils {
         if (doc != null) {
             BasicDBList toList = (BasicDBList)doc.get("to");
             if (!toList.contains(username)) toList.add(username);
-            messageColl.update(new BasicDBObject("_id", messageId), new BasicDBObject("to", toList));
+            messageColl.update(new BasicDBObject("_id", messageId),
+                    new BasicDBObject("$set", new BasicDBObject("to", toList)));
         }
+
+        return true;
+    }
+
+    public static boolean syncAccount(String username, ObjectId messageId) {
+        DBCollection accountColl = getDb().getCollection("account");
+
+        accountColl.update(new BasicDBObject("username", username),
+                new BasicDBObject("$set", new BasicDBObject("lastupdate", messageId)));
 
         return true;
     }
 
     public static boolean changeGroupId(String username, String password, int newGroupId) {
         DBCollection accountColl = getDb().getCollection("account");
-        accountColl.update(new BasicDBObject("username", username), new BasicDBObject("groupid", newGroupId));
+        accountColl.update(new BasicDBObject("username", username),
+                new BasicDBObject("$set", new BasicDBObject("groupid", newGroupId)));
 
         return true;
     }

@@ -9,6 +9,20 @@ import static org.junit.Assert.*;
  */
 public class DatabaseUtilsTest {
     @Test
+    public void findAccount() throws Exception {
+
+    }
+
+    @Test
+    public void addUserToMessage() throws Exception {
+    }
+
+    @Test
+    public void syncAccount() throws Exception {
+
+    }
+
+    @Test
     public void isExisted() throws Exception {
         boolean exist = DatabaseUtils.isExisted("q");
 
@@ -26,7 +40,7 @@ public class DatabaseUtilsTest {
 
     @Test
     public void createMessage() throws Exception {
-
+        DatabaseUtils.createMessage("hello", "q");
     }
 
     @Test

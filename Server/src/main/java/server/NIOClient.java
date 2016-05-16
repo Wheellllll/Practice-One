@@ -1,5 +1,8 @@
 package server;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
 import wheellllll.database.DatabaseUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
@@ -9,6 +12,7 @@ import java.nio.channels.AsynchronousSocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Client inherited from BaseClient. You may need to implement the event wheellllll.handler.
@@ -257,7 +261,14 @@ public class NIOClient extends BaseClient {
                 /*
                  * Storage message
                  */
-                DatabaseUtils.createMessage(message, getUsername());
+                ObjectId messageId = DatabaseUtils.createMessage(message, getUsername());
+
+                List<DBObject> accounts = DatabaseUtils.findAccount(new BasicDBObject("groupid", getGroupId()));
+
+                for (DBObject account : accounts) {
+                    BasicDBObject ac = (BasicDBObject) account;
+                    if (!ac.getString("username").equals(getUsername()))DatabaseUtils.addUserToMessage(ac.getString("username"), messageId);
+                }
 
 
                 for (BaseClient client : getClients()) {
@@ -269,6 +280,7 @@ public class NIOClient extends BaseClient {
                                     .add("message",message)
                                     .build();
                             client.sendMessage(msgToSend);
+                            DatabaseUtils.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else if (client == this) {
