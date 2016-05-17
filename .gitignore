@@ -1,4 +1,6 @@
 out/
+clientlog/
+serverlog/
 */target/
 *.db
 *.log
@@ -18,3 +20,4 @@ out/
 .idea/sqlDataSources.xml
 .idea/dynamic.xml
 .idea/uiDesigner.xml
+

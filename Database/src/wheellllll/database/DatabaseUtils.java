@@ -27,9 +27,12 @@ public class DatabaseUtils {
             Class.forName(JDBC_DRIVER);
             connection = DriverManager.getConnection(DB_URL);
             statement = connection.createStatement();
-            String create_sql = "CREATE TABLE IF NOT EXISTS account " +
-                    "(username VARCHAR , password VARCHAR , groupid INT DEFAULT 1)";
-            statement.executeUpdate(create_sql);
+            String create_account_sql = "CREATE TABLE IF NOT EXISTS account " +
+                    "(username VARCHAR PRIMARY KEY, password VARCHAR , groupid INT DEFAULT 1, lastupdate INT)";
+            String create_message_sql = "CREATE TABLE IF NOT EXISTS message " +
+                    "(id INTEGER PRIMARY KEY AUTOINCREMENT,  message VARCHAR , fromuser VARCHAR , touser VARCHAR)";
+            statement.executeUpdate(create_account_sql);
+            statement.executeUpdate(create_message_sql);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
@@ -133,7 +136,7 @@ public class DatabaseUtils {
      * @return boolean Return true if creating account successfully, otherwise false
      */
     public static boolean createAccount(String username, String password, int groupid) {
-        String sql = "INSERT INTO account VALUES (?, ?, ?)";
+        String sql = "INSERT INTO account VALUES (?, ?, ?, NULL)";
         PreparedStatement pstmt = null;
         Connection conn = getConnection();
         try {
@@ -141,6 +144,38 @@ public class DatabaseUtils {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
             pstmt.setInt(3, groupid);
+            pstmt.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (pstmt != null) {
+                try {
+                    pstmt.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return true;
+    }
+
+    public static boolean createMessage(String message, String from, String to) {
+        String sql = "INSERT INTO message VALUES (?, ?, ?)";
+        PreparedStatement pstmt = null;
+        Connection conn = getConnection();
+        try {
+            pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, message);
+            pstmt.setString(2, from);
+            pstmt.setString(3, to);
             pstmt.execute();
         } catch (SQLException e) {
             e.printStackTrace();

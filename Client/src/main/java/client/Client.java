@@ -1,8 +1,12 @@
 package client;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import wheellllll.utils.MessageBuilder;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -37,6 +41,19 @@ public class Client extends BaseClient {
             intervalLogger.updateIndex("Login successfully number", 1);
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
+
+            /*
+             * Handle unread message
+             */
+            String unreadMessageS = msg.get("unreadmessage");
+            JSONArray unreadMessageA = JSON.parseArray(unreadMessageS);
+            for (int i = 0; i < unreadMessageA.size(); i++) {
+                JSONObject o = unreadMessageA.getJSONObject(i);
+                String from = o.getString("from");
+                String message = o.getString("message");
+                if (!DEBUG) getChatRoomForm().addMessage(from, message);
+            }
+
         } else {
             /*
              * 登陆失败，更新UI
