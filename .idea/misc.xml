@@ -67,6 +67,7 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/Socket/pom.xml" />
         <option value="$PROJECT_DIR$/Config/pom.xml" />
+        <option value="$PROJECT_DIR$/Database/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

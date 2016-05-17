@@ -21,6 +21,7 @@ public abstract class BaseServer {
     IntervalLogger intervalLogger = new IntervalLogger();
     RealtimeLogger realtimeLogger = new RealtimeLogger();
     ArchiveManager archiveManager = new ArchiveManager();
+    ArchiveManager aarchiveManager = new ArchiveManager();
 
     protected static boolean DEBUG = false;
 
@@ -67,6 +68,14 @@ public abstract class BaseServer {
         archiveManager.setInitialDelay(1);
         archiveManager.setInterval(1, TimeUnit.DAYS);
         archiveManager.start();
+
+        //初始化aarchiveManager
+        aarchiveManager.setArchiveDir("./serveraarchive");
+        aarchiveManager.setDatePattern("yyyy-MM-dd");
+        aarchiveManager.addFolder("./serverarchive");
+        aarchiveManager.setInitialDelay(1);
+        aarchiveManager.setInterval(1, TimeUnit.DAYS);
+        aarchiveManager.start();
     }
 
     public BaseServer() {

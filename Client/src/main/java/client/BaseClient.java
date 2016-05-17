@@ -42,6 +42,7 @@ public abstract class BaseClient {
     protected IntervalLogger intervalLogger = new IntervalLogger();
     protected RealtimeLogger realtimeLogger = new RealtimeLogger();
     protected ArchiveManager archiveManager = new ArchiveManager();
+    protected ArchiveManager aarchiveManager = new ArchiveManager();
 
     private String username = null;
     private String password = null;
@@ -126,6 +127,14 @@ public abstract class BaseClient {
         archiveManager.setInitialDelay(1);
         archiveManager.setInterval(1, TimeUnit.DAYS);
         archiveManager.start();
+
+        //初始化archiveManager
+        aarchiveManager.setArchiveDir("./clientaarchive");
+        aarchiveManager.setDatePattern("yyyy-MM-dd");
+        aarchiveManager.addFolder("./clientarchive");
+        aarchiveManager.setInterval(7, TimeUnit.DAYS);
+        aarchiveManager.setInitialDelay(1);
+        aarchiveManager.start();
     }
 
     public BaseClient() {
