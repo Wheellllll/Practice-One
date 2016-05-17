@@ -13,14 +13,24 @@ public class ChatRoomForm {
     private JTextArea messageArea = new JTextArea();
     private JTextArea chatArea = new JTextArea(3, 30);
     private JButton sendBtn = new JButton("发送");
+    private JTextArea groupMember = new JTextArea(30, 15);
 
     public ChatRoomForm() {
-        frame.setSize(500, 500);
+        frame.setSize(800, 600);
         initFrame();
         frame.setVisible(true);
     }
 
     private void initFrame() {
+        //左半部
+        JPanel left = new JPanel();
+        groupMember.setEditable(false);
+        JScrollPane gmPane = new JScrollPane(groupMember);
+        gmPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        gmPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        left.add(gmPane, BorderLayout.CENTER);
+
+        //右半部
         //底部发送区域
         JPanel container = new JPanel();
         container.setLayout(new BorderLayout());
@@ -45,7 +55,8 @@ public class ChatRoomForm {
         container.add(messageScrollPane, BorderLayout.CENTER);
         container.add(bottomPanel, BorderLayout.SOUTH);
 
-        frame.add(container);
+        frame.add(left, BorderLayout.WEST);
+        frame.add(container, BorderLayout.CENTER);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
     }
@@ -71,8 +82,20 @@ public class ChatRoomForm {
      * @param message message send by the user
      */
     public void addMessage(String from, String message) {
-        messageArea.append(from + ":" + message + "\n");
+        String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date(System.currentTimeMillis()));
+        messageArea.append(date + "  " + from + ":\n");
+        messageArea.append(message + "\n");
         messageArea.setCaretPosition(messageArea.getDocument().getLength());
+    }
+
+    public void addMessage(String from, String message, String date) {
+        messageArea.append(date + "  " + from + ":\n");
+        messageArea.append(message + "\n");
+        messageArea.setCaretPosition(messageArea.getDocument().getLength());
+    }
+
+    public void displayGroupMember(String members) {
+        groupMember.setText("组内成员列表：\n" + members);
     }
 
     /**
@@ -104,5 +127,9 @@ public class ChatRoomForm {
                 if (code == KeyEvent.VK_ENTER && modifiers == KeyEvent.CTRL_MASK) listener.actionPerformed(null);
             }
         });
+    }
+
+    public void setOnWindowClosingListener(final WindowAdapter adapter) {
+        frame.addWindowListener(adapter);
     }
 }

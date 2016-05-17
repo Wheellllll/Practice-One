@@ -1,10 +1,15 @@
 package client;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import wheellllll.utils.MessageBuilder;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 
 /**
@@ -36,6 +41,20 @@ public class Client extends BaseClient {
             intervalLogger.updateIndex("Login successfully number", 1);
             if (!DEBUG) getLoginAndRegisterForm().close();
             if (!DEBUG) initChatRoomUI();
+
+            /*
+             * Handle unread message
+             */
+            String unreadMessageS = msg.get("unreadmessage");
+            JSONArray unreadMessageA = JSON.parseArray(unreadMessageS);
+            for (int i = 0; i < unreadMessageA.size(); i++) {
+                JSONObject o = unreadMessageA.getJSONObject(i);
+                String from = o.getString("from");
+                String message = o.getString("message");
+                String date = o.getString("date");
+                if (!DEBUG) getChatRoomForm().addMessage(from, message, date);
+            }
+
         } else {
             /*
              * 登陆失败，更新UI
@@ -121,15 +140,16 @@ public class Client extends BaseClient {
     public void OnForward(HashMap<String,String> msg) {
         String from = msg.get("from");
         String message = msg.get("message");
+        String date = msg.get("date");
 
         HashMap<String, String> map = new HashMap<>();
         map.put("username", getUsername());
-        map.put("time", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        map.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         map.put("message", message);
         realtimeLogger.log(map);
 
         intervalLogger.updateIndex("Receive message number", 1);
-        if (!DEBUG) getChatRoomForm().addMessage(from, message);
+        if (!DEBUG) getChatRoomForm().addMessage(from, message, date);
         String msgToSend = new MessageBuilder()
                 .add("event", "forward")
                 .add("username", getUsername())
@@ -139,9 +159,26 @@ public class Client extends BaseClient {
     }
 
     @Override
-    public void OnGroupChange(HashMap<String, String> args) {
-        String newGId = args.get("groupid");
-        getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
+    public void OnGroup(HashMap<String, String> args) {
+        String type = args.get("type");
+        if (type.equals("change")) {
+            String newGId = args.get("groupid");
+            getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
+        } else if (type.equals("member")) {
+            String members = args.get("members");
+            String[] ms = members.split("\u0004");
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (String s : ms) {
+                if (first) {
+                    sb.append(s);
+                    first = false;
+                } else {
+                    sb.append("\n").append(s);
+                }
+            }
+            getChatRoomForm().displayGroupMember(sb.toString());
+        }
     }
 
     /**

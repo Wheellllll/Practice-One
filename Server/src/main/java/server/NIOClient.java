@@ -1,5 +1,9 @@
 package server;
 
+import com.alibaba.fastjson.JSON;
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import org.bson.types.ObjectId;
 import wheellllll.database.DatabaseUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
@@ -7,8 +11,10 @@ import wheellllll.utils.StringUtils;
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Client inherited from BaseClient. You may need to implement the event wheellllll.handler.
@@ -84,6 +90,55 @@ public class NIOClient extends BaseClient {
                             .add("event","relogin")
                             .add("result","success");
                 }
+
+                /*
+                 * build unread message
+                 */
+                ArrayList<HashMap<String, String>> m = new ArrayList<>();
+
+                BasicDBObject ac = (BasicDBObject) DatabaseUtils.findOneAccount(new BasicDBObject("username", username));
+                ObjectId lastupdate = ac.getObjectId("lastupdate");
+                BasicDBObject msg = (BasicDBObject) DatabaseUtils.findOneMessage(new BasicDBObject("_id", lastupdate));
+
+                List<DBObject> msgs;
+                if (msg != null) {
+                    msgs = DatabaseUtils.findMessage(
+                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getLong("utime")))
+                                    .append("to", username),
+                            new BasicDBObject("utime", 1)
+                    );
+                } else {
+                    msgs = DatabaseUtils.findMessage(
+                            new BasicDBObject("to", username),
+                            new BasicDBObject("utime", 1)
+                    );
+                }
+
+                /*
+                 * TODO: Time
+                 */
+                for (DBObject tempMsg : msgs) {
+                    HashMap<String, String> tempMap = new HashMap<>();
+                    tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
+                    tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
+                    Long utime = ((BasicDBObject)tempMsg).getLong("utime");
+                    String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
+                    tempMap.put("date", date);
+                    m.add(tempMap);
+                }
+
+                /*
+                 * Ack last unread message
+                 */
+                if (!msgs.isEmpty()) {
+                    BasicDBObject tempMsg = (BasicDBObject) msgs.get(msgs.size() - 1);
+                    DatabaseUtils.syncAccount(username, tempMsg.getObjectId("_id"));
+                }
+
+
+                String unreadMessage = JSON.toJSONString(m);
+                megBuilder.add("unreadmessage", unreadMessage);
+
                 getServer().intervalLogger.updateIndex("Valid Login Number", 1);
                 String megToSend = megBuilder.build();
                 sendMessage(megToSend);
@@ -93,6 +148,7 @@ public class NIOClient extends BaseClient {
                 setUsername(username);
                 setPassword(encryptedPass);
                 setGroupId(groupId);
+                OnGroupChanged(groupId, groupId);
             }
         } else {
             getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
@@ -165,6 +221,7 @@ public class NIOClient extends BaseClient {
                         .add("groupid", String.valueOf(getGroupId()))
                         .build();
                 sendMessage(msgToSend);
+                OnGroupChanged(getGroupId(), getGroupId());
             } else {
                 String msgToSend = new MessageBuilder()
                         .add("result","fail")
@@ -234,6 +291,7 @@ public class NIOClient extends BaseClient {
                         break;
                     }
 
+                    int oldGId = getGroupId();
                     DatabaseUtils.changeGroupId(getUsername(), getPassword(), newGId);
                     setGroupId(newGId);
 
@@ -244,6 +302,8 @@ public class NIOClient extends BaseClient {
                             .build();
                     sendMessage(msgToSend);
 
+                    OnGroupChanged(oldGId, newGId);
+
                     msgToSend = new MessageBuilder()
                             .add("event", "forward")
                             .add("from", "管理员")
@@ -253,6 +313,23 @@ public class NIOClient extends BaseClient {
 
                     break;
                 }
+
+                /*
+                 * Storage message
+                 */
+                BasicDBObject messageObj = DatabaseUtils.createMessage(message, getUsername());
+                ObjectId messageId = messageObj.getObjectId("_id");
+                Long utime = messageObj.getLong("utime");
+                String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
+
+                List<DBObject> accounts = DatabaseUtils.findAccount(new BasicDBObject("groupid", getGroupId()));
+
+                for (DBObject account : accounts) {
+                    BasicDBObject ac = (BasicDBObject) account;
+                    if (!ac.getString("username").equals(getUsername()))DatabaseUtils.addUserToMessage(ac.getString("username"), messageId);
+                }
+
+
                 for (BaseClient client : getClients()) {
                     if (client != this && client.getGroupId() == this.getGroupId()) {
                         if (client.getStatus() == Status.LOGIN || client.getStatus() == Status.IGNORE) {
@@ -260,8 +337,13 @@ public class NIOClient extends BaseClient {
                                     .add("event","forward")
                                     .add("from",getUsername())
                                     .add("message",message)
+                                    .add("date", date)
                                     .build();
                             client.sendMessage(msgToSend);
+                            /*
+                             * sync message
+                             */
+                            DatabaseUtils.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else if (client == this) {
@@ -270,6 +352,7 @@ public class NIOClient extends BaseClient {
                                 .add("event", "forward")
                                 .add("from", "你")
                                 .add("message", message)
+                                .add("date", date)
                                 .build();
                         sendMessage(msgToSend);
                     }
@@ -343,6 +426,9 @@ public class NIOClient extends BaseClient {
     public void OnDisconnect(HashMap<String, String> args) {
         try {
             System.out.format("Stopped listening to the client %s%n", getSocketChannel().getRemoteAddress());
+            int oldGId = getGroupId();
+            setGroupId(0);
+            OnGroupChanged(oldGId, oldGId);
             getClients().remove(this);
             getSocketChannel().close();
         } catch (IOException e) {

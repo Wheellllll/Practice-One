@@ -18,6 +18,8 @@ import wheellllll.utils.MessageBuilder;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -210,6 +212,15 @@ public abstract class BaseClient {
                 mChatRoomForm.clearChatArea();
             }
         });
+        mChatRoomForm.setOnWindowClosingListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                String msgToSend = new MessageBuilder()
+                        .add("event", "disconnect")
+                        .build();
+                sendMessage(msgToSend);
+            }
+        });
     }
 
     private void initEvent() {
@@ -246,7 +257,7 @@ public abstract class BaseClient {
         }).addEventListener("group", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
-                OnGroupChange(args);
+                OnGroup(args);
             }
         }).addEventListener("disconnect", new EventListener() {
             @Override
@@ -303,7 +314,7 @@ public abstract class BaseClient {
     public abstract void OnRelogin(HashMap<String, String> args);
     public abstract void OnSend(HashMap<String, String> args);
     public abstract void OnForward(HashMap<String, String> args);
-    public abstract void OnGroupChange(HashMap<String, String> args);
+    public abstract void OnGroup(HashMap<String, String> args);
     public abstract void OnDisconnect(HashMap<String, String> args);
     public abstract void OnError(HashMap<String, String> args);
 
