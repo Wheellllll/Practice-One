@@ -320,7 +320,7 @@ public class NIOClient extends BaseClient {
                 BasicDBObject messageObj = DatabaseUtils.createMessage(message, getUsername());
                 ObjectId messageId = messageObj.getObjectId("_id");
                 Long utime = messageObj.getLong("utime");
-                String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date(utime));
+                String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
 
                 List<DBObject> accounts = DatabaseUtils.findAccount(new BasicDBObject("groupid", getGroupId()));
 
