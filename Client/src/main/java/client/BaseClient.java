@@ -46,6 +46,7 @@ public abstract class BaseClient {
 
     private String username = null;
     private String password = null;
+
     private int groupId = 0;
 
     protected static boolean DEBUG = false;
@@ -89,6 +90,7 @@ public abstract class BaseClient {
     public void sendMessage(String message) {
         SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
+
 
     protected void initPerformance() {
         //初始化intervalLogger
@@ -306,5 +308,7 @@ public abstract class BaseClient {
     public abstract void OnGroupChange(HashMap<String, String> args);
     public abstract void OnDisconnect(HashMap<String, String> args);
     public abstract void OnError(HashMap<String, String> args);
+
+    public abstract String msgIdGennertor();
 
 }

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="ArchiveManager">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/ArchiveManager.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

@@ -86,4 +86,10 @@ public class ClientTest {
     public void testOnDisconnect() throws Exception {
         System.out.println("Disconnect");
     }
+
+    @Test
+    public void testMsgIdGennertor()throws Exception {
+        Client client = new Client();
+        client.msgIdGennertor();
+    }
 }

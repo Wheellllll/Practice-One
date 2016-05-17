@@ -3,8 +3,11 @@ package client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.codec.digest.DigestUtils;
 import wheellllll.utils.MessageBuilder;
 
+import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +19,8 @@ import java.util.HashMap;
  */
 public class Client extends BaseClient {
     public static void main(String[] args) {
-        new Client();
+      new Client();
+
     }
 
     /**
@@ -118,6 +122,7 @@ public class Client extends BaseClient {
             intervalLogger.updateIndex("Send message number", 1);
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
+                    .add("msgId",msgIdGennertor())
                     .add("event", "relogin")
                     .add("username", getUsername())
                     .add("password", getPassword())
@@ -177,5 +182,15 @@ public class Client extends BaseClient {
     @Override
     public void OnError(HashMap<String, String> msg) {
 
+    }
+
+    @Override
+    public String msgIdGennertor(){
+        String date = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date(System.currentTimeMillis()));
+        String idString = getUsername() + date;
+        System.out.println(idString);
+        String result = DigestUtils.md5Hex(idString);
+        System.out.println(result);
+        return result;
     }
 }
