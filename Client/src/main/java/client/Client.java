@@ -5,6 +5,7 @@ import wheellllll.utils.MessageBuilder;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 
 /**
@@ -139,9 +140,26 @@ public class Client extends BaseClient {
     }
 
     @Override
-    public void OnGroupChange(HashMap<String, String> args) {
-        String newGId = args.get("groupid");
-        getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
+    public void OnGroup(HashMap<String, String> args) {
+        String type = args.get("type");
+        if (type.equals("change")) {
+            String newGId = args.get("groupid");
+            getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
+        } else if (type.equals("member")) {
+            String members = args.get("members");
+            String[] ms = members.split("\u0004");
+            StringBuilder sb = new StringBuilder();
+            boolean first = true;
+            for (String s : ms) {
+                if (first) {
+                    sb.append(s);
+                    first = false;
+                } else {
+                    sb.append("\n").append(s);
+                }
+            }
+            getChatRoomForm().displayGroupMember(sb.toString());
+        }
     }
 
     /**

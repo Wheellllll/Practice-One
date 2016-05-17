@@ -13,12 +13,14 @@ import wheellllll.socket.SocketUtils;
 import wheellllll.socket.handler.PackageHandler;
 import wheellllll.socket.handler.ReadHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
+import wheellllll.utils.MessageBuilder;
 
 import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Base client which implement the dirty works
@@ -77,6 +79,36 @@ public abstract class BaseClient {
     public BaseClient(AsynchronousSocketChannel socketChannel, BaseServer server) {
         this(socketChannel);
         this.mServer = server;
+    }
+
+    public ArrayList<BaseClient> findGroupMember() {
+        return clients.stream().filter(c -> c.getGroupId() == getGroupId()).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public String getGroupMember() {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (BaseClient c : findGroupMember()) {
+            if (first) {
+                sb.append(c.getUsername());
+                first = false;
+            } else {
+                sb.append("\u0004").append(c.getUsername());
+            }
+        }
+        return sb.toString();
+    }
+
+    public void OnGroupChanged(int oldGId, int newGId) {
+        clients.stream().filter(c -> c.getGroupId() == oldGId || c.getGroupId() == newGId).forEach(c -> {
+            String msgToSend = new MessageBuilder()
+                    .add("event", "group")
+                    .add("type", "member")
+                    .add("members", c.getGroupMember())
+                    .build();
+            c.sendMessage(msgToSend);
+        });
+        System.out.println("执行OnGroupChanged");
     }
 
     public static ArrayList<BaseClient> getClients() {
