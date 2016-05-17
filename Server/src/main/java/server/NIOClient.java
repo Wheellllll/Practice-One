@@ -146,6 +146,7 @@ public class NIOClient extends BaseClient {
                 setUsername(username);
                 setPassword(encryptedPass);
                 setGroupId(groupId);
+                OnGroupChanged(groupId, groupId);
             }
         } else {
             getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
@@ -218,6 +219,7 @@ public class NIOClient extends BaseClient {
                         .add("groupid", String.valueOf(getGroupId()))
                         .build();
                 sendMessage(msgToSend);
+                OnGroupChanged(getGroupId(), getGroupId());
             } else {
                 String msgToSend = new MessageBuilder()
                         .add("result","fail")
@@ -287,6 +289,7 @@ public class NIOClient extends BaseClient {
                         break;
                     }
 
+                    int oldGId = getGroupId();
                     DatabaseUtils.changeGroupId(getUsername(), getPassword(), newGId);
                     setGroupId(newGId);
 
@@ -296,6 +299,8 @@ public class NIOClient extends BaseClient {
                             .add("groupid", String.valueOf(getGroupId()))
                             .build();
                     sendMessage(msgToSend);
+
+                    OnGroupChanged(oldGId, newGId);
 
                     msgToSend = new MessageBuilder()
                             .add("event", "forward")
@@ -414,6 +419,9 @@ public class NIOClient extends BaseClient {
     public void OnDisconnect(HashMap<String, String> args) {
         try {
             System.out.format("Stopped listening to the client %s%n", getSocketChannel().getRemoteAddress());
+            int oldGId = getGroupId();
+            setGroupId(0);
+            OnGroupChanged(oldGId, oldGId);
             getClients().remove(this);
             getSocketChannel().close();
         } catch (IOException e) {
