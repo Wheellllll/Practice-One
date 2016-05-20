@@ -1,5 +1,6 @@
 package wheellllll.database;
 
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.junit.Test;
 
@@ -18,7 +19,7 @@ public class DatabaseUtilsTest {
     @Test
     public void addUserToMessage() throws Exception {
         String userName = "test";
-        ObjectId messageId = DatabaseUtils.createMessage("test",userName);
+        ObjectId messageId = new ObjectId("222222");
         boolean temp = DatabaseUtils.addUserToMessage(userName, messageId);
         assertEquals(temp, true);
     }
@@ -26,7 +27,7 @@ public class DatabaseUtilsTest {
     @Test
     public void syncAccount() throws Exception {
         DatabaseUtils.createAccount("222222","111111",1);
-        ObjectId message = DatabaseUtils.createMessage("test","222222");
+        ObjectId message = new ObjectId("222222");
         boolean sync = DatabaseUtils.syncAccount("222222",message);
         assertEquals(sync, true);
     }
@@ -52,7 +53,7 @@ public class DatabaseUtilsTest {
 
     @Test
     public void createMessage() throws Exception {
-        ObjectId temp = DatabaseUtils.createMessage("hello", "q");
+        BasicDBObject temp = DatabaseUtils.createMessage("hello", "q");
         assertNotEquals(temp, null);
     }
 
