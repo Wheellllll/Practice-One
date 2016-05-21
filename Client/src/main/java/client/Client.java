@@ -37,6 +37,7 @@ public class Client extends BaseClient {
     public void OnLogin(HashMap<String,String> msg) {
 
         if (msg.get("result").equals("success")) {
+            logger.info("Login Success");
             setGroupId(Integer.parseInt(msg.get("groupid")));
             intervalLogger.updateIndex("Login successfully number", 1);
             if (!DEBUG) getLoginAndRegisterForm().close();
@@ -59,6 +60,7 @@ public class Client extends BaseClient {
             /*
              * 登陆失败，更新UI
              */
+            logger.info("Login Fails");
             if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
             intervalLogger.updateIndex("Login failed number", 1);
         }
@@ -72,12 +74,14 @@ public class Client extends BaseClient {
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
+            logger.info("Login Success(Adminstrtor)");
             intervalLogger.updateIndex("Login successfully number", 1);
         } else {
             /*
              * 重新登陆失败，再来一次
              */
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
+            logger.info("Login Fails(Adminstrtor)");
             intervalLogger.updateIndex("Login failed number", 1);
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -98,12 +102,16 @@ public class Client extends BaseClient {
         if (msg.get("result").equals("success")) {
             setGroupId(Integer.parseInt(msg.get("groupid")));
             if (!DEBUG) getLoginAndRegisterForm().close();
+            logger.info("Register Success");
             initChatRoomUI();
         } else {
             /*
              * 注册失败，更新UI
              */
-            if (!DEBUG) getLoginAndRegisterForm().setError(msg.get("reason"));
+            if (!DEBUG) {
+                getLoginAndRegisterForm().setError(msg.get("reason"));
+                logger.warn("Register Fails");
+            }
         }
     }
 
@@ -114,9 +122,11 @@ public class Client extends BaseClient {
     @Override
     public void OnSend(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
+
             /*
              * 发送成功，记录一下
              */
+            logger.info("Send Message Success");
             intervalLogger.updateIndex("Send message number", 1);
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
@@ -129,6 +139,7 @@ public class Client extends BaseClient {
             /*
              * 发送失败
              */
+            logger.error("Send Message Fails");
         }
     }
 
@@ -164,6 +175,7 @@ public class Client extends BaseClient {
         if (type.equals("change")) {
             String newGId = args.get("groupid");
             getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
+            logger.info("Chatroom Changed");
         } else if (type.equals("member")) {
             String members = args.get("members");
             String[] ms = members.split("\u0004");
@@ -187,6 +199,7 @@ public class Client extends BaseClient {
      */
     @Override
     public void OnDisconnect(HashMap<String, String> args) {
+        logger.error("Disconnect");
         System.out.println("Disconnect");
     }
 
