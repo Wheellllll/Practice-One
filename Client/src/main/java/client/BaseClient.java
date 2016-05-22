@@ -2,7 +2,9 @@ package client;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
-import org.apache.log4j.Logger;
+import org.apache.log4j.Level;
+
+import org.apache.log4j.*;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
@@ -34,6 +36,9 @@ import java.util.concurrent.TimeUnit;
  * Base class for client
  */
 public abstract class BaseClient {
+    //log4j
+    static Logger logger = Logger.getLogger(BaseClient.class);
+
     private LoginAndRegisterForm mLoginAndRegisterForm = null;
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
@@ -93,8 +98,6 @@ public abstract class BaseClient {
         SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
-    //log4j
-    Logger logger = Logger.getLogger(BaseClient.class);
 
     protected void initPerformance() {
 

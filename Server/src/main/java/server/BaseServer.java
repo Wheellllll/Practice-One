@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class BaseServer {
     //log4j
-    Logger logger = Logger.getLogger(BaseServer.class);
+    static Logger logger = Logger.getLogger(BaseServer.class);
     IntervalLogger intervalLogger = new IntervalLogger();
     RealtimeLogger realtimeLogger = new RealtimeLogger();
     ArchiveManager archiveManager = new ArchiveManager();

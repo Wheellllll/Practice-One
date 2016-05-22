@@ -3,6 +3,8 @@ package client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import wheellllll.utils.MessageBuilder;
 
 import java.text.SimpleDateFormat;
@@ -16,8 +18,12 @@ import java.util.StringTokenizer;
  * Client inherited from BaseClient. You may need to implement the event wheellllll.handler.
  */
 public class Client extends BaseClient {
+
+
     public static void main(String[] args) {
+        logger.setLevel(Level.INFO);
         new Client();
+
     }
 
     /**
