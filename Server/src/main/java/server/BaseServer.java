@@ -113,6 +113,7 @@ public abstract class BaseServer {
             new NIOClient(clientSock, BaseServer.this);
             //处理下一条连接
             serverSock.accept(serverSock, this);
+            logger.info("One message handle completed");
         }
 
         public void failed(Throwable e, AsynchronousServerSocketChannel asynchronousServerSocketChannel) {

@@ -230,7 +230,7 @@ public abstract class BaseClient {
                         .add("event", "disconnect")
                         .build();
                 sendMessage(msgToSend);
-                logger.info(username+" leave the Chatroom");
+                logger.info(username+" leaves the Chatroom");
             }
         });
     }
@@ -296,12 +296,12 @@ public abstract class BaseClient {
         } catch (IOException e) {
             if (!DEBUG) {
                 mLoginAndRegisterForm.setError("连接服务器失败");
-                logger.error("Connect to the server fail");
+                logger.error("Connect to the server fails");
             }
         } catch (UnresolvedAddressException e) {
             if (!DEBUG) {
                 mLoginAndRegisterForm.setError("连接服务器失败");
-                logger.error("Connect to the server fail");
+                logger.error("Connect to the server fails");
             }
         }
     }

@@ -26,6 +26,7 @@ public class Client extends BaseClient {
      */
     @Override
     public void OnConnect(HashMap<String, String> msg) {
+        logger.info("Connected");
         System.out.println("Connected");
     }
 
@@ -74,14 +75,14 @@ public class Client extends BaseClient {
     public void OnRelogin(HashMap<String, String> msg) {
         if (msg.get("result").equals("success")) {
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆成功");
-            logger.info("Login Success(Adminstrtor)");
+            logger.info("Login Success(Adminstrator)");
             intervalLogger.updateIndex("Login successfully number", 1);
         } else {
             /*
              * 重新登陆失败，再来一次
              */
             if (!DEBUG) getChatRoomForm().addMessage("管理员", "登陆失败，重试中...");
-            logger.info("Login Fails(Adminstrtor)");
+            logger.info("Login Fails(Adminstrator)");
             intervalLogger.updateIndex("Login failed number", 1);
             String msgToSend = new MessageBuilder()
                     .add("event", "relogin")
@@ -199,7 +200,7 @@ public class Client extends BaseClient {
      */
     @Override
     public void OnDisconnect(HashMap<String, String> args) {
-        logger.error("Disconnect");
+        logger.warn("Disconnect");
         System.out.println("Disconnect");
     }
 
