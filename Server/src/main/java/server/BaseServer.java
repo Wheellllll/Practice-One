@@ -3,6 +3,7 @@ package server;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
+import org.apache.log4j.Logger;
 import wheellllll.performance.ArchiveManager;
 import wheellllll.performance.IntervalLogger;
 import wheellllll.performance.RealtimeLogger;
@@ -18,6 +19,8 @@ import java.util.concurrent.TimeUnit;
  * Base server which implement the dirty works
  */
 public abstract class BaseServer {
+    //log4j
+    static Logger logger = Logger.getLogger(BaseServer.class);
     IntervalLogger intervalLogger = new IntervalLogger();
     RealtimeLogger realtimeLogger = new RealtimeLogger();
     ArchiveManager archiveManager = new ArchiveManager();
@@ -90,14 +93,16 @@ public abstract class BaseServer {
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel
                     .open()
                     .bind(socketAddress);
+            logger.info("Server is listening at "+socketAddress);
             System.out.format("Server is listening at %s%n", socketAddress);
             serverSocketChannel.accept(serverSocketChannel, new ConnectionHandler());
 
             if (!DEBUG) Thread.currentThread().join();
         } catch (IOException e) {
+            logger.error("Server failed to start",e);
             System.out.format("Server failed to start: %s", e.getMessage());
         } catch (InterruptedException e) {
-            System.out.println("Server Stopped");
+            logger.error("Server Stopped",e);
         }
     }
 
@@ -108,9 +113,11 @@ public abstract class BaseServer {
             new NIOClient(clientSock, BaseServer.this);
             //处理下一条连接
             serverSock.accept(serverSock, this);
+            logger.info("One message handle completed");
         }
 
         public void failed(Throwable e, AsynchronousServerSocketChannel asynchronousServerSocketChannel) {
+            logger.error("Fail to connect to client",e);
             System.out.println("Fail to connect to client");
         }
     }

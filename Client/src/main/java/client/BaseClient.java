@@ -2,6 +2,9 @@ package client;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
+import org.apache.log4j.Level;
+
+import org.apache.log4j.*;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
@@ -33,6 +36,9 @@ import java.util.concurrent.TimeUnit;
  * Base class for client
  */
 public abstract class BaseClient {
+    //log4j
+    static Logger logger = Logger.getLogger(BaseClient.class);
+
     private LoginAndRegisterForm mLoginAndRegisterForm = null;
     private ChatRoomForm mChatRoomForm = null;
     private AsynchronousSocketChannel mSocketChannel = null;
@@ -92,7 +98,10 @@ public abstract class BaseClient {
         SocketUtils.sendMessage(mSocketWrapper, message, null);
     }
 
+
     protected void initPerformance() {
+
+
         //初始化intervalLogger
         intervalLogger.setLogDir("./clientlog");
         intervalLogger.setLogPrefix("client");
@@ -148,6 +157,7 @@ public abstract class BaseClient {
 
             if (!DEBUG) Thread.currentThread().join();
         } catch (InterruptedException e) {
+            logger.error("Stop to connect to server");
             System.out.format("Stop to connect to server");
         }
     }
@@ -169,6 +179,7 @@ public abstract class BaseClient {
                 password = pass;
 
                 sendMessage(msgToSend);
+                logger.info("the login UI launch success");
             }
         });
 
@@ -186,6 +197,8 @@ public abstract class BaseClient {
                 password = pass;
 
                 sendMessage(msgToSend);
+                logger.info(username+" register success");
+                logger.info(username+" register success");
             }
         });
         mLoginAndRegisterForm.setOnConfigListener(new ActionListener() {
@@ -210,6 +223,7 @@ public abstract class BaseClient {
                         .build();
                 sendMessage(msgToSend);
                 mChatRoomForm.clearChatArea();
+                logger.info("the Chatroom launch success");
             }
         });
         mChatRoomForm.setOnWindowClosingListener(new WindowAdapter() {
@@ -219,6 +233,7 @@ public abstract class BaseClient {
                         .add("event", "disconnect")
                         .build();
                 sendMessage(msgToSend);
+                logger.info(username+" leaves the Chatroom");
             }
         });
     }
@@ -282,9 +297,15 @@ public abstract class BaseClient {
             AsynchronousSocketChannel socketChannel = AsynchronousSocketChannel.open();
             socketChannel.connect(serverAddress, socketChannel, new ConnectionHandler());
         } catch (IOException e) {
-            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) {
+                mLoginAndRegisterForm.setError("连接服务器失败");
+                logger.error("Connect to the server fails");
+            }
         } catch (UnresolvedAddressException e) {
-            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) {
+                mLoginAndRegisterForm.setError("连接服务器失败");
+                logger.error("Connect to the server fails");
+            }
         }
     }
 
@@ -294,7 +315,10 @@ public abstract class BaseClient {
         public void completed(Void result, AsynchronousSocketChannel socketChannel) {
             mSocketChannel = socketChannel;
             mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
-            if (!DEBUG) mLoginAndRegisterForm.setCorrect("成功连接服务器");
+            if (!DEBUG){
+                mLoginAndRegisterForm.setCorrect("成功连接服务器");
+                logger.info("Connect to the server success");
+            }
             OnConnect(null);
 
             /*
@@ -304,7 +328,10 @@ public abstract class BaseClient {
         }
 
         public void failed(Throwable e, AsynchronousSocketChannel asynchronousSocketChannel) {
-            if (!DEBUG) mLoginAndRegisterForm.setError("连接服务器失败");
+            if (!DEBUG) {
+                mLoginAndRegisterForm.setError("连接服务器失败");
+                logger.error("Connect to the server fail");
+            }
         }
     }
 
