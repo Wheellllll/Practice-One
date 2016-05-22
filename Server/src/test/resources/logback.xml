@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--scan为true会定时扫描配置文件(检测改变),scanPeriod为扫描间隔，单位有milliseconds, seconds, minutes, hours-->
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+    <!--context的名字-->
+    <contextName>Logback Demo</contextName>
+
+    <!--定义属性，name为属性名，value为属性值，可在后面通过${name}方式进行引用-->
+    <property name="LOG_HOME" value="logback_test" />
+
+    <!--appender 用来设置输出，一个appender对应一种输出方式，如ConsoleAppender(输出到控制台)、FileAppender(输出到文件)、
+    RollingFileAppender(输出到文件，并在满足某个要求后进行其他操作，如文件达到一定大小后进行压缩)-->
+
+    <!-- 控制台输出 -->
+    <!--之后可以通过name进行引用-->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder定义输出格式，默认配置为PartternLayoutEncoder -->
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--文件输出-->
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <file>${LOG_HOME}/myLog.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <!--true表示追加，false表示清空重写，默认为true-->
+        <append>false</append>
+    </appender>
+
+    <!-- 按照每天生成日志文件 -->
+    <appender name="ROLLINGFILE"  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/%d{yyyy-MM-dd}.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+        <!--日志文件最大的大小-->
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!--定义Logger,之后可通过name引用-->
+    <!--additivity值表示被该Logger使用的appender是否会被向上传递，默认为true，
+    为true时当前logger输出后会将appender向上传递，若在祖先中再次引用相同的appender则会出现重复输出-->
+
+    <!--level的值为指定日志的级别，有TRACE, DEBUG, INFO, WARN, ERROR五个级别，例如：
+    记录请求(形如logger.info("xxx");)级别为 p，其 logger的有效级别为 q， 只有则当 p>=q时， 该请求才会被执行。-->
+    <logger name="name1" level="DEBUG" additivity="true" />
+    <logger name="name2" level="INFO" additivity="true">
+        <appender-ref ref="FILE"/>
+    </logger>
+
+    <!--根结点的logger-->
+    <root level="ERROR">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="ROLLINGFILE" />
+
+        <!--若此处再此引用FILE则会出现重复-->
+        <!--<appender-ref ref="FILE" />-->
+    </root>
+</configuration>
