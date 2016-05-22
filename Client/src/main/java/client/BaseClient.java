@@ -194,7 +194,8 @@ public abstract class BaseClient {
                 password = pass;
 
                 sendMessage(msgToSend);
-                logger.info(username+"Register success");
+                logger.info(username+" register success");
+                logger.info(username+" register success");
             }
         });
         mLoginAndRegisterForm.setOnConfigListener(new ActionListener() {
@@ -229,7 +230,7 @@ public abstract class BaseClient {
                         .add("event", "disconnect")
                         .build();
                 sendMessage(msgToSend);
-                logger.info(username+"Leave the Chatroom");
+                logger.info(username+" leave the Chatroom");
             }
         });
     }

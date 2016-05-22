@@ -126,7 +126,7 @@ public class Client extends BaseClient {
             /*
              * 发送成功，记录一下
              */
-            logger.info("Send Message Success");
+            logger.info("Send one Message Success");
             intervalLogger.updateIndex("Send message number", 1);
         } else if (msg.get("reason").equals("relogin")) {
             String msgToSend = new MessageBuilder()
@@ -175,7 +175,7 @@ public class Client extends BaseClient {
         if (type.equals("change")) {
             String newGId = args.get("groupid");
             getChatRoomForm().updateGroupId(Integer.parseInt(newGId));
-            logger.info("Chatroom Changed");
+            logger.info("Chatroom Changed to "+newGId);
         } else if (type.equals("member")) {
             String members = args.get("members");
             String[] ms = members.split("\u0004");
