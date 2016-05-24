@@ -7,6 +7,8 @@ import octoteam.tahiti.performance.reporter.AppendFileReporter;
 import octoteam.tahiti.performance.reporter.LogReporter;
 import octoteam.tahiti.quota.CapacityLimiter;
 import octoteam.tahiti.quota.ThroughputLimiter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import wheellllll.event.EventListener;
 import wheellllll.event.EventManager;
 import wheellllll.socket.SocketUtils;
@@ -52,8 +54,11 @@ public abstract class BaseClient {
     private CapacityLimiter capacityLimiter;
     private ThroughputLimiter throughputLimiter;
 
+    protected Logger logger = null;
+
     public BaseClient(AsynchronousSocketChannel socketChannel) {
         initialEvent();
+        logger = LoggerFactory.getLogger("serverlogback");
         this.mSocketChannel = socketChannel;
         this.mSocketWrapper = new AsynchronousSocketChannelWrapper(socketChannel);
         ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ServerConfig.json");
