@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--scan为true会定时扫描配置文件(检测改变),scanPeriod为扫描间隔，单位有milliseconds, seconds, minutes, hours-->
+<configuration debug="false" scan="true" scanPeriod="30 seconds">
+    <!--context的名字-->
+    <contextName>Logback For Clients</contextName>
+
+    <!--定义属性，name为属性名，value为属性值，可在后面通过${name}方式进行引用-->
+    <property name="ClientLog_HOME" value="clientlog" />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+	<appender name="clientErrorAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">   
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+			<fileNamePattern>${ClientLog_HOME}/error/%d{yyyy-MM-dd}.log</fileNamePattern> 
+			<MaxHistory>30</MaxHistory>			
+		</rollingPolicy>  
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+			<pattern>%d{HH:mm:ss.SSS} %thread %X{invokeNo} %logger{40} %msg%n</pattern>  
+		</encoder>  
+		<!--Only Client Error msgs recorded in this file By.Filter-->
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>ERROR</level>  
+			<onMatch>ACCEPT</onMatch>  
+			<onMismatch>DENY</onMismatch>  
+		</filter> 
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+	</appender> 
+
+	<appender name="clientWarnAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">   
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+			<fileNamePattern>${ClientLog_HOME}/warn/%d{yyyy-MM-dd}.log</fileNamePattern> 
+			<MaxHistory>30</MaxHistory>			
+		</rollingPolicy>  
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+			<pattern>%d{HH:mm:ss.SSS} %thread %X{invokeNo} %logger{40} %msg%n</pattern>  
+		</encoder>  
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>WARN</level>  
+			<onMatch>ACCEPT</onMatch>  
+			<onMismatch>DENY</onMismatch>  
+		</filter>  
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+	</appender>	
+	
+	<appender name="clientInfoAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+			<fileNamePattern>${ClientLog_HOME}/info/%d{yyyy-MM-dd}.log</fileNamePattern> 
+			<MaxHistory>30</MaxHistory>			
+		</rollingPolicy>  
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">  
+			<pattern>%d{HH:mm:ss.SSS} %thread %X{invokeNo} %logger{40} %msg%n</pattern>  
+		</encoder>  
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>INFO</level>  
+			<onMatch>ACCEPT</onMatch>  
+			<onMismatch>DENY</onMismatch>  
+		</filter>  
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <MaxFileSize>10MB</MaxFileSize>
+        </triggeringPolicy>
+	</appender>
+
+    <logger name="clientlogback" level="INFO" additivity="true">
+		<appender-ref ref="clientErrorAppender"/>
+		<appender-ref ref="clientWarnAppender"/>
+		<appender-ref ref="clientInfoAppender"/>
+    </logger>
+
+    <root level="ERROR">
+        <appender-ref ref="STDOUT" />	
+    </root>
+</configuration>

@@ -2,6 +2,7 @@ package client;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
+import org.slf4j.LoggerFactory;
 import ui.ChatRoomForm;
 import ui.ConfigDialog;
 import ui.LoginAndRegisterForm;
@@ -29,6 +30,8 @@ import java.nio.channels.UnresolvedAddressException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+
 /**
  * Base class for client
  */
@@ -45,6 +48,8 @@ public abstract class BaseClient {
     protected RealtimeLogger realtimeLogger = new RealtimeLogger();
     protected ArchiveManager archiveManager = new ArchiveManager();
     protected ArchiveManager aarchiveManager = new ArchiveManager();
+
+    protected  Logger logger = null;
 
     private String username = null;
     private String password = null;
@@ -137,12 +142,14 @@ public abstract class BaseClient {
         aarchiveManager.setInterval(7, TimeUnit.DAYS);
         aarchiveManager.setInitialDelay(1);
         aarchiveManager.start();
+
     }
 
     public BaseClient() {
         try {
             initEvent();
             initPerformance();
+            logger = LoggerFactory.getLogger("clientlogback");
             if (!DEBUG) initWelcomeUI();
             tryConnect();
 
