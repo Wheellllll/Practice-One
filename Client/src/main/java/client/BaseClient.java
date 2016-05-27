@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
+import wheellllll.utils.Network;
 
 /**
  * Base class for client
@@ -153,12 +154,10 @@ public abstract class BaseClient {
     protected void initUDPSocket() {
         try {
             Server udpServer = new Server();
-            udpServer.start();
-            udpServer.bind(26343, 16234);
+            Network.register(udpServer);
             udpServer.addListener(new Listener() {
                 @Override
                 public void received(Connection connection, Object object) {
-                    System.out.println("aaaaaaaaaaaaaaaaaa");
                     HashMap<String, String> msg = (HashMap)object;
                     String _id = msg.get("_id");
                     String from = msg.get("from");
@@ -183,6 +182,8 @@ public abstract class BaseClient {
                     connection.sendUDP(msgToSend);
                 }
             });
+            udpServer.bind(54555, 54556);
+            udpServer.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

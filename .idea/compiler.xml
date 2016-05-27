@@ -32,13 +32,13 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
-      <module name="AccessServer" target="1.5" />
+      <module name="AccessServer" target="1.8" />
       <module name="Client" target="1.8" />
       <module name="Database" target="1.8" />
       <module name="ForwardServer" target="1.8" />
       <module name="PracticeOne" target="1.8" />
       <module name="Server" target="1.8" />
-      <module name="Utils" target="1.5" />
+      <module name="Utils" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

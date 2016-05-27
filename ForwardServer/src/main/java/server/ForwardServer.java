@@ -4,6 +4,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import wheellllll.utils.MessageBuilder;
+import wheellllll.utils.Network;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,15 +17,16 @@ public class ForwardServer {
         try {
             Client client = new Client();
             client.start();
-            client.connect(1000, "127.0.0.1", 54555, 54777);
+            Network.register(client);
+            client.connect(1000, "127.0.0.1", 54555, 54556);
 
-//            HashMap<String, String> msg = new MessageBuilder()
-//                    .add("_id", "31627368746831")
-//                    .add("from", "sweet")
-//                    .add("message", "hello world")
-//                    .add("date", "2016-05-27 00:39:40")
-//                    .buildMap();
-//            client.sendUDP(msg);
+            HashMap<String, String> msg = new MessageBuilder()
+                    .add("_id", "31627368746831")
+                    .add("from", "sweet")
+                    .add("message", "hello world")
+                    .add("date", "2016-05-27 00:39:40")
+                    .buildMap();
+            client.sendUDP(msg);
 //            client.sendUDP(msg);
 //            client.sendUDP(msg);
 //            client.sendTCP(msg);
@@ -37,7 +39,6 @@ public class ForwardServer {
                     HashMap<String, String> msg = (HashMap)object;
                 }
             });
-//            client.sendUDP(msg);
 
             Thread.currentThread().join();
         } catch (InterruptedException e) {
