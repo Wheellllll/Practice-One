@@ -30,13 +30,11 @@ import java.net.SocketAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
-import wheellllll.utils.Network;
+import wheellllll.utils.chatrmi.Network;
 
 /**
  * Base class for client
@@ -179,10 +177,10 @@ public abstract class BaseClient {
                             .add("username", getUsername())
                             .add("ack", _id)
                             .buildMap();
-                    connection.sendUDP(msgToSend);
+                    connection.sendTCP(msgToSend);
                 }
             });
-            udpServer.bind(54555, 54556);
+            udpServer.bind(12450);
             udpServer.start();
         } catch (IOException e) {
             e.printStackTrace();

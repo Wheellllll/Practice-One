@@ -3,8 +3,11 @@ package server;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import wheellllll.utils.MessageBuilder;
-import wheellllll.utils.Network;
+import wheellllll.utils.chatrmi.IForward;
+import wheellllll.utils.chatrmi.Network;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -13,39 +16,59 @@ import java.util.HashMap;
  * Created by sweet on 5/27/16.
  */
 public class ForwardServer {
-    public static void main(String args[]) {
+    class Forward extends Connection implements IForward {
+        public Forward() {
+            new ObjectSpace(this).register(Network.FORWARD, this);
+        }
+
+        @Override
+        public boolean forward(String host, int port, HashMap<String, String> args) {
+            try {
+                Client client = new Client();
+                client.start();
+                Network.register(client);
+                client.connect(1000, "127.0.0.1", 12450);
+                HashMap<String, String> msg = new MessageBuilder()
+                        .add("_id", "31627368746831")
+                        .add("from", "sweet")
+                        .add("message", "hello world")
+                        .add("date", "2016-05-27 00:39:40")
+                        .buildMap();
+                client.sendTCP(msg);
+                client.close();
+
+                System.out.println("Message Sended");
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+    }
+
+    protected void initServer() {
         try {
-            Client client = new Client();
-            client.start();
-            Network.register(client);
-            client.connect(1000, "127.0.0.1", 54555, 54556);
-
-            HashMap<String, String> msg = new MessageBuilder()
-                    .add("_id", "31627368746831")
-                    .add("from", "sweet")
-                    .add("message", "hello world")
-                    .add("date", "2016-05-27 00:39:40")
-                    .buildMap();
-            client.sendUDP(msg);
-//            client.sendUDP(msg);
-//            client.sendUDP(msg);
-//            client.sendTCP(msg);
-            String a = "aaaa";
-            client.sendUDP(a);
-
-            client.addListener(new Listener() {
-                public void received (Connection connection, Object object) {
-                    System.out.println("bbbbbbbbb");
-                    HashMap<String, String> msg = (HashMap)object;
+            Server server = new Server() {
+                @Override
+                protected Connection newConnection() {
+                    return new Forward();
                 }
-            });
+            };
+            Network.register(server);
+            server.bind(12460);
+            server.start();
 
-            Thread.currentThread().join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public ForwardServer() {
+        initServer();
+    }
+
+    public static void main(String args[]) {
+        new ForwardServer();
     }
 
 }
