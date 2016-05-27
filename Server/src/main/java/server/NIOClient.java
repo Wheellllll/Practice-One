@@ -290,13 +290,14 @@ public class NIOClient extends BaseClient {
                         newGId = Integer.parseInt(message.split(" ")[1]);
                     } catch (Exception e) {
                         //输入不合法则不改变 group id
-                        msgToSend = new MessageBuilder()
+                        HashMap<String, String> msg = new MessageBuilder()
                                 .add("event", "forward")
                                 .add("from", "管理员")
                                 .add("message", "请输入合法的整数以切换到其他组")
-                                .buildString();
+                                .buildMap();
                         logger.warn("Group switch Waring, Reson: 整数不合法");
-                        sendMessage(msgToSend);
+                        getServer().forwardServer.forward("127.0.0.1", 12450, msg);
+//                        sendMessage(msgToSend);
                         break;
                     }
 
@@ -313,12 +314,13 @@ public class NIOClient extends BaseClient {
 
                     OnGroupChanged(oldGId, newGId);
 
-                    msgToSend = new MessageBuilder()
+                    HashMap<String, String> msg = new MessageBuilder()
                             .add("event", "forward")
                             .add("from", "管理员")
                             .add("message", String.format("切换到第%d组", newGId))
-                            .buildString();
-                    sendMessage(msgToSend);
+                            .buildMap();
+                    getServer().forwardServer.forward("127.0.0.1", 12450, msg);
+//                    sendMessage(msgToSend);
 
                     break;
                 }
@@ -357,13 +359,14 @@ public class NIOClient extends BaseClient {
                         }
                     } else if (client == this) {
                         //发给自己的
-                        msgToSend = new MessageBuilder()
+                        HashMap<String, String> msg = new MessageBuilder()
                                 .add("event", "forward")
                                 .add("from", "你")
                                 .add("message", message)
                                 .add("date", date)
-                                .buildString();
-                        sendMessage(msgToSend);
+                                .buildMap();
+//                        sendMessage(msgToSend);
+                        getServer().forwardServer.forward("127.0.0.1", 12450, msg);
                     }
                 }
 

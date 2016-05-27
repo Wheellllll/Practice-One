@@ -3,8 +3,10 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/AccessServer/AccessServer.iml" filepath="$PROJECT_DIR$/AccessServer/AccessServer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AuthServer/AuthServer.iml" filepath="$PROJECT_DIR$/AuthServer/AuthServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/Client/Client.iml" filepath="$PROJECT_DIR$/Client/Client.iml" />
       <module fileurl="file://$PROJECT_DIR$/Database/Database.iml" filepath="$PROJECT_DIR$/Database/Database.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DatabaseServer/DatabaseServer.iml" filepath="$PROJECT_DIR$/DatabaseServer/DatabaseServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/ForwardServer/ForwardServer.iml" filepath="$PROJECT_DIR$/ForwardServer/ForwardServer.iml" />
       <module fileurl="file://$PROJECT_DIR$/FunctionalityTest/FunctionalityTest.iml" filepath="$PROJECT_DIR$/FunctionalityTest/FunctionalityTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/PracticeOne.iml" filepath="$PROJECT_DIR$/PracticeOne.iml" />

@@ -28,13 +28,7 @@ public class ForwardServer {
                 client.start();
                 Network.register(client);
                 client.connect(1000, "127.0.0.1", 12450);
-                HashMap<String, String> msg = new MessageBuilder()
-                        .add("_id", "31627368746831")
-                        .add("from", "sweet")
-                        .add("message", "hello world")
-                        .add("date", "2016-05-27 00:39:40")
-                        .buildMap();
-                client.sendTCP(msg);
+                client.sendTCP(args);
                 client.close();
 
                 System.out.println("Message Sended");

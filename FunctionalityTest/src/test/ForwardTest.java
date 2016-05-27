@@ -7,7 +7,7 @@ import wheellllll.utils.MessageBuilder;
 import java.util.HashMap;
 
 /**
- * This class is written for testing server forward message
+ * This class is written for testing server forwardServer message
  */
 public class ForwardTest {
     public static void main(String args[])
@@ -29,7 +29,7 @@ public class ForwardTest {
 
             @Override
             public void OnForward(HashMap<String,String> args) {
-                assert ("forward" == args.get("event"));
+                assert ("forwardServer" == args.get("event"));
                 assert ("success" == args.get("ack"));
 
             }

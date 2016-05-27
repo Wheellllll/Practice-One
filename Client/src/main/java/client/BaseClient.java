@@ -156,28 +156,8 @@ public abstract class BaseClient {
             udpServer.addListener(new Listener() {
                 @Override
                 public void received(Connection connection, Object object) {
-                    HashMap<String, String> msg = (HashMap)object;
-                    String _id = msg.get("_id");
-                    String from = msg.get("from");
-                    String message = msg.get("message");
-                    String date = msg.get("date");
-
-//                    HashMap<String, String> map = new HashMap<>();
-//                    map.put("username", getUsername());
-//                    map.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-//                    map.put("message", message);
-//                    realtimeLogger.log(map);
-
-//                    logger.info("USER：{} , Msg：{} ，be forwarded",getUsername(),message);
-
-//                    intervalLogger.updateIndex("Receive message number", 1);
-                    if (!DEBUG) getChatRoomForm().addMessage(from, message, date);
-                    HashMap<String, String> msgToSend = new MessageBuilder()
-                            .add("event", "forward")
-                            .add("username", getUsername())
-                            .add("ack", _id)
-                            .buildMap();
-                    connection.sendTCP(msgToSend);
+                    HashMap<String, String> args = (HashMap)object;
+                    SocketUtils.dispatchMessage(mEventManager, args);
                 }
             });
             udpServer.bind(12450);

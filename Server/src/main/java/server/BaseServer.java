@@ -1,11 +1,15 @@
 package server;
 
 
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
 import wheellllll.performance.ArchiveManager;
 import wheellllll.performance.IntervalLogger;
 import wheellllll.performance.RealtimeLogger;
+import wheellllll.utils.chatrmi.IForward;
+import wheellllll.utils.chatrmi.Network;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,6 +28,8 @@ public abstract class BaseServer {
     ArchiveManager aarchiveManager = new ArchiveManager();
 
     protected static boolean DEBUG = false;
+
+    protected IForward forwardServer;
 
     public static void DEBUG_MODE(boolean flag) {
         DEBUG = flag;
@@ -78,6 +84,21 @@ public abstract class BaseServer {
         aarchiveManager.start();
     }
 
+    protected void connectForwardServer() {
+        try {
+            Client forwardClient = new Client();
+            forwardClient.start();
+
+            Network.register(forwardClient);
+
+            forwardClient.connect(1000, "127.0.0.1", 12460);
+
+            forwardServer = ObjectSpace.getRemoteObject(forwardClient, Network.FORWARD, IForward.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public BaseServer() {
         try {
             //此处json复用配置管理
@@ -85,6 +106,7 @@ public abstract class BaseServer {
             ConfigBean config = configManager.loadToBean(ConfigBean.class);
 
             initPerformance();
+            connectForwardServer();
 
             InetSocketAddress socketAddress = new InetSocketAddress(config.getHost(), config.getPort());
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel

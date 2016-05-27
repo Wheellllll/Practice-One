@@ -91,4 +91,22 @@ public class SocketUtils {
         }
     }
 
+        /**
+     * This method dispatch event depending on the message
+     *
+     * @param eventManager A event manager that charge for the dispatch
+     * @param args A message which include the event
+     */
+    public static void dispatchMessage(EventManager eventManager, HashMap<String, String> args) {
+        try {
+            String event = args.get("event");
+            eventManager.triggerEvent(event, args);
+        } catch (Exception e) {
+            HashMap<String, String> error = new HashMap<String, String>();
+            error.put("event", "error");
+            error.put("reason", "message is not a valid json string!");
+            eventManager.triggerEvent("error", error);
+        }
+    }
+
 }
