@@ -1,5 +1,8 @@
 package client;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
 import org.slf4j.LoggerFactory;
@@ -27,6 +30,8 @@ import java.net.SocketAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.UnresolvedAddressException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -145,10 +150,49 @@ public abstract class BaseClient {
 
     }
 
+    protected void initUDPSocket() {
+        try {
+            Server udpServer = new Server();
+            udpServer.start();
+            udpServer.bind(26343, 16234);
+            udpServer.addListener(new Listener() {
+                @Override
+                public void received(Connection connection, Object object) {
+                    System.out.println("aaaaaaaaaaaaaaaaaa");
+                    HashMap<String, String> msg = (HashMap)object;
+                    String _id = msg.get("_id");
+                    String from = msg.get("from");
+                    String message = msg.get("message");
+                    String date = msg.get("date");
+
+//                    HashMap<String, String> map = new HashMap<>();
+//                    map.put("username", getUsername());
+//                    map.put("date", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+//                    map.put("message", message);
+//                    realtimeLogger.log(map);
+
+//                    logger.info("USER：{} , Msg：{} ，be forwarded",getUsername(),message);
+
+//                    intervalLogger.updateIndex("Receive message number", 1);
+                    if (!DEBUG) getChatRoomForm().addMessage(from, message, date);
+                    HashMap<String, String> msgToSend = new MessageBuilder()
+                            .add("event", "forward")
+                            .add("username", getUsername())
+                            .add("ack", _id)
+                            .buildMap();
+                    connection.sendUDP(msgToSend);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public BaseClient() {
         try {
             initEvent();
             initPerformance();
+            initUDPSocket();
             logger = LoggerFactory.getLogger("clientlogback");
             if (!DEBUG) initWelcomeUI();
             tryConnect();
@@ -171,7 +215,7 @@ public abstract class BaseClient {
                         .add("event", "login")
                         .add("username", user)
                         .add("password", pass)
-                        .build();
+                        .buildString();
                 username = user;
                 password = pass;
 
@@ -188,7 +232,7 @@ public abstract class BaseClient {
                         .add("event", "reg")
                         .add("username", user)
                         .add("password", pass)
-                        .build();
+                        .buildString();
                 username = user;
                 password = pass;
 
@@ -214,7 +258,7 @@ public abstract class BaseClient {
                 msgToSend = new MessageBuilder()
                         .add("event", "send")
                         .add("message", msgToSend)
-                        .build();
+                        .buildString();
                 sendMessage(msgToSend);
                 mChatRoomForm.clearChatArea();
             }
@@ -224,7 +268,7 @@ public abstract class BaseClient {
             public void windowClosing(WindowEvent e) {
                 String msgToSend = new MessageBuilder()
                         .add("event", "disconnect")
-                        .build();
+                        .buildString();
                 sendMessage(msgToSend);
             }
         });

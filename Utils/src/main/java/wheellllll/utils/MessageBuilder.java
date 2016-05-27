@@ -29,10 +29,15 @@ public class MessageBuilder {
      *
      * @return Json string
      */
-    public String build()
+    public String buildString()
     {
         String jsonString = JSON.toJSONString(message);
         return jsonString;
+    }
+
+    public HashMap<String, String> buildMap()
+    {
+        return message;
     }
 
     /**

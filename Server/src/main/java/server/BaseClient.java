@@ -2,9 +2,6 @@ package server;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
-import octoteam.tahiti.performance.PerformanceMonitor;
-import octoteam.tahiti.performance.reporter.AppendFileReporter;
-import octoteam.tahiti.performance.reporter.LogReporter;
 import octoteam.tahiti.quota.CapacityLimiter;
 import octoteam.tahiti.quota.ThroughputLimiter;
 import org.slf4j.Logger;
@@ -21,7 +18,6 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -110,7 +106,7 @@ public abstract class BaseClient {
                     .add("event", "group")
                     .add("type", "member")
                     .add("members", c.getGroupMember())
-                    .build();
+                    .buildString();
             c.sendMessage(msgToSend);
         });
         System.out.println("执行OnGroupChanged");

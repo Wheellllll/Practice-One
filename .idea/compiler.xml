@@ -22,18 +22,23 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
+        <module name="AccessServer" />
         <module name="Client" />
         <module name="Database" />
+        <module name="ForwardServer" />
         <module name="PracticeOne" />
         <module name="Server" />
+        <module name="Utils" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
+      <module name="AccessServer" target="1.5" />
       <module name="Client" target="1.8" />
-      <module name="Config" target="1.8" />
       <module name="Database" target="1.8" />
+      <module name="ForwardServer" target="1.8" />
       <module name="PracticeOne" target="1.8" />
       <module name="Server" target="1.8" />
+      <module name="Utils" target="1.5" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -66,7 +66,7 @@ public class NIOClient extends BaseClient {
                             .add("result","fail")
                             .add("reason","该用户已在其他终端登陆");
                     logger.warn("USER: {} login fail,Reason: 该用户已在其他终端登陆",getUsername());
-                    String msgToSend = msgBuilder.build();
+                    String msgToSend = msgBuilder.buildString();
                     sendMessage(msgToSend);
                     return;
                 }
@@ -78,7 +78,7 @@ public class NIOClient extends BaseClient {
                         .add("result","fail")
                         .add("reason","用户已登陆");
                 logger.warn("USER: {} login fail,Reason: 用户已登陆",getUsername());
-                String megToSend = megBuilder.build();
+                String megToSend = megBuilder.buildString();
                 sendMessage(megToSend);
             } else if (getStatus() == Status.LOGOUT || getStatus() == Status.RELOGIN) {
                 MessageBuilder megBuilder = null;
@@ -94,7 +94,7 @@ public class NIOClient extends BaseClient {
                 }
 
                 /*
-                 * build unread message
+                 * buildString unread message
                  */
                 ArrayList<HashMap<String, String>> m = new ArrayList<>();
 
@@ -142,7 +142,7 @@ public class NIOClient extends BaseClient {
                 megBuilder.add("unreadmessage", unreadMessage);
 
                 getServer().intervalLogger.updateIndex("Valid Login Number", 1);
-                String megToSend = megBuilder.build();
+                String megToSend = megBuilder.buildString();
                 sendMessage(megToSend);
                 setStatus(Status.LOGIN);
                 getCapacityLimiter().reset();
@@ -159,7 +159,7 @@ public class NIOClient extends BaseClient {
                     .add("result","fail")
                     .add("reason","登陆失败！请检查用户名和密码");
             logger.warn("User Login Fail ,Reason :用户名和密码出现问题 ");
-            String megToSend = megBuilder.build();
+            String megToSend = megBuilder.buildString();
             sendMessage(megToSend);
         }
     }
@@ -186,7 +186,7 @@ public class NIOClient extends BaseClient {
                     .add("result", "fail")
                     .add("event", "reg")
                     .add("reason", "用户名不能为空")
-                    .build();
+                    .buildString();
             sendMessage(msgToSend);
             logger.warn("Register Fail,Reason : 用户名不能为空");
             return;
@@ -198,7 +198,7 @@ public class NIOClient extends BaseClient {
                     .add("result","fail")
                     .add("event","reg")
                     .add("reason","用户名已存在")
-                    .build();
+                    .buildString();
             logger.warn("Register Fail,Reason : 用户名已存在");
             sendMessage(msgToSend);
 
@@ -207,7 +207,7 @@ public class NIOClient extends BaseClient {
                     .add("result","fail")
                     .add("event","reg")
                     .add("reason","密码太短（至少6位）")
-                    .build();
+                    .buildString();
             logger.warn("Register Fail,Reason : 密码太短");
             sendMessage(msgToSend);
         } else {
@@ -224,7 +224,7 @@ public class NIOClient extends BaseClient {
                         .add("result","success")
                         .add("event","reg")
                         .add("groupid", String.valueOf(getGroupId()))
-                        .build();
+                        .buildString();
                 logger.info("USER :{},Register success,", username);
                 sendMessage(msgToSend);
                 OnGroupChanged(getGroupId(), getGroupId());
@@ -233,7 +233,7 @@ public class NIOClient extends BaseClient {
                         .add("result","fail")
                         .add("event","reg")
                         .add("reason","注册失败！请不要输入奇怪的字符")
-                        .build();
+                        .buildString();
                 logger.warn("Register Fail,Reason : 出现奇怪的字符");
                 sendMessage(msgToSend);
             }
@@ -294,7 +294,7 @@ public class NIOClient extends BaseClient {
                                 .add("event", "forward")
                                 .add("from", "管理员")
                                 .add("message", "请输入合法的整数以切换到其他组")
-                                .build();
+                                .buildString();
                         logger.warn("Group switch Waring, Reson: 整数不合法");
                         sendMessage(msgToSend);
                         break;
@@ -308,7 +308,7 @@ public class NIOClient extends BaseClient {
                             .add("event", "group")
                             .add("type", "change")
                             .add("groupid", String.valueOf(getGroupId()))
-                            .build();
+                            .buildString();
                     sendMessage(msgToSend);
 
                     OnGroupChanged(oldGId, newGId);
@@ -317,7 +317,7 @@ public class NIOClient extends BaseClient {
                             .add("event", "forward")
                             .add("from", "管理员")
                             .add("message", String.format("切换到第%d组", newGId))
-                            .build();
+                            .buildString();
                     sendMessage(msgToSend);
 
                     break;
@@ -347,7 +347,7 @@ public class NIOClient extends BaseClient {
                                     .add("from",getUsername())
                                     .add("message",message)
                                     .add("date", date)
-                                    .build();
+                                    .buildString();
                             client.sendMessage(msgToSend);
                             /*
                              * sync message
@@ -362,7 +362,7 @@ public class NIOClient extends BaseClient {
                                 .add("from", "你")
                                 .add("message", message)
                                 .add("date", date)
-                                .build();
+                                .buildString();
                         sendMessage(msgToSend);
                     }
                 }
@@ -370,7 +370,7 @@ public class NIOClient extends BaseClient {
                 msgToSend = new MessageBuilder()
                         .add("event","send")
                         .add("result","success")
-                        .build();
+                        .buildString();
                 sendMessage(msgToSend);
 
                 HashMap<String, String> map = new HashMap<>();
@@ -385,7 +385,7 @@ public class NIOClient extends BaseClient {
                         .add("event", "send")
                         .add("result", "fail")
                         .add("reason", "You have exceeded message number per second")
-                        .build();
+                        .buildString();
                 logger.warn("USER {} , send msg fail ,Reason :exceeded message number per second",args.get("username"));
                 sendMessage(msgToSend);
 
@@ -393,7 +393,7 @@ public class NIOClient extends BaseClient {
                         .add("event", "forward")
                         .add("from", "管理员")
                         .add("message", "发送的太快了！请休息一下...")
-                        .build();
+                        .buildString();
                 logger.warn("管理员 ,forward msg fail ,reason :发送的太快 ");
                 sendMessage(msgToSend);
 
@@ -404,7 +404,7 @@ public class NIOClient extends BaseClient {
                         .add("event", "send")
                         .add("result", "fail")
                         .add("reason", "relogin")
-                        .build();
+                        .buildString();
                 logger.warn("USER: {} send msg fail ,Reason : need to relogin", args.get("username"));
                 sendMessage(msgToSend);
 
@@ -412,7 +412,7 @@ public class NIOClient extends BaseClient {
                         .add("event", "forward")
                         .add("from", "管理员")
                         .add("message", "超过每个用户发送消息次数，尝试重新登陆中...")
-                        .build();
+                        .buildString();
                 logger.warn("管理员 ,forward msg fail ,reason :超过每个用户发送消息次数，需要重新登陆中 ");
                 sendMessage(msgToSend);
 
@@ -461,7 +461,7 @@ public class NIOClient extends BaseClient {
         String msgToSend = new MessageBuilder()
                 .add("event", "error")
                 .add("reason", "error")
-                .build();
+                .buildString();
         logger.error("Error happens");
         sendMessage(msgToSend);
     }

@@ -33,7 +33,7 @@ public class LoginTest {
        msgBuilder.add("event","reg");
        msgBuilder.add("username","funcTest");
        msgBuilder.add("password","123456");
-       String msg = msgBuilder.build();
+       String msg = msgBuilder.buildString();
        client.sendMessage(msg);
 
        //登录
@@ -41,14 +41,14 @@ public class LoginTest {
        loginMsgBuilder.add("event","login");
        loginMsgBuilder.add("username","funcTest");
        loginMsgBuilder.add("password","123456");
-       String loginMsg = loginMsgBuilder.build();
+       String loginMsg = loginMsgBuilder.buildString();
        client.sendMessage(loginMsg);
 
         String msgToSend = new MessageBuilder()
                 .add("event", "login")
                 .add("username", "test1")
                 .add("password", "test")
-                .build();
+                .buildString();
         client.sendMessage(msgToSend);
 
         try {

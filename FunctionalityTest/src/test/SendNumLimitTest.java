@@ -34,7 +34,7 @@ public class SendNumLimitTest {
         msgBuilder.add("event","login");
         msgBuilder.add("username","funcTest");
         msgBuilder.add("password","123456");
-        String msg = msgBuilder.build();
+        String msg = msgBuilder.buildString();
         client.sendMessage(msg);
 
         for(int i = 1; i <= 6; ++i)
@@ -42,7 +42,7 @@ public class SendNumLimitTest {
             MessageBuilder msgToSendBuilder = new MessageBuilder();
             msgToSendBuilder.add("event","send");
             msgToSendBuilder.add("message",msgToSend);
-            String message = msgToSendBuilder.build();
+            String message = msgToSendBuilder.buildString();
             client.sendMessage(message);
         }
     }

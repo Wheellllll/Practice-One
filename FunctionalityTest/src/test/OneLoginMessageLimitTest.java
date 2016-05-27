@@ -39,7 +39,7 @@ public class OneLoginMessageLimitTest {
         msgBuilder.add("event","login");
         msgBuilder.add("username","q");
         msgBuilder.add("password","qqqqqq");
-        String msg = msgBuilder.build();
+        String msg = msgBuilder.buildString();
         client.setUsername("w");
         client.setPassword("wwwwww");
         client.sendMessage(msg);
@@ -47,7 +47,7 @@ public class OneLoginMessageLimitTest {
         MessageBuilder msgToSendBuilder = new MessageBuilder();
         msgToSendBuilder.add("event","send");
         msgToSendBuilder.add("message",msgToSend);
-        String message = msgToSendBuilder.build();
+        String message = msgToSendBuilder.buildString();
         //发送100条消息
         for (int i = 1; i <= 20; ++i)
         {

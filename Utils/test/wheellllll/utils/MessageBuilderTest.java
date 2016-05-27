@@ -19,7 +19,7 @@ public class MessageBuilderTest {
     public void testAdd() throws Exception {
         MessageBuilder msgBuilder = new MessageBuilder();
         msgBuilder.add("test","testbuild");
-        String result = msgBuilder.build();
+        String result = msgBuilder.buildString();
         HashMap<String,String> test = new HashMap<String,String>();
         test.put("test","testbuild");
         String expect = JSON.toJSONString(test);
@@ -30,7 +30,7 @@ public class MessageBuilderTest {
     @Test
     public void testBuild() throws Exception {
         MessageBuilder msgBuilder = new MessageBuilder();
-        String result = msgBuilder.build();
+        String result = msgBuilder.buildString();
         assertEquals("{}",result);
     }
 
