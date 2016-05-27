@@ -27,7 +27,7 @@ public class ForwardServer {
                 Client client = new Client();
                 client.start();
                 Network.register(client);
-                client.connect(1000, "127.0.0.1", 12450);
+                client.connect(1000, host, port);
                 client.sendTCP(args);
                 client.close();
 

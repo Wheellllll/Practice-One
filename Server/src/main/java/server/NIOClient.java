@@ -5,10 +5,12 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import wheellllll.database.DatabaseUtils;
+import wheellllll.socket.SocketUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,7 +31,6 @@ public class NIOClient extends BaseClient {
         super(socketChannel, server);
     }
 
-
     /**
      * Triggered when connect to the client
      * @param args Json params passed to this method
@@ -37,6 +38,16 @@ public class NIOClient extends BaseClient {
     @Override
     public void OnConnect(HashMap<String, String> args) {
         getClients().add(this);
+    }
+
+    /**
+     * Triggered when received init event from the client
+     * @param args
+     */
+    @Override
+    public void OnInit(HashMap<String, String> args) {
+        int availablePort = Integer.parseInt(args.get("port"));
+        setUdpPort(availablePort);
     }
 
     /**
@@ -296,7 +307,7 @@ public class NIOClient extends BaseClient {
                                 .add("message", "请输入合法的整数以切换到其他组")
                                 .buildMap();
                         logger.warn("Group switch Waring, Reson: 整数不合法");
-                        getServer().forwardServer.forward("127.0.0.1", 12450, msg);
+                        getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
 //                        sendMessage(msgToSend);
                         break;
                     }
@@ -319,7 +330,7 @@ public class NIOClient extends BaseClient {
                             .add("from", "管理员")
                             .add("message", String.format("切换到第%d组", newGId))
                             .buildMap();
-                    getServer().forwardServer.forward("127.0.0.1", 12450, msg);
+                    getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
 //                    sendMessage(msgToSend);
 
                     break;
@@ -366,7 +377,7 @@ public class NIOClient extends BaseClient {
                                 .add("date", date)
                                 .buildMap();
 //                        sendMessage(msgToSend);
-                        getServer().forwardServer.forward("127.0.0.1", 12450, msg);
+                        getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
                     }
                 }
 

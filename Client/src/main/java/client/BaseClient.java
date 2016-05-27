@@ -58,6 +58,7 @@ public abstract class BaseClient {
     private String username = null;
     private String password = null;
     private int groupId = 0;
+    private int udpPort = 0;
 
     protected static boolean DEBUG = false;
 
@@ -87,6 +88,14 @@ public abstract class BaseClient {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public void setUdpPort(int port) {
+        this.udpPort = port;
+    }
+
+    public int getUdpPort() {
+        return this.udpPort;
     }
 
     public LoginAndRegisterForm getLoginAndRegisterForm() {
@@ -160,7 +169,7 @@ public abstract class BaseClient {
                     SocketUtils.dispatchMessage(mEventManager, args);
                 }
             });
-            udpServer.bind(12450);
+            udpServer.bind(getUdpPort());
             udpServer.start();
         } catch (IOException e) {
             e.printStackTrace();
@@ -171,7 +180,6 @@ public abstract class BaseClient {
         try {
             initEvent();
             initPerformance();
-            initUDPSocket();
             logger = LoggerFactory.getLogger("clientlogback");
             if (!DEBUG) initWelcomeUI();
             tryConnect();

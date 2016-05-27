@@ -6,6 +6,9 @@ import wheellllll.socket.handler.WriteHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
 import wheellllll.socket.model.Attachment;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -107,6 +110,16 @@ public class SocketUtils {
             error.put("reason", "message is not a valid json string!");
             eventManager.triggerEvent("error", error);
         }
+    }
+
+    public static String getIpFromSocketChannel(AsynchronousSocketChannel channel) {
+        try {
+            InetSocketAddress socketAddress = (InetSocketAddress)channel.getRemoteAddress();
+            return socketAddress.getAddress().getHostAddress();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

@@ -43,6 +43,7 @@ public abstract class BaseClient {
     private String mUsername = null;
     private String mPassword = null;
     private int groupId = 0;
+    private int udpPort = 0;
     private Status mStatus = Status.LOGOUT;
 
     private BaseServer mServer = null;
@@ -164,6 +165,14 @@ public abstract class BaseClient {
         this.groupId = groupId;
     }
 
+    public int getUdpPort() {
+        return this.udpPort;
+    }
+
+    public void setUdpPort(int port) {
+        this.udpPort = port;
+    }
+
     public Status getStatus() {
         return mStatus;
     }
@@ -217,6 +226,11 @@ public abstract class BaseClient {
             public void run(HashMap<String, String> args) {
                 OnError(args);
             }
+        }).addEventListener("init", new EventListener() {
+            @Override
+            public void run(HashMap<String, String> args) {
+                OnInit(args);
+            }
         });
     }
 
@@ -235,5 +249,7 @@ public abstract class BaseClient {
     public abstract void OnDisconnect(HashMap<String, String> args);
 
     public abstract void OnError(HashMap<String, String> args);
+
+    public abstract void OnInit(HashMap<String, String> args);
 
 }
