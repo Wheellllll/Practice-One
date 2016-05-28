@@ -21,17 +21,21 @@ public class DatabaseServer {
             new ObjectSpace(this).register(Network.DATABASE, this);
         }
 
+        @Override
         public BasicDBObject saveMessage(String message, String from) {
             return DatabaseUtils.createMessage(message, from);
         }
 
+        @Override
         public boolean syncAccount(String username, ObjectId messageId) {
             return DatabaseUtils.syncAccount(username, messageId);
         }
 
+        @Override
         public boolean addUserToMessage(String username, ObjectId messageId) {
             return DatabaseUtils.addUserToMessage(username, messageId);
         }
+
     }
 
     protected void initServer() {

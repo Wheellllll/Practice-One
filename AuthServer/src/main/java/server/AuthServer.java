@@ -32,6 +32,7 @@ public class AuthServer {
         public HashMap register(HashMap<String, String> args) {
             return null;
         }
+
     }
 
     protected void initServer() {
