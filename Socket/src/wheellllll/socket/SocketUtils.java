@@ -89,7 +89,7 @@ public class SocketUtils {
         } catch (Exception e) {
             HashMap<String, String> args = new HashMap<String, String>();
             args.put("event", "error");
-            args.put("reason", "message is not a valid json string!");
+            args.put("reason", e.toString());
             eventManager.triggerEvent("error", args);
         }
     }
@@ -107,7 +107,7 @@ public class SocketUtils {
         } catch (Exception e) {
             HashMap<String, String> error = new HashMap<String, String>();
             error.put("event", "error");
-            error.put("reason", "message is not a valid json string!");
+            error.put("reason", e.toString());
             eventManager.triggerEvent("error", error);
         }
     }

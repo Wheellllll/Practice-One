@@ -23,8 +23,10 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="AccessServer" />
+        <module name="AuthServer" />
         <module name="Client" />
         <module name="Database" />
+        <module name="DatabaseServer" />
         <module name="ForwardServer" />
         <module name="PracticeOne" />
         <module name="Server" />
@@ -33,8 +35,10 @@
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="AccessServer" target="1.8" />
+      <module name="AuthServer" target="1.8" />
       <module name="Client" target="1.8" />
       <module name="Database" target="1.8" />
+      <module name="DatabaseServer" target="1.8" />
       <module name="ForwardServer" target="1.8" />
       <module name="PracticeOne" target="1.8" />
       <module name="Server" target="1.8" />

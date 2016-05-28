@@ -8,6 +8,7 @@ import octoteam.tahiti.config.loader.JsonAdapter;
 import wheellllll.performance.ArchiveManager;
 import wheellllll.performance.IntervalLogger;
 import wheellllll.performance.RealtimeLogger;
+import wheellllll.utils.chatrmi.IChatDatabase;
 import wheellllll.utils.chatrmi.IForward;
 import wheellllll.utils.chatrmi.Network;
 
@@ -30,6 +31,7 @@ public abstract class BaseServer {
     protected static boolean DEBUG = false;
 
     protected IForward forwardServer;
+    protected IChatDatabase chatDatabaseServer;
 
     public static void DEBUG_MODE(boolean flag) {
         DEBUG = flag;
@@ -89,11 +91,26 @@ public abstract class BaseServer {
             Client forwardClient = new Client();
             forwardClient.start();
 
-            Network.register(forwardClient);
+            Network.registerForward(forwardClient);
 
-            forwardClient.connect(1000, "127.0.0.1", 12460);
+            forwardClient.connect(1000, Network.FORWARD_HOST, Network.FORWARD_PORT);
 
             forwardServer = ObjectSpace.getRemoteObject(forwardClient, Network.FORWARD, IForward.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected void connectChatDatabaseServer() {
+        try {
+            Client chatDatabaseClient = new Client();
+            chatDatabaseClient.start();
+
+            Network.registerDatabase(chatDatabaseClient);
+
+            chatDatabaseClient.connect(1000, Network.DATABASE_HOST, Network.DATABASE_PORT);
+
+            chatDatabaseServer = ObjectSpace.getRemoteObject(chatDatabaseClient, Network.DATABASE, IChatDatabase.class);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,6 +124,7 @@ public abstract class BaseServer {
 
             initPerformance();
             connectForwardServer();
+            connectChatDatabaseServer();
 
             InetSocketAddress socketAddress = new InetSocketAddress(config.getHost(), config.getPort());
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel

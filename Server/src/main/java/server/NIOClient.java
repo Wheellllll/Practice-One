@@ -176,7 +176,7 @@ public class NIOClient extends BaseClient {
     }
 
     /**
-     * Triggered when received register request from the client
+     * Triggered when received registerForward request from the client
      * @param args Json params passed to this method
      */
     @Override
@@ -308,7 +308,6 @@ public class NIOClient extends BaseClient {
                                 .buildMap();
                         logger.warn("Group switch Waring, Reson: 整数不合法");
                         getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
-//                        sendMessage(msgToSend);
                         break;
                     }
 
@@ -331,7 +330,6 @@ public class NIOClient extends BaseClient {
                             .add("message", String.format("切换到第%d组", newGId))
                             .buildMap();
                     getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
-//                    sendMessage(msgToSend);
 
                     break;
                 }
@@ -339,7 +337,7 @@ public class NIOClient extends BaseClient {
                 /*
                  * Storage message
                  */
-                BasicDBObject messageObj = DatabaseUtils.createMessage(message, getUsername());
+                BasicDBObject messageObj = getServer().chatDatabaseServer.saveMessage(message, getUsername());
                 ObjectId messageId = messageObj.getObjectId("_id");
                 Long utime = messageObj.getLong("utime");
                 String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
@@ -348,7 +346,7 @@ public class NIOClient extends BaseClient {
 
                 for (DBObject account : accounts) {
                     BasicDBObject ac = (BasicDBObject) account;
-                    if (!ac.getString("username").equals(getUsername()))DatabaseUtils.addUserToMessage(ac.getString("username"), messageId);
+                    if (!ac.getString("username").equals(getUsername())) getServer().chatDatabaseServer.addUserToMessage(ac.getString("username"), messageId);
                 }
 
 
@@ -365,7 +363,7 @@ public class NIOClient extends BaseClient {
                             /*
                              * sync message
                              */
-                            DatabaseUtils.syncAccount(client.getUsername(), messageId);
+                            getServer().chatDatabaseServer.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else if (client == this) {
@@ -376,7 +374,6 @@ public class NIOClient extends BaseClient {
                                 .add("message", message)
                                 .add("date", date)
                                 .buildMap();
-//                        sendMessage(msgToSend);
                         getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
                     }
                 }
@@ -474,7 +471,7 @@ public class NIOClient extends BaseClient {
     public void OnError(HashMap<String, String> args) {
         String msgToSend = new MessageBuilder()
                 .add("event", "error")
-                .add("reason", "error")
+                .add("reason", args.get("reason"))
                 .buildString();
         logger.error("Error happens");
         sendMessage(msgToSend);

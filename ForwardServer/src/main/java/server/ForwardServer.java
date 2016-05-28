@@ -2,10 +2,8 @@ package server;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
-import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.chatrmi.IForward;
 import wheellllll.utils.chatrmi.Network;
 
@@ -26,7 +24,6 @@ public class ForwardServer {
             try {
                 Client client = new Client();
                 client.start();
-                Network.register(client);
                 client.connect(1000, host, port);
                 client.sendTCP(args);
                 client.close();
@@ -48,8 +45,8 @@ public class ForwardServer {
                     return new Forward();
                 }
             };
-            Network.register(server);
-            server.bind(12460);
+            Network.registerForward(server);
+            server.bind(Network.FORWARD_PORT);
             server.start();
 
         } catch (IOException e) {

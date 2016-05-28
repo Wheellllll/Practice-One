@@ -21,6 +21,7 @@
     <orderEntry type="library" name="Maven: kryonet:kryonet:2.21" level="project" />
     <orderEntry type="library" name="Maven: com.esotericsoftware.reflectasm:reflectasm:shaded:1.07" level="project" />
     <orderEntry type="library" name="Maven: com.esotericsoftware.minlog:minlog:1.2" level="project" />
+    <orderEntry type="library" name="Maven: org.mongodb:mongo-java-driver:2.13.3" level="project" />
     <orderEntry type="module" module-name="Utils" />
   </component>
 </module>

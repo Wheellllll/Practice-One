@@ -161,7 +161,7 @@ public abstract class BaseClient {
     protected void initUDPSocket() {
         try {
             Server udpServer = new Server();
-            Network.register(udpServer);
+            Network.registerForward(udpServer);
             udpServer.addListener(new Listener() {
                 @Override
                 public void received(Connection connection, Object object) {

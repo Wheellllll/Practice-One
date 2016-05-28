@@ -71,6 +71,8 @@
         <option value="$PROJECT_DIR$/AccessServer/pom.xml" />
         <option value="$PROJECT_DIR$/ForwardServer/pom.xml" />
         <option value="$PROJECT_DIR$/Utils/pom.xml" />
+        <option value="$PROJECT_DIR$/DatabaseServer/pom.xml" />
+        <option value="$PROJECT_DIR$/AuthServer/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">
