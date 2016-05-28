@@ -32,6 +32,7 @@ public class Network {
          */
         kryo.register(IForward.class);
         kryo.register(IChatDatabase.class);
+        kryo.register(IAuth.class);
         /*
          * Register model
          */
