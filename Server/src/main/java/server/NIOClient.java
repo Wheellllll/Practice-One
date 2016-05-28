@@ -176,7 +176,7 @@ public class NIOClient extends BaseClient {
     }
 
     /**
-     * Triggered when received registerForward request from the client
+     * Triggered when received register request from the client
      * @param args Json params passed to this method
      */
     @Override
@@ -338,6 +338,7 @@ public class NIOClient extends BaseClient {
                  * Storage message
                  */
                 BasicDBObject messageObj = getServer().chatDatabaseServer.saveMessage(message, getUsername());
+//                BasicDBObject messageObj = DatabaseUtils.createMessage(message, getUsername());
                 ObjectId messageId = messageObj.getObjectId("_id");
                 Long utime = messageObj.getLong("utime");
                 String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
@@ -347,6 +348,7 @@ public class NIOClient extends BaseClient {
                 for (DBObject account : accounts) {
                     BasicDBObject ac = (BasicDBObject) account;
                     if (!ac.getString("username").equals(getUsername())) getServer().chatDatabaseServer.addUserToMessage(ac.getString("username"), messageId);
+//                    if (!ac.getString("username").equals(getUsername())) DatabaseUtils.addUserToMessage(ac.getString("username"), messageId);
                 }
 
 
@@ -364,6 +366,7 @@ public class NIOClient extends BaseClient {
                              * sync message
                              */
                             getServer().chatDatabaseServer.syncAccount(client.getUsername(), messageId);
+//                            DatabaseUtils.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else if (client == this) {

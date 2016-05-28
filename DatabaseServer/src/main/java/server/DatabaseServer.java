@@ -42,7 +42,7 @@ public class DatabaseServer {
                     return new ChatDatabase();
                 }
             };
-            Network.registerDatabase(server);
+            Network.register(server);
             server.bind(Network.DATABASE_PORT);
             server.start();
         } catch (IOException e) {

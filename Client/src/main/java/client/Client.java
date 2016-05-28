@@ -111,7 +111,7 @@ public class Client extends BaseClient {
     }
 
     /**
-     * Triggered when received registerForward result from the server
+     * Triggered when received register result from the server
      * @param msg Json params passed to this method
      */
     @Override

@@ -24,6 +24,9 @@ public class ForwardServer {
             try {
                 Client client = new Client();
                 client.start();
+
+                Network.register(client);
+
                 client.connect(1000, host, port);
                 client.sendTCP(args);
                 client.close();
@@ -45,7 +48,7 @@ public class ForwardServer {
                     return new Forward();
                 }
             };
-            Network.registerForward(server);
+            Network.register(server);
             server.bind(Network.FORWARD_PORT);
             server.start();
 

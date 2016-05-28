@@ -24,45 +24,20 @@ public class Network {
     static public final short AUTH_PORT = 12470;
 
     // This registers objects that are going to be sent over the network.
-    static public void registerForward(EndPoint endPoint) {
+    static public void register(EndPoint endPoint) {
         Kryo kryo = endPoint.getKryo();
         ObjectSpace.registerClasses(kryo);
         /*
          * Register interface
          */
         kryo.register(IForward.class);
-        /*
-         * Register model
-         */
-        kryo.register(HashMap.class);
-    }
-
-    static public void registerDatabase(EndPoint endPoint) {
-        Kryo kryo = endPoint.getKryo();
-        ObjectSpace.registerClasses(kryo);
-        /*
-         * Register interface
-         */
         kryo.register(IChatDatabase.class);
         /*
          * Register model
          */
+        kryo.register(HashMap.class);
         kryo.register(BasicDBObject.class);
         kryo.register(BasicDBList.class);
         kryo.register(ObjectId.class);
-    }
-
-    static public void registerAuth(EndPoint endPoint) {
-        Kryo kryo = endPoint.getKryo();
-        ObjectSpace.registerClasses(kryo);
-        /*
-         * Register interface
-         */
-        kryo.register(IAuth.class);
-        /*
-         * Register model
-         */
-        kryo.register(HashMap.class);
-        kryo.register(BasicDBObject.class);
     }
 }

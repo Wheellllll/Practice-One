@@ -91,7 +91,7 @@ public abstract class BaseServer {
             Client forwardClient = new Client();
             forwardClient.start();
 
-            Network.registerForward(forwardClient);
+            Network.register(forwardClient);
 
             forwardClient.connect(1000, Network.FORWARD_HOST, Network.FORWARD_PORT);
 
@@ -106,7 +106,7 @@ public abstract class BaseServer {
             Client chatDatabaseClient = new Client();
             chatDatabaseClient.start();
 
-            Network.registerDatabase(chatDatabaseClient);
+            Network.register(chatDatabaseClient);
 
             chatDatabaseClient.connect(1000, Network.DATABASE_HOST, Network.DATABASE_PORT);
 

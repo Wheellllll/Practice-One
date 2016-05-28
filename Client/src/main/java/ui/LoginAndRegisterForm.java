@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
 /**
- * Provide a GUI of the login and registerForward for the client. Users need to login or registerForward in the GUI.
+ * Provide a GUI of the login and register for the client. Users need to login or register in the GUI.
  */
 public class LoginAndRegisterForm {
     private JFrame frame = new JFrame("欢迎界面");
@@ -124,8 +124,8 @@ public class LoginAndRegisterForm {
     }
 
     /**
-     * Add a listener to the registerForward event
-     * @param listener listener called when registerForward
+     * Add a listener to the register event
+     * @param listener listener called when register
      */
     public void setOnRegisterListener(ActionListener listener) {
         registerBtn.addActionListener(listener);
