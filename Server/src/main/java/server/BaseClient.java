@@ -211,7 +211,7 @@ public abstract class BaseClient {
             public void run(HashMap<String, String> args) {
                 OnSend(args);
             }
-        }).addEventListener("forwardServer", new EventListener() {
+        }).addEventListener("forward", new EventListener() {
             @Override
             public void run(HashMap<String, String> args) {
                 OnForward(args);

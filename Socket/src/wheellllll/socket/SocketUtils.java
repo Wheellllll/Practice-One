@@ -94,7 +94,7 @@ public class SocketUtils {
         }
     }
 
-        /**
+    /**
      * This method dispatch event depending on the message
      *
      * @param eventManager A event manager that charge for the dispatch
