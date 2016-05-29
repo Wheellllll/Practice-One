@@ -11,6 +11,7 @@ import wheellllll.performance.RealtimeLogger;
 import wheellllll.utils.chatrmi.IChatDatabase;
 import wheellllll.utils.chatrmi.IForward;
 import wheellllll.utils.chatrmi.Network;
+import wheellllll.utils.chatrmi.RMIManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -30,8 +31,7 @@ public abstract class BaseServer {
 
     protected static boolean DEBUG = false;
 
-    protected IForward forwardServer;
-    protected IChatDatabase chatDatabaseServer;
+    protected RMIManager rmiManager;
 
     public static void DEBUG_MODE(boolean flag) {
         DEBUG = flag;
@@ -86,45 +86,14 @@ public abstract class BaseServer {
         aarchiveManager.start();
     }
 
-    protected void connectForwardServer() {
-        try {
-            Client forwardClient = new Client();
-            forwardClient.start();
-
-            Network.register(forwardClient);
-
-            forwardClient.connect(1000, Network.FORWARD_HOST, Network.FORWARD_PORT);
-
-            forwardServer = ObjectSpace.getRemoteObject(forwardClient, Network.FORWARD, IForward.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    protected void connectChatDatabaseServer() {
-        try {
-            Client chatDatabaseClient = new Client();
-            chatDatabaseClient.start();
-
-            Network.register(chatDatabaseClient);
-
-            chatDatabaseClient.connect(1000, Network.DATABASE_HOST, Network.DATABASE_PORT);
-
-            chatDatabaseServer = ObjectSpace.getRemoteObject(chatDatabaseClient, Network.DATABASE, IChatDatabase.class);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public BaseServer() {
         try {
             //此处json复用配置管理
             ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ServerConfig.json");
             ConfigBean config = configManager.loadToBean(ConfigBean.class);
+            rmiManager = new RMIManager();
 
             initPerformance();
-            connectForwardServer();
-            connectChatDatabaseServer();
 
             InetSocketAddress socketAddress = new InetSocketAddress(config.getHost(), config.getPort());
             AsynchronousServerSocketChannel serverSocketChannel = AsynchronousServerSocketChannel

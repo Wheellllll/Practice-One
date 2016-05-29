@@ -2,6 +2,7 @@ package server;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import wheellllll.utils.chatrmi.IChatDatabase;
 import wheellllll.utils.chatrmi.IForward;
 import wheellllll.utils.chatrmi.Network;
 import wheellllll.utils.chatrmi.RMIManager;
@@ -16,12 +17,15 @@ public class AccessServer {
     public static void main(String args[]) {
         try {
             RMIManager rmiManager = new RMIManager();
-            Thread.sleep(10000);
-            IForward forward = (IForward)rmiManager.getServer(IForward.class);
-            forward.forward("127.0.0.1", 1000, null);
+            while (true) {
+                Thread.sleep(1000);
+                IForward chatDatabase = (IForward) rmiManager.getServer(IForward.class);
+                if (chatDatabase != null) {
+                    chatDatabase.forward("127.0.0.1", 1000, null);
+                }
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 }

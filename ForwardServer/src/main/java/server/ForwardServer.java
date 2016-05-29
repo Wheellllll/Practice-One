@@ -25,22 +25,22 @@ public class ForwardServer {
 
         @Override
         public boolean forward(String host, int port, HashMap<String, String> args) {
-//            try {
-//                Client client = new Client();
-//                client.start();
-//
-//                Network.register(client);
-//
-//                client.connect(1000, host, port);
-//                client.sendTCP(args);
-//                client.close();
+            try {
+                Client client = new Client();
+                client.start();
+
+                Network.register(client);
+
+                client.connect(1000, host, port);
+                client.sendTCP(args);
+                client.close();
 
                 System.out.println("Message Sended");
                 return true;
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;
         }
 
     }
@@ -74,10 +74,10 @@ public class ForwardServer {
             msg.put("class", IForward.class);
             msg.put("port", openPort);
             client.sendTCP(msg);
+            client.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public ForwardServer() {
