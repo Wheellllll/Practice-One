@@ -14,6 +14,7 @@ import wheellllll.utils.chatrmi.Network;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by sweet on 5/28/16.
@@ -27,13 +28,30 @@ public class AuthServer {
         }
 
         @Override
-        public HashMap login(HashMap<String, String> args) {
-            args.put("aaa", "bbb");
-            return null;
+        public HashMap<String, String> login(HashMap<String, String> args) {
+            String username = args.get("username");
+            String encryptedPass = StringUtils.md5Hash(args.get("password"));
+
+            int groupId = DatabaseUtils.isValid(username, encryptedPass);
+            if (groupId != -1) {
+                HashMap<String, String> result = new MessageBuilder()
+                        .add("event", args.get("event"))
+                        .add("groupId", "" + groupId)
+                        .add("result", "success")
+                        .buildMap();
+                return result;
+            } else {
+                HashMap<String, String> result = new MessageBuilder()
+                        .add("event", args.get("event"))
+                        .add("result", "fail")
+                        .add("reason","登陆失败！请检查用户名和密码")
+                        .buildMap();
+                return result;
+            }
         }
 
         @Override
-        public HashMap register(HashMap<String, String> args) {
+        public HashMap<String, String> register(HashMap<String, String> args) {
             /*
              * 1.判断是否已经注册
              * 2.判断密码是否大于6位

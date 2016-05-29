@@ -7,6 +7,6 @@ import java.util.HashMap;
  */
 public interface IAuth {
     public static int RMI_ID = Network.AUTH;
-    public HashMap login(HashMap<String, String> args);
-    public HashMap register(HashMap<String, String> args);
+    public HashMap<String, String> login(HashMap<String, String> args);
+    public HashMap<String, String> register(HashMap<String, String> args);
 }
