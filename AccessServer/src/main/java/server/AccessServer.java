@@ -2,12 +2,10 @@ package server;
 
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
-import wheellllll.utils.chatrmi.IChatDatabase;
-import wheellllll.utils.chatrmi.IForward;
-import wheellllll.utils.chatrmi.Network;
-import wheellllll.utils.chatrmi.RMIManager;
+import wheellllll.utils.chatrmi.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -19,9 +17,11 @@ public class AccessServer {
             RMIManager rmiManager = new RMIManager();
             while (true) {
                 Thread.sleep(1000);
-                IForward chatDatabase = (IForward) rmiManager.getServer(IForward.class);
-                if (chatDatabase != null) {
-                    chatDatabase.forward("127.0.0.1", 1000, null);
+                IAuth auth = (IAuth) rmiManager.getServer(IAuth.class);
+                if (auth != null) {
+                    HashMap<String, String> msg = new HashMap<>();
+                    auth.login(msg);
+                    System.out.println("Done");
                 }
             }
         } catch (InterruptedException e) {

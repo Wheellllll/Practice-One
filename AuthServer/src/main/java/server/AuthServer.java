@@ -4,7 +4,10 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import wheellllll.database.DatabaseUtils;
 import wheellllll.socket.SocketUtils;
+import wheellllll.utils.MessageBuilder;
+import wheellllll.utils.StringUtils;
 import wheellllll.utils.chatrmi.IAuth;
 import wheellllll.utils.chatrmi.IForward;
 import wheellllll.utils.chatrmi.Network;
@@ -25,19 +28,66 @@ public class AuthServer {
 
         @Override
         public HashMap login(HashMap<String, String> args) {
-            return null;
-        }
-
-        @Override
-        public HashMap relogin(HashMap<String, String> args) {
+            args.put("aaa", "bbb");
             return null;
         }
 
         @Override
         public HashMap register(HashMap<String, String> args) {
-            return null;
-        }
+            /*
+             * 1.判断是否已经注册
+             * 2.判断密码是否大于6位
+             * 3.加密存储
+             * 4.成功则自动登陆
+             * 5.失败则返回错误信息
+             */
 
+            String username = args.get("username");
+            String password = args.get("password");
+
+            if (username == null || username.equals("")) {
+                HashMap msgToSend = new MessageBuilder()
+                        .add("result", "fail")
+                        .add("event", "reg")
+                        .add("reason", "用户名不能为空")
+                        .buildMap();
+                return msgToSend;
+            }
+
+            if (DatabaseUtils.isExisted(username)) {
+
+                HashMap msgToSend = new MessageBuilder()
+                        .add("result","fail")
+                        .add("event","reg")
+                        .add("reason","用户名已存在")
+                        .buildMap();
+                return msgToSend;
+            } else if (password.length() < 6) {
+                HashMap msgToSend = new MessageBuilder()
+                        .add("result","fail")
+                        .add("event","reg")
+                        .add("reason","密码太短（至少6位）")
+                        .buildMap();
+                return msgToSend;
+            } else {
+                String encryptedPass = StringUtils.md5Hash(password);
+                boolean b = DatabaseUtils.createAccount(username, encryptedPass, 1);
+                if (b) {
+                    HashMap msgToSend = new MessageBuilder()
+                            .add("result", "success")
+                            .add("event", "reg")
+                            .buildMap();
+                    return msgToSend;
+                } else {
+                    HashMap msgToSend = new MessageBuilder()
+                            .add("result","fail")
+                            .add("event","reg")
+                            .add("reason","注册失败！请不要输入奇怪的字符")
+                            .buildMap();
+                    return msgToSend;
+                }
+            }
+        }
     }
 
     protected void initServer() {

@@ -8,11 +8,11 @@ import wheellllll.database.DatabaseUtils;
 import wheellllll.socket.SocketUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
+import wheellllll.utils.chatrmi.IAuth;
 import wheellllll.utils.chatrmi.IChatDatabase;
 import wheellllll.utils.chatrmi.IForward;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -65,116 +65,116 @@ public class NIOClient extends BaseClient {
          * 4.失败返回错误信息
          */
 
-        String username = args.get("username");
-        String encryptedPass = StringUtils.md5Hash(args.get("password"));
-        int groupId = DatabaseUtils.isValid(username, encryptedPass);
-        if (groupId != -1) {
-            setGroupId(groupId);
-            for (BaseClient client : getClients()) {
-                if (client != this && client.getUsername() != null &&
-                        client.getUsername().equals(username) && client.getStatus() != Status.LOGOUT) {
-                    getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
-                    MessageBuilder msgBuilder = new MessageBuilder()
-                            .add("event","login")
-                            .add("result","fail")
-                            .add("reason","该用户已在其他终端登陆");
-                    logger.warn("USER: {} login fail,Reason: 该用户已在其他终端登陆",getUsername());
-                    String msgToSend = msgBuilder.buildString();
-                    sendMessage(msgToSend);
-                    return;
-                }
-            }
-            if (getStatus() == Status.LOGIN) {
-                getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
-                MessageBuilder megBuilder = new MessageBuilder()
-                        .add("event","login")
-                        .add("result","fail")
-                        .add("reason","用户已登陆");
-                logger.warn("USER: {} login fail,Reason: 用户已登陆",getUsername());
-                String megToSend = megBuilder.buildString();
-                sendMessage(megToSend);
-            } else if (getStatus() == Status.LOGOUT || getStatus() == Status.RELOGIN) {
-                MessageBuilder megBuilder = null;
-                if (getStatus() == Status.LOGOUT) {
-                    megBuilder = new MessageBuilder()
-                            .add("event","login")
-                            .add("result","success")
-                            .add("groupid", String.valueOf(getGroupId()));
-                } else {
-                    megBuilder = new MessageBuilder()
-                            .add("event","relogin")
-                            .add("result","success");
-                }
-
-                /*
-                 * buildString unread message
-                 */
-                ArrayList<HashMap<String, String>> m = new ArrayList<>();
-
-                BasicDBObject ac = (BasicDBObject) DatabaseUtils.findOneAccount(new BasicDBObject("username", username));
-                ObjectId lastupdate = ac.getObjectId("lastupdate");
-                BasicDBObject msg = (BasicDBObject) DatabaseUtils.findOneMessage(new BasicDBObject("_id", lastupdate));
-
-                List<DBObject> msgs;
-                if (msg != null) {
-                    msgs = DatabaseUtils.findMessage(
-                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getLong("utime")))
-                                    .append("to", username),
-                            new BasicDBObject("utime", 1)
-                    );
-                } else {
-                    msgs = DatabaseUtils.findMessage(
-                            new BasicDBObject("to", username),
-                            new BasicDBObject("utime", 1)
-                    );
-                }
-
-                /*
-                 * TODO: Time
-                 */
-                for (DBObject tempMsg : msgs) {
-                    HashMap<String, String> tempMap = new HashMap<>();
-                    tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
-                    tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
-                    Long utime = ((BasicDBObject)tempMsg).getLong("utime");
-                    String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
-                    tempMap.put("date", date);
-                    m.add(tempMap);
-                }
-
-                /*
-                 * Ack last unread message
-                 */
-                if (!msgs.isEmpty()) {
-                    BasicDBObject tempMsg = (BasicDBObject) msgs.get(msgs.size() - 1);
-                    DatabaseUtils.syncAccount(username, tempMsg.getObjectId("_id"));
-                }
-
-
-                String unreadMessage = JSON.toJSONString(m);
-                megBuilder.add("unreadmessage", unreadMessage);
-
-                getServer().intervalLogger.updateIndex("Valid Login Number", 1);
-                String megToSend = megBuilder.buildString();
-                sendMessage(megToSend);
-                setStatus(Status.LOGIN);
-                getCapacityLimiter().reset();
-                getThroughputLimiter().reset();
-                setUsername(username);
-                setPassword(encryptedPass);
-                setGroupId(groupId);
-                OnGroupChanged(groupId, groupId);
-            }
-        } else {
-            getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
-            MessageBuilder megBuilder = new MessageBuilder()
-                    .add("event","login")
-                    .add("result","fail")
-                    .add("reason","登陆失败！请检查用户名和密码");
-            logger.warn("User Login Fail ,Reason :用户名和密码出现问题 ");
-            String megToSend = megBuilder.buildString();
-            sendMessage(megToSend);
-        }
+//        String username = args.get("username");
+//        String encryptedPass = StringUtils.md5Hash(args.get("password"));
+//        int groupId = DatabaseUtils.isValid(username, encryptedPass);
+//        if (groupId != -1) {
+//            setGroupId(groupId);
+//            for (BaseClient client : getClients()) {
+//                if (client != this && client.getUsername() != null &&
+//                        client.getUsername().equals(username) && client.getStatus() != Status.LOGOUT) {
+//                    getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
+//                    MessageBuilder msgBuilder = new MessageBuilder()
+//                            .add("event","login")
+//                            .add("result","fail")
+//                            .add("reason","该用户已在其他终端登陆");
+//                    logger.warn("USER: {} login fail,Reason: 该用户已在其他终端登陆",getUsername());
+//                    String msgToSend = msgBuilder.buildString();
+//                    sendMessage(msgToSend);
+//                    return;
+//                }
+//            }
+//            if (getStatus() == Status.LOGIN) {
+//                getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
+//                MessageBuilder megBuilder = new MessageBuilder()
+//                        .add("event","login")
+//                        .add("result","fail")
+//                        .add("reason","用户已登陆");
+//                logger.warn("USER: {} login fail,Reason: 用户已登陆",getUsername());
+//                String megToSend = megBuilder.buildString();
+//                sendMessage(megToSend);
+//            } else if (getStatus() == Status.LOGOUT || getStatus() == Status.RELOGIN) {
+//                MessageBuilder megBuilder = null;
+//                if (getStatus() == Status.LOGOUT) {
+//                    megBuilder = new MessageBuilder()
+//                            .add("event","login")
+//                            .add("result","success")
+//                            .add("groupid", String.valueOf(getGroupId()));
+//                } else {
+//                    megBuilder = new MessageBuilder()
+//                            .add("event","relogin")
+//                            .add("result","success");
+//                }
+//
+//                /*
+//                 * buildString unread message
+//                 */
+//                ArrayList<HashMap<String, String>> m = new ArrayList<>();
+//
+//                BasicDBObject ac = (BasicDBObject) DatabaseUtils.findOneAccount(new BasicDBObject("username", username));
+//                ObjectId lastupdate = ac.getObjectId("lastupdate");
+//                BasicDBObject msg = (BasicDBObject) DatabaseUtils.findOneMessage(new BasicDBObject("_id", lastupdate));
+//
+//                List<DBObject> msgs;
+//                if (msg != null) {
+//                    msgs = DatabaseUtils.findMessage(
+//                            new BasicDBObject("utime", new BasicDBObject("$gt", msg.getLong("utime")))
+//                                    .append("to", username),
+//                            new BasicDBObject("utime", 1)
+//                    );
+//                } else {
+//                    msgs = DatabaseUtils.findMessage(
+//                            new BasicDBObject("to", username),
+//                            new BasicDBObject("utime", 1)
+//                    );
+//                }
+//
+//                /*
+//                 * TODO: Time
+//                 */
+//                for (DBObject tempMsg : msgs) {
+//                    HashMap<String, String> tempMap = new HashMap<>();
+//                    tempMap.put("from", ((BasicDBObject)tempMsg).getString("from"));
+//                    tempMap.put("message", ((BasicDBObject)tempMsg).getString("message"));
+//                    Long utime = ((BasicDBObject)tempMsg).getLong("utime");
+//                    String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
+//                    tempMap.put("date", date);
+//                    m.add(tempMap);
+//                }
+//
+//                /*
+//                 * Ack last unread message
+//                 */
+//                if (!msgs.isEmpty()) {
+//                    BasicDBObject tempMsg = (BasicDBObject) msgs.get(msgs.size() - 1);
+//                    DatabaseUtils.syncAccount(username, tempMsg.getObjectId("_id"));
+//                }
+//
+//
+//                String unreadMessage = JSON.toJSONString(m);
+//                megBuilder.add("unreadmessage", unreadMessage);
+//
+//                getServer().intervalLogger.updateIndex("Valid Login Number", 1);
+//                String megToSend = megBuilder.buildString();
+//                sendMessage(megToSend);
+//                setStatus(Status.LOGIN);
+//                getCapacityLimiter().reset();
+//                getThroughputLimiter().reset();
+//                setUsername(username);
+//                setPassword(encryptedPass);
+//                setGroupId(groupId);
+//                OnGroupChanged(groupId, groupId);
+//            }
+//        } else {
+//            getServer().intervalLogger.updateIndex("Invalid Login Number", 1);
+//            MessageBuilder megBuilder = new MessageBuilder()
+//                    .add("event","login")
+//                    .add("result","fail")
+//                    .add("reason","登陆失败！请检查用户名和密码");
+//            logger.warn("User Login Fail ,Reason :用户名和密码出现问题 ");
+//            String megToSend = megBuilder.buildString();
+//            sendMessage(megToSend);
+//        }
     }
 
     /**
@@ -194,62 +194,25 @@ public class NIOClient extends BaseClient {
         String username = args.get("username");
         String password = args.get("password");
 
-        if (username == null || username.equals("")) {
-            String msgToSend = new MessageBuilder()
-                    .add("result", "fail")
-                    .add("event", "reg")
-                    .add("reason", "用户名不能为空")
-                    .buildString();
-            sendMessage(msgToSend);
-            logger.warn("Register Fail,Reason : 用户名不能为空");
-            return;
-        }
-
-        if (DatabaseUtils.isExisted(username)) {
-
-            String msgToSend = new MessageBuilder()
-                    .add("result","fail")
-                    .add("event","reg")
-                    .add("reason","用户名已存在")
-                    .buildString();
-            logger.warn("Register Fail,Reason : 用户名已存在");
-            sendMessage(msgToSend);
-
-        } else if (password.length() < 6) {
-            String msgToSend = new MessageBuilder()
-                    .add("result","fail")
-                    .add("event","reg")
-                    .add("reason","密码太短（至少6位）")
-                    .buildString();
-            logger.warn("Register Fail,Reason : 密码太短");
-            sendMessage(msgToSend);
-        } else {
-            String encryptedPass = StringUtils.md5Hash(password);
-            boolean b = DatabaseUtils.createAccount(username, encryptedPass, 1);
-            if (b) {
+        IAuth auth = (IAuth)getServer().rmiManager.getServer(IAuth.class);
+        if (auth != null) {
+            HashMap<String, String> result = auth.register(args);
+            if ("success".equals(result.get("result"))) {
                 setUsername(username);
-                setPassword(encryptedPass);
+                setPassword(StringUtils.md5Hash(password));
                 setGroupId(1);
                 setStatus(Status.LOGIN);
                 getCapacityLimiter().reset();
                 getThroughputLimiter().reset();
-                String msgToSend = new MessageBuilder()
-                        .add("result","success")
-                        .add("event","reg")
-                        .add("groupid", String.valueOf(getGroupId()))
-                        .buildString();
-                logger.info("USER :{},Register success,", username);
-                sendMessage(msgToSend);
                 OnGroupChanged(getGroupId(), getGroupId());
+                result.put("groupid", String.valueOf(getGroupId()));
+                sendMessage(JSON.toJSONString(result));
+                logger.info("USER :{},Register success,", username);
             } else {
-                String msgToSend = new MessageBuilder()
-                        .add("result","fail")
-                        .add("event","reg")
-                        .add("reason","注册失败！请不要输入奇怪的字符")
-                        .buildString();
-                logger.warn("Register Fail,Reason : 出现奇怪的字符");
-                sendMessage(msgToSend);
+                sendMessage(JSON.toJSONString(result));
             }
+        } else {
+            logger.error("Auth Server is unavailable");
         }
     }
 
