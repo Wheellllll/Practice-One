@@ -15,13 +15,15 @@ import java.util.HashMap;
 public class Network {
     static public final short FORWARD = 1;
     static public final String FORWARD_HOST = "127.0.0.1";
-    static public final short FORWARD_PORT = 12450;
+    static public final int FORWARD_PORT = 12450;
     static public final short DATABASE = 2;
     static public final String DATABASE_HOST = "127.0.0.1";
-    static public final short DATABASE_PORT = 12460;
+    static public final int DATABASE_PORT = 12460;
     static public final short AUTH = 3;
     static public final String AUTH_HOST = "127.0.0.1";
-    static public final short AUTH_PORT = 12470;
+    static public final int AUTH_PORT = 12470;
+    static public final String REGISTER_CENTER_HOST = "127.0.0.1";
+    static public final int REGISTER_CENTER_PORT = 45012;
 
     // This registers objects that are going to be sent over the network.
     static public void register(EndPoint endPoint) {
@@ -36,6 +38,8 @@ public class Network {
         /*
          * Register model
          */
+        kryo.register(Object.class);
+        kryo.register(Class.class);
         kryo.register(HashMap.class);
         kryo.register(BasicDBObject.class);
         kryo.register(BasicDBList.class);
