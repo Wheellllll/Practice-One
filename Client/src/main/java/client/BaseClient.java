@@ -1,5 +1,8 @@
 package client;
 
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
+import com.esotericsoftware.kryonet.Server;
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
 import org.slf4j.LoggerFactory;
@@ -31,6 +34,7 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
+import wheellllll.utils.chatrmi.Network;
 
 /**
  * Base class for client
@@ -54,6 +58,7 @@ public abstract class BaseClient {
     private String username = null;
     private String password = null;
     private int groupId = 0;
+    private int udpPort = 0;
 
     protected static boolean DEBUG = false;
 
@@ -83,6 +88,14 @@ public abstract class BaseClient {
 
     public void setGroupId(int groupId) {
         this.groupId = groupId;
+    }
+
+    public void setUdpPort(int port) {
+        this.udpPort = port;
+    }
+
+    public int getUdpPort() {
+        return this.udpPort;
     }
 
     public LoginAndRegisterForm getLoginAndRegisterForm() {
@@ -145,6 +158,24 @@ public abstract class BaseClient {
 
     }
 
+    protected void initUDPSocket() {
+        try {
+            Server udpServer = new Server();
+            Network.register(udpServer);
+            udpServer.addListener(new Listener() {
+                @Override
+                public void received(Connection connection, Object object) {
+                    HashMap<String, String> args = (HashMap)object;
+                    SocketUtils.dispatchMessage(mEventManager, args);
+                }
+            });
+            udpServer.bind(getUdpPort());
+            udpServer.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public BaseClient() {
         try {
             initEvent();
@@ -171,7 +202,7 @@ public abstract class BaseClient {
                         .add("event", "login")
                         .add("username", user)
                         .add("password", pass)
-                        .build();
+                        .buildString();
                 username = user;
                 password = pass;
 
@@ -188,7 +219,7 @@ public abstract class BaseClient {
                         .add("event", "reg")
                         .add("username", user)
                         .add("password", pass)
-                        .build();
+                        .buildString();
                 username = user;
                 password = pass;
 
@@ -214,7 +245,7 @@ public abstract class BaseClient {
                 msgToSend = new MessageBuilder()
                         .add("event", "send")
                         .add("message", msgToSend)
-                        .build();
+                        .buildString();
                 sendMessage(msgToSend);
                 mChatRoomForm.clearChatArea();
             }
@@ -224,7 +255,7 @@ public abstract class BaseClient {
             public void windowClosing(WindowEvent e) {
                 String msgToSend = new MessageBuilder()
                         .add("event", "disconnect")
-                        .build();
+                        .buildString();
                 sendMessage(msgToSend);
             }
         });

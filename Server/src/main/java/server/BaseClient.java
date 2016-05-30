@@ -2,9 +2,6 @@ package server;
 
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
-import octoteam.tahiti.performance.PerformanceMonitor;
-import octoteam.tahiti.performance.reporter.AppendFileReporter;
-import octoteam.tahiti.performance.reporter.LogReporter;
 import octoteam.tahiti.quota.CapacityLimiter;
 import octoteam.tahiti.quota.ThroughputLimiter;
 import org.slf4j.Logger;
@@ -21,7 +18,6 @@ import java.io.IOException;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +43,7 @@ public abstract class BaseClient {
     private String mUsername = null;
     private String mPassword = null;
     private int groupId = 0;
+    private int udpPort = 0;
     private Status mStatus = Status.LOGOUT;
 
     private BaseServer mServer = null;
@@ -110,7 +107,7 @@ public abstract class BaseClient {
                     .add("event", "group")
                     .add("type", "member")
                     .add("members", c.getGroupMember())
-                    .build();
+                    .buildString();
             c.sendMessage(msgToSend);
         });
         System.out.println("执行OnGroupChanged");
@@ -168,6 +165,14 @@ public abstract class BaseClient {
         this.groupId = groupId;
     }
 
+    public int getUdpPort() {
+        return this.udpPort;
+    }
+
+    public void setUdpPort(int port) {
+        this.udpPort = port;
+    }
+
     public Status getStatus() {
         return mStatus;
     }
@@ -221,6 +226,11 @@ public abstract class BaseClient {
             public void run(HashMap<String, String> args) {
                 OnError(args);
             }
+        }).addEventListener("init", new EventListener() {
+            @Override
+            public void run(HashMap<String, String> args) {
+                OnInit(args);
+            }
         });
     }
 
@@ -239,5 +249,7 @@ public abstract class BaseClient {
     public abstract void OnDisconnect(HashMap<String, String> args);
 
     public abstract void OnError(HashMap<String, String> args);
+
+    public abstract void OnInit(HashMap<String, String> args);
 
 }

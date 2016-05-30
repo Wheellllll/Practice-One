@@ -3,16 +3,14 @@ package client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import wheellllll.socket.SocketUtils;
 import wheellllll.utils.MessageBuilder;
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.StringTokenizer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -29,8 +27,15 @@ public class Client extends BaseClient {
      */
     @Override
     public void OnConnect(HashMap<String, String> msg) {
-        System.out.println("Connected");
         logger.info("Connected to the given host & port ");
+        int port = SocketUtils.getAvailablePort();
+        setUdpPort(port);
+        initUDPSocket();
+        String msgToSend = new MessageBuilder()
+                .add("event", "init")
+                .add("port", ""+port)
+                .buildString();
+        sendMessage(msgToSend);
     }
 
     /**
@@ -94,7 +99,7 @@ public class Client extends BaseClient {
                     .add("event", "relogin")
                     .add("username", getUsername())
                     .add("password", getPassword())
-                    .build();
+                    .buildString();
             sendMessage(msgToSend);
         }
     }
@@ -140,7 +145,7 @@ public class Client extends BaseClient {
                     .add("event", "relogin")
                     .add("username", getUsername())
                     .add("password", getPassword())
-                    .build();
+                    .buildString();
             logger.info("USER {} Unable to send msg now ,Reason: Need to relogin",getUsername());
             sendMessage(msgToSend);
         } else {
@@ -176,7 +181,7 @@ public class Client extends BaseClient {
                 .add("event", "forward")
                 .add("username", getUsername())
                 .add("ack", "success")
-                .build();
+                .buildString();
         sendMessage(msgToSend);
     }
 

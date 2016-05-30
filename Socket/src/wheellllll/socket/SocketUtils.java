@@ -6,6 +6,10 @@ import wheellllll.socket.handler.WriteHandler;
 import wheellllll.socket.model.AsynchronousSocketChannelWrapper;
 import wheellllll.socket.model.Attachment;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -86,8 +90,48 @@ public class SocketUtils {
         } catch (Exception e) {
             HashMap<String, String> args = new HashMap<String, String>();
             args.put("event", "error");
-            args.put("reason", "message is not a valid json string!");
+            args.put("reason", e.toString());
             eventManager.triggerEvent("error", args);
+        }
+    }
+
+    /**
+     * This method dispatch event depending on the message
+     *
+     * @param eventManager A event manager that charge for the dispatch
+     * @param args A message which include the event
+     */
+    public static void dispatchMessage(EventManager eventManager, HashMap<String, String> args) {
+        try {
+            String event = args.get("event");
+            eventManager.triggerEvent(event, args);
+        } catch (Exception e) {
+            HashMap<String, String> error = new HashMap<String, String>();
+            error.put("event", "error");
+            error.put("reason", e.toString());
+            eventManager.triggerEvent("error", error);
+        }
+    }
+
+    public static String getIpFromSocketChannel(AsynchronousSocketChannel channel) {
+        try {
+            InetSocketAddress socketAddress = (InetSocketAddress)channel.getRemoteAddress();
+            return socketAddress.getAddress().getHostAddress();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static int getAvailablePort() {
+        try {
+            ServerSocket s = new ServerSocket(0);
+            int port = s.getLocalPort();
+            s.close();
+            return port;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 

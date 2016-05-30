@@ -1,11 +1,17 @@
 package server;
 
 
+import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.rmi.ObjectSpace;
 import octoteam.tahiti.config.ConfigManager;
 import octoteam.tahiti.config.loader.JsonAdapter;
 import wheellllll.performance.ArchiveManager;
 import wheellllll.performance.IntervalLogger;
 import wheellllll.performance.RealtimeLogger;
+import wheellllll.utils.chatrmi.IChatDatabase;
+import wheellllll.utils.chatrmi.IForward;
+import wheellllll.utils.chatrmi.Network;
+import wheellllll.utils.chatrmi.RMIManager;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -24,6 +30,8 @@ public abstract class BaseServer {
     ArchiveManager aarchiveManager = new ArchiveManager();
 
     protected static boolean DEBUG = false;
+
+    protected RMIManager rmiManager;
 
     public static void DEBUG_MODE(boolean flag) {
         DEBUG = flag;
@@ -83,6 +91,7 @@ public abstract class BaseServer {
             //此处json复用配置管理
             ConfigManager configManager = new ConfigManager(new JsonAdapter(), "./ServerConfig.json");
             ConfigBean config = configManager.loadToBean(ConfigBean.class);
+            rmiManager = new RMIManager();
 
             initPerformance();
 
