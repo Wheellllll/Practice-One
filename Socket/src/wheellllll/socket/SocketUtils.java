@@ -9,6 +9,7 @@ import wheellllll.socket.model.Attachment;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -120,6 +121,18 @@ public class SocketUtils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static int getAvailablePort() {
+        try {
+            ServerSocket s = new ServerSocket(0);
+            int port = s.getLocalPort();
+            s.close();
+            return port;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
 }

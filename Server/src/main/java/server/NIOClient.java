@@ -8,6 +8,8 @@ import wheellllll.database.DatabaseUtils;
 import wheellllll.socket.SocketUtils;
 import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.StringUtils;
+import wheellllll.utils.chatrmi.IChatDatabase;
+import wheellllll.utils.chatrmi.IForward;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -307,7 +309,12 @@ public class NIOClient extends BaseClient {
                                 .add("message", "请输入合法的整数以切换到其他组")
                                 .buildMap();
                         logger.warn("Group switch Waring, Reson: 整数不合法");
-                        getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
+                        IForward forward = (IForward)getServer().rmiManager.getServer(IForward.class);
+                        if (forward != null) {
+                            forward.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
+                        } else {
+                            logger.error("Forward Server is unavailable");
+                        }
                         break;
                     }
 
@@ -329,15 +336,29 @@ public class NIOClient extends BaseClient {
                             .add("from", "管理员")
                             .add("message", String.format("切换到第%d组", newGId))
                             .buildMap();
-                    getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
 
+                    IForward forward = (IForward)getServer().rmiManager.getServer(IForward.class);
+                    if (forward != null) {
+                        forward.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
+                    } else {
+                        logger.error("Forward Server is unavailable");
+                    }
                     break;
                 }
 
                 /*
                  * Storage message
                  */
-                BasicDBObject messageObj = getServer().chatDatabaseServer.saveMessage(message, getUsername());
+
+                IChatDatabase chatDatabase = (IChatDatabase) getServer().rmiManager.getServer(IChatDatabase.class);
+                if (chatDatabase == null) {
+                    /*
+                     * TODO: Server is unavailable
+                     */
+                    logger.error("Chat Database Server is unavailable");
+                    break;
+                }
+                BasicDBObject messageObj = chatDatabase.saveMessage(message, getUsername());
                 ObjectId messageId = messageObj.getObjectId("_id");
                 Long utime = messageObj.getLong("utime");
                 String date = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date(utime));
@@ -346,7 +367,7 @@ public class NIOClient extends BaseClient {
 
                 for (DBObject account : accounts) {
                     BasicDBObject ac = (BasicDBObject) account;
-                    if (!ac.getString("username").equals(getUsername())) getServer().chatDatabaseServer.addUserToMessage(ac.getString("username"), messageId);
+                    if (!ac.getString("username").equals(getUsername())) chatDatabase.addUserToMessage(ac.getString("username"), messageId);
                 }
 
 
@@ -363,7 +384,7 @@ public class NIOClient extends BaseClient {
                             /*
                              * sync message
                              */
-                            getServer().chatDatabaseServer.syncAccount(client.getUsername(), messageId);
+                            chatDatabase.syncAccount(client.getUsername(), messageId);
                             getServer().intervalLogger.updateIndex("Forward Message Number", 1);
                         }
                     } else if (client == this) {
@@ -374,7 +395,13 @@ public class NIOClient extends BaseClient {
                                 .add("message", message)
                                 .add("date", date)
                                 .buildMap();
-                        getServer().forwardServer.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
+
+                        IForward forward = (IForward)getServer().rmiManager.getServer(IForward.class);
+                        if (forward != null) {
+                            forward.forward(SocketUtils.getIpFromSocketChannel(getSocketChannel()), getUdpPort(), msg);
+                        } else {
+                            logger.error("Forward Server is unavailable");
+                        }
                     }
                 }
 

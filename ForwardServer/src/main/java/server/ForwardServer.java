@@ -4,6 +4,8 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 import com.esotericsoftware.kryonet.rmi.ObjectSpace;
+import wheellllll.socket.SocketUtils;
+import wheellllll.utils.MessageBuilder;
 import wheellllll.utils.chatrmi.IForward;
 import wheellllll.utils.chatrmi.Network;
 
@@ -14,6 +16,8 @@ import java.util.HashMap;
  * Created by sweet on 5/27/16.
  */
 public class ForwardServer {
+    private int openPort;
+
     class Forward extends Connection implements IForward {
         public Forward() {
             new ObjectSpace(this).register(Network.FORWARD, this);
@@ -38,6 +42,7 @@ public class ForwardServer {
             }
             return false;
         }
+
     }
 
     protected void initServer() {
@@ -49,7 +54,8 @@ public class ForwardServer {
                 }
             };
             Network.register(server);
-            server.bind(Network.FORWARD_PORT);
+            openPort = SocketUtils.getAvailablePort();
+            server.bind(openPort);
             server.start();
 
         } catch (IOException e) {
@@ -57,8 +63,26 @@ public class ForwardServer {
         }
     }
 
+    protected void connectRegisterCenter() {
+        try {
+            Client client = new Client();
+            client.start();
+            Network.register(client);
+            client.connect(3000, Network.REGISTER_CENTER_HOST, Network.REGISTER_CENTER_PORT);
+
+            HashMap<String, Object> msg = new HashMap<>();
+            msg.put("class", IForward.class);
+            msg.put("port", openPort);
+            client.sendTCP(msg);
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public ForwardServer() {
         initServer();
+        connectRegisterCenter();
     }
 
     public static void main(String args[]) {

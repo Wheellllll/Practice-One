@@ -3,6 +3,7 @@ package client;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import wheellllll.socket.SocketUtils;
 import wheellllll.utils.MessageBuilder;
 
 import java.io.IOException;
@@ -27,21 +28,14 @@ public class Client extends BaseClient {
     @Override
     public void OnConnect(HashMap<String, String> msg) {
         logger.info("Connected to the given host & port ");
-        try {
-            ServerSocket s = new ServerSocket(0);
-            int port = s.getLocalPort();
-            s.close();
-            setUdpPort(port);
-            initUDPSocket();
-            String msgToSend = new MessageBuilder()
-                    .add("event", "init")
-                    .add("port", ""+port)
-                    .buildString();
-            sendMessage(msgToSend);
-        } catch (IOException e) {
-            e.printStackTrace();
-            logger.error("Unable to find available port");
-        }
+        int port = SocketUtils.getAvailablePort();
+        setUdpPort(port);
+        initUDPSocket();
+        String msgToSend = new MessageBuilder()
+                .add("event", "init")
+                .add("port", ""+port)
+                .buildString();
+        sendMessage(msgToSend);
     }
 
     /**
