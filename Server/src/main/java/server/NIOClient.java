@@ -313,6 +313,7 @@ public class NIOClient extends BaseClient {
                     HashMap<String, String> msg = new MessageBuilder()
                             .add("event", "forward")
                             .add("from", "管理员")
+                            .add("date", new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new java.util.Date()))
                             .add("message", String.format("切换到第%d组", newGId))
                             .buildMap();
 

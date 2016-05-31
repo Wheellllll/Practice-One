@@ -110,7 +110,6 @@ public abstract class BaseClient {
                     .buildString();
             c.sendMessage(msgToSend);
         });
-        System.out.println("执行OnGroupChanged");
     }
 
     public static ArrayList<BaseClient> getClients() {
